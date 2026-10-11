@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMA Negeri 1 Insan Cendekia — Sekolah Digital Heci.Tech</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Alpine.js for Interactive States -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <!-- Google Fonts: Plus Jakarta Sans & Newsreader (Editorial Serif) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: {
+                            DEFAULT: '#172A43',
+                            dark: '#0f1c2e',
+                            light: '#223d61'
+                        },
+                        ivory: {
+                            DEFAULT: '#F7F5F0',
+                            dark: '#eae5d9'
+                        },
+                        sage: {
+                            DEFAULT: '#A7B7A0',
+                            dark: '#8b9d84'
+                        },
+                        amber: {
+                            DEFAULT: '#D6A34D',
+                            dark: '#be8c37'
+                        },
+                        slateCustom: '#586575'
+                    },
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        serif: ['Newsreader', 'serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        [x-cloak] { display: none !important; }
+    </style>
+</head>
+<body class="bg-ivory text-navy font-sans antialiased selection:bg-amber selection:text-white" x-data="schoolApp()">
+
+    <div class="bg-navy text-white text-xs py-2 px-4 sm:px-8 border-b border-white/10">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2">
+            <div class="flex items-center space-x-6">
+                <span class="flex items-center gap-1.5"><svg class="w-3.5 h-3.5 text-amber" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg> Jl. Pendidikan Raya No. 45, Padang, Sumatera Barat</span>
+                <span class="hidden md:flex items-center gap-1.5"><svg class="w-3.5 h-3.5 text-amber" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg> (0751) 892045</span>
+            </div>
+            <div class="flex items-center space-x-4">
+                <span class="text-amber font-medium">NPSN: 10304892</span>
+                <span>|</span>
+                <button @click="currentView = 'admin'" class="text-sage hover:text-white transition flex items-center gap-1 font-medium">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                    CMS Login
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <header class="sticky top-0 z-40 bg-ivory/95 backdrop-blur-md border-b border-navy/10 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-8 h-20 flex items-center justify-between">
+            <!-- Logo & Title -->
+            <a href="#" @click.prevent="currentView = 'home'" class="flex items-center gap-3 group">
+                <div class="w-11 h-11 rounded-lg bg-navy text-white flex items-center justify-center font-serif text-xl font-bold tracking-wider shadow-sm group-hover:bg-navy-light transition">
+                    IC
+                </div>
+                <div>
+                    <h1 class="font-serif font-bold text-lg text-navy tracking-tight leading-tight">SMA Negeri 1 Insan Cendekia</h1>
+                    <p class="text-xs text-slateCustom uppercase tracking-wider font-semibold">Padang — Unggul & Berkarakter</p>
+                </div>
+            </a>
+
+            <!-- Desktop Nav -->
+            <nav class="hidden lg:flex items-center space-x-7 text-sm font-medium text-navy">
+                <a href="#" @click.prevent="currentView = 'home'" :class="currentView === 'home' ? 'text-amber font-semibold border-b-2 border-amber pb-1' : 'hover:text-amber transition'">Beranda</a>
+                <a href="#" @click.prevent="currentView = 'profil'" :class="currentView === 'profil' ? 'text-amber font-semibold border-b-2 border-amber pb-1' : 'hover:text-amber transition'">Profil</a>
+                <a href="#" @click.prevent="currentView = 'akademik'" :class="currentView === 'akademik' ? 'text-amber font-semibold border-b-2 border-amber pb-1' : 'hover:text-amber transition'">Akademik</a>
+                <a href="#" @click.prevent="currentView = 'guru'" :class="currentView === 'guru' ? 'text-amber font-semibold border-b-2 border-amber pb-1' : 'hover:text-amber transition'">Guru & Staf</a>
+                <a href="#" @click.prevent="currentView = 'berita'" :class="currentView === 'berita' || currentView === 'berita-detail' ? 'text-amber font-semibold border-b-2 border-amber pb-1' : 'hover:text-amber transition'">Berita</a>
+                <a href="#" @click.prevent="currentView = 'agenda'" :class="currentView === 'agenda' ? 'text-amber font-semibold border-b-2 border-amber pb-1' : 'hover:text-amber transition'">Agenda</a>
+                <a href="#" @click.prevent="currentView = 'galeri'" :class="currentView === 'galeri' ? 'text-amber font-semibold border-b-2 border-amber pb-1' : 'hover:text-amber transition'">Galeri</a>
+                <a href="#" @click.prevent="currentView = 'kontak'" :class="currentView === 'kontak' ? 'text-amber font-semibold border-b-2 border-amber pb-1' : 'hover:text-amber transition'">Kontak</a>
+            </nav>
+
+            <!-- CTA PPDB & Mobile Toggle -->
+            <div class="flex items-center gap-3">
+                <a href="#" @click.prevent="currentView = 'ppdb'" class="hidden sm:inline-flex items-center gap-2 bg-amber hover:bg-amber-dark text-white text-sm font-semibold px-5 py-2.5 rounded-md shadow-sm transition transform active:scale-95">
+                    <span>PPDB 2026</span>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                </a>
+                <button @click="mobileMenuOpen = !mobileMenuOpen" class="lg:hidden p-2 rounded-md text-navy hover:bg-navy/5">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path x-show="!mobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        <path x-show="mobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div x-show="mobileMenuOpen" x-cloak class="lg:hidden bg-ivory border-b border-navy/10 px-4 pt-2 pb-6 space-y-3">
+            <a href="#" @click.prevent="currentView = 'home'; mobileMenuOpen = false" class="block py-2 font-medium border-b border-navy/5">Beranda</a>
+            <a href="#" @click.prevent="currentView = 'profil'; mobileMenuOpen = false" class="block py-2 font-medium border-b border-navy/5">Profil Sekolah</a>
+            <a href="#" @click.prevent="currentView = 'akademik'; mobileMenuOpen = false" class="block py-2 font-medium border-b border-navy/5">Akademik</a>
+            <a href="#" @click.prevent="currentView = 'guru'; mobileMenuOpen = false" class="block py-2 font-medium border-b border-navy/5">Guru & Tenaga Kependidikan</a>
+            <a href="#" @click.prevent="currentView = 'berita'; mobileMenuOpen = false" class="block py-2 font-medium border-b border-navy/5">Berita & Pengumuman</a>
+            <a href="#" @click.prevent="currentView = 'agenda'; mobileMenuOpen = false" class="block py-2 font-medium border-b border-navy/5">Agenda & Kalender</a>
+            <a href="#" @click.prevent="currentView = 'galeri'; mobileMenuOpen = false" class="block py-2 font-medium border-b border-navy/5">Galeri Kegiatan</a>
+            <a href="#" @click.prevent="currentView = 'ppdb'; mobileMenuOpen = false" class="block py-2 font-semibold text-amber border-b border-navy/5">Informasi PPDB 2026</a>
+            <a href="#" @click.prevent="currentView = 'kontak'; mobileMenuOpen = false" class="block py-2 font-medium">Kontak Sekolah</a>
+        </div>
+    </header>
+
+    <main x-show="currentView === 'home'">
+        <!-- Hero Section with Authentic Unsplash Photography -->
+        <section class="relative overflow-hidden py-16 lg:py-24 bg-ivory border-b border-navy/10">
+            <div class="max-w-7xl mx-auto px-4 sm:px-8 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                <div class="lg:col-span-7 space-y-6">
+                    <div class="inline-flex items-center gap-2 bg-sage/20 border border-sage/40 text-navy px-3.5 py-1.5 rounded-full text-xs font-semibold tracking-wide">
+                        <span class="w-2 h-2 rounded-full bg-amber animate-pulse"></span>
+                        PPDB Tahun Ajaran 2026/2027 Resmi Dibuka
+                    </div>
+                    <h1 class="font-serif text-4xl sm:text-5xl lg:text-6xl text-navy font-bold leading-[1.15]">
+                        Bertumbuh dalam Pengetahuan, Berkarakter dalam Tindakan.
+                    </h1>
+                    <p class="text-slateCustom text-base sm:text-lg leading-relaxed max-w-2xl">
+                        Membentuk generasi unggul yang menguasai sains, teknologi, serta berlandaskan nilai integritas dan kepemimpinan moral di Kota Padang.
+                    </p>
+                    <div class="flex flex-wrap items-center gap-4 pt-2">
+                        <a href="#" @click.prevent="currentView = 'ppdb'" class="bg-amber hover:bg-amber-dark text-white font-semibold px-7 py-3.5 rounded-md shadow-sm transition flex items-center gap-2 text-base">
+                            <span>Informasi PPDB 2026</span>
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                        </a>
+                        <a href="#" @click.prevent="currentView = 'profil'" class="bg-white hover:bg-navy/5 text-navy border border-navy/20 font-semibold px-6 py-3.5 rounded-md transition text-base">
+                            Jelajahi Sekolah
+                        </a>
+                    </div>
+                </div>
+                <div class="lg:col-span-5 relative">
+                    <div class="relative rounded-xl overflow-hidden shadow-xl border-4 border-white bg-slate-200">
+                        <img src="https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&w=900&q=80" alt="Siswa belajar di laboratorium sains modern" class="w-full h-[420px] object-cover" onerror="this.src='https://placehold.co/900x420/172A43/FFFFFF?text=Laboratorium+Sains'">
+                        <div class="absolute inset-0 bg-gradient-to-t from-navy/60 via-transparent to-transparent flex items-end p-6">
+                            <div class="text-white">
+                                <p class="text-xs uppercase tracking-wider text-amber font-semibold">Lingkungan Akademik</p>
+                                <p class="font-serif text-lg font-medium">Fasilitas Laboratorium Sains & Komputer Terpadu</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Floating badge -->
+                    <div class="absolute -bottom-6 -left-6 bg-white p-4 rounded-lg shadow-lg border border-navy/10 hidden sm:flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-sage/20 flex items-center justify-center text-navy font-bold">A</div>
+                        <div>
+                            <p class="text-xs text-slateCustom">Akreditasi Sekolah</p>
+                            <p class="font-bold text-navy text-sm">Unggul (A) — BAN-S/M</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pengumuman Prioritas -->
+        <section class="bg-navy text-white py-6 px-4 sm:px-8">
+            <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <span class="bg-amber text-white text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded">Penting</span>
+                    <div>
+                        <p class="text-sm font-semibold text-ivory">Jadwal Seleksi Administrasi & Berkas PPDB Gelombang 1</p>
+                        <p class="text-xs text-slate-300">Batas akhir pengunggahan rapor dan dokumen pendukung adalah 25 Juni 2026.</p>
+                    </div>
+                </div>
+                <a href="#" @click.prevent="currentView = 'berita'" class="text-xs font-semibold text-amber hover:underline flex items-center gap-1 shrink-0">
+                    Lihat Semua Pengumuman &rarr;
+                </a>
+            </div>
+        </section>
+
+        <!-- Profil Singkat & Nilai Utama -->
+        <section class="py-20 px-4 sm:px-8 bg-white">
+            <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                <div class="lg:col-span-5 space-y-6">
+                    <span class="text-xs font-bold uppercase tracking-widest text-slateCustom">Tentang Institusi</span>
+                    <h2 class="font-serif text-3xl sm:text-4xl font-bold text-navy leading-tight">
+                        Tradisi Keunggulan Akademik dan Pembentukan Karakter Luhur
+                    </h2>
+                    <p class="text-slateCustom leading-relaxed">
+                        Berdiri sejak tahun 1985, SMA Negeri 1 Insan Cendekia telah menjadi rujukan pendidikan menengah atas di Sumatera Barat. Kami memadukan kurikulum nasional merdeka dengan pembinaan karakter intensif guna menyiapkan lulusan yang siap menghadapi tantangan global.
+                    </p>
+                    <div class="grid grid-cols-2 gap-6 pt-4 border-t border-navy/10">
+                        <div>
+                            <p class="font-serif text-3xl font-bold text-navy">640+</p>
+                            <p class="text-xs text-slateCustom mt-1">Siswa Aktif Berprestasi</p>
+                        </div>
+                        <div>
+                            <p class="font-serif text-3xl font-bold text-navy">48</p>
+                            <p class="text-xs text-slateCustom mt-1">Guru & Pendidik Tersertifikasi</p>
+                        </div>
+                    </div>
+                    <div class="pt-2">
+                        <a href="#" @click.prevent="currentView = 'profil'" class="inline-flex items-center gap-2 text-navy font-semibold hover:text-amber transition">
+                            <span>Baca Profil Selengkapnya & Sejarah Sekolah</span>
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                        </a>
+                    </div>
+                </div>
+                <div class="lg:col-span-7 grid grid-cols-2 gap-4">
+                    <img src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=600&q=80" alt="Upacara bendera sekolah" class="w-full h-64 object-cover rounded-lg shadow-md bg-slate-200" onerror="this.src='https://placehold.co/600x400/172A43/FFFFFF?text=Upacara+Sekolah'">
+                    <img src="https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?auto=format&fit=crop&w=600&q=80" alt="Diskusi kelompok siswa di perpustakaan" class="w-full h-64 object-cover rounded-lg shadow-md mt-8 bg-slate-200" onerror="this.src='https://placehold.co/600x400/172A43/FFFFFF?text=Perpustakaan'">
+                </div>
+            </div>
+        </section>
+
+        <!-- Program Unggulan -->
+        <section class="py-20 px-4 sm:px-8 bg-ivory">
+            <div class="max-w-7xl mx-auto">
+                <div class="text-center max-w-2xl mx-auto mb-16 space-y-3">
+                    <span class="text-xs font-bold uppercase tracking-widest text-slateCustom">Kurikulum & Pembinaan</span>
+                    <h2 class="font-serif text-3xl sm:text-4xl font-bold text-navy">Program Unggulan Sekolah</h2>
+                    <p class="text-slateCustom">Dirancang secara sistematis untuk mengoptimalkan potensi kognitif, emosional, dan sosial setiap peserta didik.</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- Program 1 -->
+                    <div class="bg-white p-8 rounded-xl shadow-sm border border-navy/10 space-y-4">
+                        <div class="w-12 h-12 rounded-lg bg-navy/5 flex items-center text-navy font-bold text-lg justify-serif">01</div>
+                        <h3 class="font-serif font-bold text-xl text-navy">Penguatan Sains & Riset</h3>
+                        <p class="text-slateCustom text-sm leading-relaxed">Fasilitas laboratorium lengkap dengan bimbingan olimpiade sains nasional dan karya tulis ilmiah remaja.</p>
+                    </div>
+                    <!-- Program 2 -->
+                    <div class="bg-white p-8 rounded-xl shadow-sm border border-navy/10 space-y-4">
+                        <div class="w-12 h-12 rounded-lg bg-navy/5 flex items-center text-navy font-bold text-lg justify-serif">02</div>
+                        <h3 class="font-serif font-bold text-xl text-navy">Karakter & Kepemimpinan</h3>
+                        <p class="text-slateCustom text-sm leading-relaxed">Pembinaan keagamaan, kegiatan kepramukaan, dan pelatihan soft skills untuk membentuk pemimpin masa depan.</p>
+                    </div>
+                    <!-- Program 3 -->
+                    <div class="bg-white p-8 rounded-xl shadow-sm border border-navy/10 space-y-4">
+                        <div class="w-12 h-12 rounded-lg bg-navy/5 flex items-center text-navy font-bold text-lg justify-serif">03</div>
+                        <h3 class="font-serif font-bold text-xl text-navy">Bilingual & Literasi Digital</h3>
+                        <p class="text-slateCustom text-sm leading-relaxed">Integrasi teknologi dalam pembelajaran harian serta penguatan kecakapan bahasa Inggris dan literasi digital.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Berita & Agenda Terbaru -->
+        <section class="py-20 px-4 sm:px-8 bg-white">
+            <div class="max-w-7xl mx-auto">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-4">
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-widest text-slateCustom">Publikasi Terkini</span>
+                        <h2 class="font-serif text-3xl sm:text-4xl font-bold text-navy mt-1">Berita & Kegiatan Terbaru</h2>
+                    </div>
+                    <a href="#" @click.prevent="currentView = 'berita'" class="text-sm font-semibold text-navy hover:text-amber flex items-center gap-1">
+                        Lihat Semua Berita &rarr;
+                    </a>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- Artikel 1 -->
+                    <div class="group cursor-pointer" @click="currentView = 'berita-detail'">
+                        <div class="rounded-lg overflow-hidden mb-4 bg-ivory aspect-video">
+                            <img src="https://images.unsplash.com/photo-1564982707381-6ab127f88456?auto=format&fit=crop&w=600&q=80" alt="Siswa berprestasi olimpiade sains" class="w-full h-full object-cover group-hover:scale-105 transition duration-300 bg-slate-200" onerror="this.src='https://placehold.co/600x400/172A43/FFFFFF?text=Berita+Prestasi'">
+                        </div>
+                        <div class="flex items-center gap-3 text-xs text-slateCustom mb-2">
+                            <span class="bg-navy/5 text-navy px-2 py-0.5 rounded font-medium">Prestasi</span>
+                            <span>•</span>
+                            <span>10 Oktober 2026</span>
+                        </div>
+                        <h3 class="font-serif font-bold text-xl text-navy group-hover:text-amber transition leading-snug">
+                            Siswa SMAN 1 Insan Cendekia Raih Medali Emas Olimpiade Sains Nasional 2026
+                        </h3>
+                    </div>
+                    <!-- Artikel 2 -->
+                    <div class="group cursor-pointer" @click="currentView = 'berita-detail'">
+                        <div class="rounded-lg overflow-hidden mb-4 bg-ivory aspect-video">
+                            <img src="https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=600&q=80" alt="Studi lingkungan siswa di luar kelas" class="w-full h-full object-cover group-hover:scale-105 transition duration-300 bg-slate-200" onerror="this.src='https://placehold.co/600x400/172A43/FFFFFF?text=Studi+Lingkungan'">
+                        </div>
+                        <div class="flex items-center gap-3 text-xs text-slateCustom mb-2">
+                            <span class="bg-navy/5 text-navy px-2 py-0.5 rounded font-medium">Kegiatan Sekolah</span>
+                            <span>•</span>
+                            <span>05 Oktober 2026</span>
+                        </div>
+                        <h3 class="font-serif font-bold text-xl text-navy group-hover:text-amber transition leading-snug">
+                            Kunjungan Edukatif dan Studi Lingkungan ke Kebun Raya Padang
+                        </h3>
+                    </div>
+                    <!-- Artikel 3 -->
+                    <div class="group cursor-pointer" @click="currentView = 'berita-detail'">
+                        <div class="rounded-lg overflow-hidden mb-4 bg-ivory aspect-video">
+                            <img src="https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?auto=format&fit=crop&w=600&q=80" alt="Pentas seni dan budaya siswa" class="w-full h-full object-cover group-hover:scale-105 transition duration-300 bg-slate-200" onerror="this.src='https://placehold.co/600x400/172A43/FFFFFF?text=Pentas+Seni'">
+                        </div>
+                        <div class="flex items-center gap-3 text-xs text-slateCustom mb-2">
+                            <span class="bg-navy/5 text-navy px-2 py-0.5 rounded font-medium">Kesiswaan</span>
+                            <span>•</span>
+                            <span>28 September 2026</span>
+                        </div>
+                        <h3 class="font-serif font-bold text-xl text-navy group-hover:text-amber transition leading-snug">
+                            Pentas Seni Tahunan: Menumbuhkan Kreativitas Seni dan Budaya Nusantara
+                        </h3>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <main x-show="currentView === 'profil'" x-cloak class="py-16 px-4 sm:px-8 max-w-7xl mx-auto space-y-16">
+        <div class="max-w-3xl space-y-4">
+            <span class="text-xs font-bold uppercase tracking-widest text-slateCustom">Profil Institusi</span>
+            <h1 class="font-serif text-4xl sm:text-5xl font-bold text-navy">Sejarah, Visi, dan Identitas Sekolah</h1>
+            <p class="text-slateCustom text-lg">Mengenal lebih dekat landasan filosofis serta perjalanan panjang SMAN 1 Insan Cendekia dalam mendidik anak bangsa.</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+            <div class="lg:col-span-8 space-y-8">
+                <div class="bg-white p-8 rounded-xl border border-navy/10 space-y-4">
+                    <h2 class="font-serif text-2xl font-bold text-navy">Sejarah Singkat Pendirian</h2>
+                    <p class="text-slateCustom leading-relaxed">
+                        Didirikan pada tahun 1985 atas prakarsa tokoh masyarakat dan pemerintah daerah Padang, sekolah ini berawal dari lembaga pendidikan rintisan yang kemudian berkembang pesat menjadi salah satu sekolah rujukan tingkat nasional. Dengan komitmen kuat terhadap mutu pendidikan, sekolah terus melakukan pembaruan fasilitas dan metode pengajaran tanpa meninggalkan nilai-nilai keluhuran budaya lokal.
+                    </p>
+                </div>
+
+                <div class="bg-white p-8 rounded-xl border border-navy/10 space-y-6">
+                    <h2 class="font-serif text-2xl font-bold text-navy">Visi & Misi</h2>
+                    <div class="space-y-4">
+                        <div>
+                            <h3 class="font-semibold text-navy mb-1">Visi Institusi</h3>
+                            <p class="text-slateCustom italic bg-ivory p-4 rounded-lg border-l-4 border-amber">
+                                “Terwujudnya lembaga pendidikan yang menghasilkan lulusan cerdas, kompetitif, berakhlak mulia, dan berwawasan lingkungan global.”
+                            </p>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-navy mb-2">Misi Utama</h3>
+                            <ul class="list-disc list-inside space-y-2 text-slateCustom text-sm leading-relaxed">
+                                <li>Menyelenggarakan proses pembelajaran berbasis sains, teknologi, dan keimanan.</li>
+                                <li>Mengembangkan potensi akademik dan non-akademik siswa melalui ekstrakurikuler terarah.</li>
+                                <li>Menanamkan nilai integritas, disiplin, dan kepedulian sosial dalam kehidupan sehari-hari sekolah.</li>
+                                <li>Membangun kemitraan strategis dengan orang tua dan masyarakat demi kemajuan peserta didik.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-8 rounded-xl border border-navy/10 space-y-6">
+                    <h2 class="font-serif text-2xl font-bold text-navy">Fasilitas Utama</h2>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="p-4 rounded-lg bg-ivory border border-navy/5">
+                            <h3 class="font-bold text-navy text-sm mb-1">Laboratorium Terpadu</h3>
+                            <p class="text-xs text-slateCustom">Fisika, Kimia, Biologi, dan Komputer berstandar modern.</p>
+                        </div>
+                        <div class="p-4 rounded-lg bg-ivory border border-navy/5">
+                            <h3 class="font-bold text-navy text-sm mb-1">Perpustakaan Digital</h3>
+                            <p class="text-xs text-slateCustom">Ribuan koleksi buku fisik dan akses jurnal digital nasional/internasional.</p>
+                        </div>
+                        <div class="p-4 rounded-lg bg-ivory border border-navy/5">
+                            <h3 class="font-bold text-navy text-sm mb-1">Pusat Olahraga & Seni</h3>
+                            <p class="text-xs text-slateCustom">Lapangan basket, bulu tangkis, dan aula serbaguna kegiatan siswa.</p>
+                        </div>
+                        <div class="p-4 rounded-lg bg-ivory border border-navy/5">
+                            <h3 class="font-bold text-navy text-sm mb-1">Masjid & Ruang Ibadah</h3>
+                            <p class="text-xs text-slateCustom">Pusat pembinaan karakter keagamaan dan kegiatan rohis sekolah.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-4 space-y-6">
+                <div class="bg-navy text-white p-6 rounded-xl space-y-4">
+                    <h3 class="font-serif text-xl font-bold">Identitas Sekolah</h3>
+                    <div class="space-y-3 text-xs border-t border-white/10 pt-4">
+                        <div class="flex justify-between"><span class="text-slate-300">Nama Resmi:</span> <span class="font-semibold text-right">SMA Negeri 1 Insan Cendekia</span></div>
+                        <div class="flex justify-between"><span class="text-slate-300">NPSN:</span> <span class="font-semibold">10304892</span></div>
+                        <div class="flex justify-between"><span class="text-slate-300">Akreditasi:</span> <span class="font-semibold text-amber">Unggul (A)</span></div>
+                        <div class="flex justify-between"><span class="text-slate-300">Kepala Sekolah:</span> <span class="font-semibold">Dr. H. Ahmad Fauzi, M.Pd.</span></div>
+                        <div class="flex justify-between"><span class="text-slate-300">Kurikulum:</span> <span class="font-semibold">Kurikulum Merdeka</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <main x-show="currentView === 'akademik'" x-cloak class="py-16 px-4 sm:px-8 max-w-7xl mx-auto space-y-12">
+        <div class="max-w-3xl space-y-4">
+            <span class="text-xs font-bold uppercase tracking-widest text-slateCustom">Pusat Informasi Akademik</span>
+            <h1 class="font-serif text-4xl sm:text-5xl font-bold text-navy">Kalender Akademik & Program Belajar</h1>
+            <p class="text-slateCustom text-lg">Informasi lengkap mengenai kurikulum, kegiatan belajar mengajar, serta agenda penting tahun ajaran berjalan.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="bg-white p-8 rounded-xl border border-navy/10 space-y-4">
+                <h3 class="font-serif text-2xl font-bold text-navy">Semester Ganjil 2026/2027</h3>
+                <ul class="space-y-3 text-sm text-slateCustom">
+                    <li class="flex justify-between py-2 border-b border-navy/5"><span>Masa Pengenalan Lingkungan Sekolah (MPLS)</span> <span class="font-semibold text-navy">13 - 15 Juli 2026</span></li>
+                    <li class="flex justify-between py-2 border-b border-navy/5"><span>Awal Kegiatan Belajar Mengajar</span> <span class="font-semibold text-navy">20 Juli 2026</span></li>
+                    <li class="flex justify-between py-2 border-b border-navy/5"><span>Penilaian Tengah Semester (PTS)</span> <span class="font-semibold text-navy">14 - 19 September 2026</span></li>
+                    <li class="flex justify-between py-2 border-b border-navy/5"><span>Penilaian Akhir Semester (PAS)</span> <span class="font-semibold text-navy">30 Nov - 05 Des 2026</span></li>
+                    <li class="flex justify-between py-2"><span>Penyerahan Buku Laporan Hasil Belajar</span> <span class="font-semibold text-navy">19 Desember 2026</span></li>
+                </ul>
+            </div>
+            <div class="bg-white p-8 rounded-xl border border-navy/10 space-y-4">
+                <h3 class="font-serif text-2xl font-bold text-navy">Semester Genap 2026/2027</h3>
+                <ul class="space-y-3 text-sm text-slateCustom">
+                    <li class="flex justify-between py-2 border-b border-navy/5"><span>Awal Semester Genap</span> <span class="font-semibold text-navy">04 Januari 2027</span></li>
+                    <li class="flex justify-between py-2 border-b border-navy/5"><span>Ujian Satuan Pendidikan (Kelas XII)</span> <span class="font-semibold text-navy">08 - 13 Maret 2027</span></li>
+                    <li class="flex justify-between py-2 border-b border-navy/5"><span>Penilaian Tengah Semester Genap</span> <span class="font-semibold text-navy">22 - 27 Maret 2027</span></li>
+                    <li class="flex justify-between py-2 border-b border-navy/5"><span>Asesmen Nasional (AN)</span> <span class="font-semibold text-navy">Agustus 2027</span></li>
+                    <li class="flex justify-between py-2"><span>Penerimaan Rapor Kenaikan Kelas</span> <span class="font-semibold text-navy">25 Juni 2027</span></li>
+                </ul>
+            </div>
+        </div>
+    </main>
+
+    <main x-show="currentView === 'guru'" x-cloak class="py-16 px-4 sm:px-8 max-w-7xl mx-auto space-y-12">
+        <div class="max-w-3xl space-y-4">
+            <span class="text-xs font-bold uppercase tracking-widest text-slateCustom">Tenaga Pendidik & Kependidikan</span>
+            <h1 class="font-serif text-4xl sm:text-5xl font-bold text-navy">Direktori Guru Profesional</h1>
+            <p class="text-slateCustom text-lg">Didukung oleh tenaga pendidik berdedikasi tinggi, tersertifikasi, dan berpengalaman di bidangnya.</p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Guru 1 -->
+            <div class="bg-white rounded-xl overflow-hidden border border-navy/10 text-center p-6 space-y-4">
+                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80" alt="Dra. Hj. Nurul Hidayah, M.Si." class="w-24 h-24 rounded-full object-cover mx-auto bg-slate-200" onerror="this.src='https://placehold.co/300x300/172A43/FFFFFF?text=Foto+Guru'">
+                <div>
+                    <h3 class="font-serif font-bold text-lg text-navy">Dra. Hj. Nurul Hidayah, M.Si.</h3>
+                    <p class="text-xs text-amber font-semibold mt-0.5">Wakil Kepala Bidang Kurikulum</p>
+                    <p class="text-xs text-slateCustom mt-1">Guru Mata Pelajaran Matematika Peminatan</p>
+                </div>
+            </div>
+            <!-- Guru 2 -->
+            <div class="bg-white rounded-xl overflow-hidden border border-navy/10 text-center p-6 space-y-4">
+                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80" alt="Drs. Eko Prasetyo, M.Pd." class="w-24 h-24 rounded-full object-cover mx-auto bg-slate-200" onerror="this.src='https://placehold.co/300x300/172A43/FFFFFF?text=Foto+Guru'">
+                <div>
+                    <h3 class="font-serif font-bold text-lg text-navy">Drs. Eko Prasetyo, M.Pd.</h3>
+                    <p class="text-xs text-amber font-semibold mt-0.5">Koordinator Pembina Sains</p>
+                    <p class="text-xs text-slateCustom mt-1">Guru Mata Pelajaran Fisika</p>
+                </div>
+            </div>
+            <!-- Guru 3 -->
+            <div class="bg-white rounded-xl overflow-hidden border border-navy/10 text-center p-6 space-y-4">
+                <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=300&q=80" alt="Siti Rahma, S.Pd., M.Ed." class="w-24 h-24 rounded-full object-cover mx-auto bg-slate-200" onerror="this.src='https://placehold.co/300x300/172A43/FFFFFF?text=Foto+Guru'">
+                <div>
+                    <h3 class="font-serif font-bold text-lg text-navy">Siti Rahma, S.Pd., M.Ed.</h3>
+                    <p class="text-xs text-amber font-semibold mt-0.5">Kepala Perpustakaan</p>
+                    <p class="text-xs text-slateCustom mt-1">Guru Mata Pelajaran Bahasa Inggris</p>
+                </div>
+            </div>
+            <!-- Guru 4 -->
+            <div class="bg-white rounded-xl overflow-hidden border border-navy/10 text-center p-6 space-y-4">
+                <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=300&q=80" alt="Rahmat Hidayat, S.Kom." class="w-24 h-24 rounded-full object-cover mx-auto bg-slate-200" onerror="this.src='https://placehold.co/300x300/172A43/FFFFFF?text=Foto+Guru'">
+                <div>
+                    <h3 class="font-serif font-bold text-lg text-navy">Rahmat Hidayat, S.Kom.</h3>
+                    <p class="text-xs text-amber font-semibold mt-0.5">Pembina IT & Lab Komputer</p>
+                    <p class="text-xs text-slateCustom mt-1">Guru Informatika</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <main x-show="currentView === 'berita'" x-cloak class="py-16 px-4 sm:px-8 max-w-7xl mx-auto space-y-12">
+        <div class="max-w-3xl space-y-4">
+            <span class="text-xs font-bold uppercase tracking-widest text-slateCustom">Publikasi & Informasi</span>
+            <h1 class="font-serif text-4xl sm:text-5xl font-bold text-navy">Berita & Pengumuman Sekolah</h1>
+            <p class="text-slateCustom text-lg">Ikuti perkembangan terbaru, agenda kegiatan, serta pengumuman resmi dari manajemen sekolah.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="bg-white rounded-xl overflow-hidden border border-navy/10 group cursor-pointer" @click="currentView = 'berita-detail'">
+                <img src="https://images.unsplash.com/photo-1564982707381-6ab127f88456?auto=format&fit=crop&w=600&q=80" alt="Berita Prestasi" class="w-full h-48 object-cover bg-slate-200" onerror="this.src='https://placehold.co/600x400/172A43/FFFFFF?text=Berita+Prestasi'">
+                <div class="p-6 space-y-3">
+                    <div class="flex items-center gap-2 text-xs text-slateCustom">
+                        <span class="bg-navy/5 text-navy px-2 py-0.5 rounded font-medium">Prestasi</span>
+                        <span>•</span>
+                        <span>10 Oktober 2026</span>
+                    </div>
+                    <h3 class="font-serif font-bold text-xl text-navy group-hover:text-amber transition leading-snug">
+                        Siswa SMAN 1 Insan Cendekia Raih Medali Emas Olimpiade Sains Nasional 2026
+                    </h3>
+                    <p class="text-slateCustom text-sm leading-relaxed line-clamp-2">
+                        Tim olimpiade fisika dan kimia kembali mengharumkan nama sekolah di kancah nasional yang diselenggarakan di Jakarta.
+                    </p>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl overflow-hidden border border-navy/10 group cursor-pointer" @click="currentView = 'berita-detail'">
+                <img src="https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=600&q=80" alt="Berita Kegiatan" class="w-full h-48 object-cover bg-slate-200" onerror="this.src='https://placehold.co/600x400/172A43/FFFFFF?text=Studi+Lingkungan'">
+                <div class="p-6 space-y-3">
+                    <div class="flex items-center gap-2 text-xs text-slateCustom">
+                        <span class="bg-navy/5 text-navy px-2 py-0.5 rounded font-medium">Kegiatan</span>
+                        <span>•</span>
+                        <span>05 Oktober 2026</span>
+                    </div>
+                    <h3 class="font-serif font-bold text-xl text-navy group-hover:text-amber transition leading-snug">
+                        Kunjungan Edukatif dan Studi Lingkungan ke Kebun Raya Padang
+                    </h3>
+                    <p class="text-slateCustom text-sm leading-relaxed line-clamp-2">
+                        Kegiatan luar kelas ini diikuti oleh seluruh siswa kelas XI untuk mempelajari keanekaragaman hayati dan ekosistem lokal.
+                    </p>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl overflow-hidden border border-navy/10 group cursor-pointer" @click="currentView = 'berita-detail'">
+                <img src="https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?auto=format&fit=crop&w=600&q=80" alt="Berita Kesiswaan" class="w-full h-48 object-cover bg-slate-200" onerror="this.src='https://placehold.co/600x400/172A43/FFFFFF?text=Pentas+Seni'">
+                <div class="p-6 space-y-3">
+                    <div class="flex items-center gap-2 text-xs text-slateCustom">
+                        <span class="bg-navy/5 text-navy px-2 py-0.5 rounded font-medium">Kesiswaan</span>
+                        <span>•</span>
+                        <span>28 September 2026</span>
+                    </div>
+                    <h3 class="font-serif font-bold text-xl text-navy group-hover:text-amber transition leading-snug">
+                        Pentas Seni Tahunan: Menumbuhkan Kreativitas Seni dan Budaya Nusantara
+                    </h3>
+                    <p class="text-slateCustom text-sm leading-relaxed line-clamp-2">
+                        Ajang unjuk bakat seni tari, teater, dan musik tradisional yang menampilkan potensi luar biasa peserta didik.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <main x-show="currentView === 'berita-detail'" x-cloak class="py-16 px-4 sm:px-8 max-w-4xl mx-auto space-y-8">
+        <div>
+            <button @click="currentView = 'berita'" class="text-xs font-semibold text-amber hover:underline flex items-center gap-1 mb-4">
+                &larr; Kembali ke Daftar Berita
+            </button>
+            <div class="flex items-center gap-2 text-xs text-slateCustom mb-3">
+                <span class="bg-navy/5 text-navy px-2 py-0.5 rounded font-medium">Prestasi</span>
+                <span>•</span>
+                <span>10 Oktober 2026</span>
+                <span>•</span>
+                <span>Oleh: Rahmat Hidayat, S.Kom.</span>
+            </div>
+            <h1 class="font-serif text-3xl sm:text-4xl font-bold text-navy leading-tight">
+                Siswa SMAN 1 Insan Cendekia Raih Medali Emas Olimpiade Sains Nasional 2026
+            </h1>
+        </div>
+
+        <div class="rounded-xl overflow-hidden aspect-video bg-slate-200">
+            <img src="https://images.unsplash.com/photo-1564982707381-6ab127f88456?auto=format&fit=crop&w=1000&q=80" alt="Detail berita medali emas OSN" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/1000x560/172A43/FFFFFF?text=Medali+Emas+OSN'">
+        </div>
+
+        <div class="prose prose-navy max-w-none text-slateCustom space-y-4 leading-relaxed text-base">
+            <p>
+                <strong>PADANG</strong> — Prestasi gemilang kembali ditorehkan oleh peserta didik SMAN 1 Insan Cendekia Padang dalam ajang Olimpiade Sains Nasional (OSN) tingkat nasional yang diumumkan pada Jumat (10/10).
+            </p>
+            <p>
+                Ananda Muhammad Farhan (Kelas XII MIPA 1) berhasil menyabet Medali Emas pada bidang studi Fisika setelah melalui tahap seleksi yang sangat ketat mulai dari tingkat kabupaten, provinsi, hingga babak final nasional di Jakarta.
+            </p>
+            <h3 class="font-serif text-xl font-bold text-navy pt-2">Dukungan Penuh Pihak Sekolah</h3>
+            <p>
+                Kepala SMAN 1 Insan Cendekia, Dr. H. Ahmad Fauzi, M.Pd., menyampaikan apresiasi dan rasa bangganya atas kerja keras siswa serta bimbingan intensif dari para guru pembimbing. "Keberhasilan ini merupakan bukti bahwa dengan disiplin, ketekunan, dan fasilitas yang memadai, siswa daerah mampu bersaing di tingkat nasional maupun internasional," ujarnya.
+            </p>
+        </div>
+    </main>
+
+    <main x-show="currentView === 'agenda'" x-cloak class="py-16 px-4 sm:px-8 max-w-7xl mx-auto space-y-12">
+        <div class="max-w-3xl space-y-4">
+            <span class="text-xs font-bold uppercase tracking-widest text-slateCustom">Kalender Kegiatan</span>
+            <h1 class="font-serif text-4xl sm:text-5xl font-bold text-navy">Agenda Sekolah Terdekat</h1>
+            <p class="text-slateCustom text-lg">Catat tanggal-tanggal penting kegiatan akademik, ujian, dan acara kesiswaan.</p>
+        </div>
+
+        <div class="bg-white rounded-xl border border-navy/10 divide-y divide-navy/10 overflow-hidden">
+            <div class="p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:bg-ivory/50 transition">
+                <div class="flex items-center gap-4">
+                    <div class="bg-amber/10 text-amber font-serif font-bold text-center p-3 rounded-lg min-w-[70px]">
+                        <span class="block text-xs uppercase">Okt</span>
+                        <span class="block text-xl">20</span>
+                    </div>
+                    <div>
+                        <span class="text-xs bg-navy/5 text-navy px-2 py-0.5 rounded font-medium">Akademik</span>
+                        <h3 class="font-serif font-bold text-lg text-navy mt-1">Sosialisasi Jalur Masuk Perguruan Tinggi (SNBP/SNBT)</h3>
+                        <p class="text-xs text-slateCustom">Aula Utama SMAN 1 Insan Cendekia • 08:00 WIB</p>
+                    </div>
+                </div>
+                <span class="text-xs bg-sage/20 text-navy font-semibold px-3 py-1 rounded-full">Akan Datang</span>
+            </div>
+            <div class="p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:bg-ivory/50 transition">
+                <div class="flex items-center gap-4">
+                    <div class="bg-amber/10 text-amber font-serif font-bold text-center p-3 rounded-lg min-w-[70px]">
+                        <span class="block text-xs uppercase">Okt</span>
+                        <span class="block text-xl">28</span>
+                    </div>
+                    <div>
+                        <span class="text-xs bg-navy/5 text-navy px-2 py-0.5 rounded font-medium">Kesiswaan</span>
+                        <h3 class="font-serif font-bold text-lg text-navy mt-1">Upacara Peringatan Hari Sumpah Pemuda 2026</h3>
+                        <p class="text-xs text-slateCustom">Lapangan Upacara Sekolah • 07:15 WIB</p>
+                    </div>
+                </div>
+                <span class="text-xs bg-sage/20 text-navy font-semibold px-3 py-1 rounded-full">Akan Datang</span>
+            </div>
+        </div>
+    </main>
+
+    <main x-show="currentView === 'galeri'" x-cloak class="py-16 px-4 sm:px-8 max-w-7xl mx-auto space-y-12">
+        <div class="max-w-3xl space-y-4">
+            <span class="text-xs font-bold uppercase tracking-widest text-slateCustom">Dokumentasi Visual</span>
+            <h1 class="font-serif text-4xl sm:text-5xl font-bold text-navy">Galeri Album Kegiatan Sekolah</h1>
+            <p class="text-slateCustom text-lg">Potret aktivitas pembelajaran, laboratorium, kegiatan ekstrakurikuler, dan prestasi siswa.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="bg-white rounded-xl overflow-hidden border border-navy/10 group cursor-pointer">
+                <div class="aspect-video overflow-hidden bg-ivory bg-slate-200">
+                    <img src="https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&w=600&q=80" alt="Praktikum Kimia" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" onerror="this.src='https://placehold.co/600x400/172A43/FFFFFF?text=Praktikum+Kimia'">
+                </div>
+                <div class="p-6 space-y-2">
+                    <span class="text-xs text-slateCustom">Tahun Ajaran 2026/2027</span>
+                    <h3 class="font-serif font-bold text-xl text-navy">Praktikum Laboratorium Kimia Terpadu</h3>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl overflow-hidden border border-navy/10 group cursor-pointer">
+                <div class="aspect-video overflow-hidden bg-ivory bg-slate-200">
+                    <img src="https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=600&q=80" alt="Pramuka" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" onerror="this.src='https://placehold.co/600x400/172A43/FFFFFF?text=Ekstrakurikuler+Pramuka'">
+                </div>
+                <div class="p-6 space-y-2">
+                    <span class="text-xs text-slateCustom">Tahun Ajaran 2026/2027</span>
+                    <h3 class="font-serif font-bold text-xl text-navy">Kegiatan Ekstrakurikuler Paskibra & Pramuka</h3>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl overflow-hidden border border-navy/10 group cursor-pointer">
+                <div class="aspect-video overflow-hidden bg-ivory bg-slate-200">
+                    <img src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=600&q=80" alt="Upacara" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" onerror="this.src='https://placehold.co/600x400/172A43/FFFFFF?text=Upacara+Bendera'">
+                </div>
+                <div class="p-6 space-y-2">
+                    <span class="text-xs text-slateCustom">Tahun Ajaran 2026/2027</span>
+                    <h3 class="font-serif font-bold text-xl text-navy">Upacara Bendera Hari Senin & Pembinaan Karakter</h3>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <main x-show="currentView === 'ppdb'" x-cloak class="py-16 px-4 sm:px-8 max-w-7xl mx-auto space-y-16">
+        <div class="max-w-3xl space-y-4">
+            <div class="inline-flex items-center gap-2 bg-sage/20 border border-sage/40 text-navy px-3.5 py-1.5 rounded-full text-xs font-semibold">
+                <span class="w-2 h-2 rounded-full bg-amber animate-pulse"></span>
+                Pendaftaran Gelombang 1 Dibuka
+            </div>
+            <h1 class="font-serif text-4xl sm:text-5xl font-bold text-navy">Penerimaan Peserta Didik Baru (PPDB) 2026/2027</h1>
+            <p class="text-slateCustom text-lg">Bergabunglah bersama SMAN 1 Insan Cendekia Padang. Temukan informasi jalur pendaftaran, persyaratan, dan jadwal seleksi di bawah ini.</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+            <div class="lg:col-span-8 space-y-8">
+                <!-- Status Banner -->
+                <div class="bg-navy text-white p-8 rounded-xl space-y-4 shadow-md">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <p class="text-xs text-amber font-semibold uppercase tracking-wider">Status Pendaftaran</p>
+                            <h2 class="font-serif text-2xl font-bold mt-1">Gelombang 1 Aktif</h2>
+                        </div>
+                        <span class="bg-amber text-white font-semibold text-xs px-3 py-1.5 rounded-md">Dibuka s.d 25 Juni 2026</span>
+                    </div>
+                    <p class="text-sm text-slate-300">Pendaftaran dilakukan secara online melalui portal resmi atau melalui sistem internal sekolah.</p>
+                    <div class="pt-2 flex flex-wrap gap-4">
+                        <a href="#form-pendaftaran" @click.prevent="ppdbTab = 'internal'" class="bg-amber hover:bg-amber-dark text-white font-semibold px-6 py-2.5 rounded-md text-sm transition">
+                            Formulir Pendaftaran Online
+                        </a>
+                        <a href="#" class="bg-white/10 hover:bg-white/20 text-white font-semibold px-6 py-2.5 rounded-md text-sm transition">
+                            Unduh Brosur Resmi (PDF)
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Jalur & Persyaratan -->
+                <div class="bg-white p-8 rounded-xl border border-navy/10 space-y-6">
+                    <h3 class="font-serif text-2xl font-bold text-navy">Jalur Penerimaan & Persyaratan Berkas</h3>
+                    <div class="space-y-4 text-sm text-slateCustom">
+                        <div class="p-4 rounded-lg bg-ivory border border-navy/5 space-y-2">
+                            <h4 class="font-bold text-navy">1. Jalur Prestasi (Akademik & Non-Akademik)</h4>
+                            <p>Melampirkan sertifikat kejuaraan minimal tingkat kabupaten/kota atau rata-rata rapor semester 1-5 minimal 88.</p>
+                        </div>
+                        <div class="p-4 rounded-lg bg-ivory border border-navy/5 space-y-2">
+                            <h4 class="font-bold text-navy">2. Jalur Reguler / Tes Tertulis</h4>
+                            <p>Mengikuti seleksi akademik berbasis komputer (Literasi Bahasa & Numerasi) yang diselenggarakan oleh panitia sekolah.</p>
+                        </div>
+                        <div class="p-4 rounded-lg bg-ivory border border-navy/5 space-y-2">
+                            <h4 class="font-bold text-navy">Persyaratan Dokumen Utama:</h4>
+                            <ul class="list-disc list-inside space-y-1">
+                                <li>Scan Ijazah / Surat Keterangan Lulus (SKL) SMP/Sederajat.</li>
+                                <li>Scan Rapor Semester 1 s.d 5 yang dilegalisir.</li>
+                                <li>Pas foto berwarna ukuran 3x4 latar belakang merah/biru.</li>
+                                <li>Scan Kartu Keluarga (KK) dan Akta Kelahiran.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Internal Form Mode B -->
+                <div id="form-pendaftaran" class="bg-white p-8 rounded-xl border border-navy/10 space-y-6">
+                    <h3 class="font-serif text-2xl font-bold text-navy">Formulir Pendaftaran Calon Siswa</h3>
+                    <form @submit.prevent="submitPPDB" class="space-y-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-navy uppercase mb-1">Nama Lengkap Siswa</label>
+                                <input type="text" x-model="ppdbForm.nama" required class="w-full px-4 py-2.5 rounded-md border border-navy/20 focus:outline-none focus:border-amber text-sm" placeholder="Sesuai ijazah SMP">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-navy uppercase mb-1">NISN</label>
+                                <input type="text" x-model="ppdbForm.nisn" required class="w-full px-4 py-2.5 rounded-md border border-navy/20 focus:outline-none focus:border-amber text-sm" placeholder="10 digit NISN">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-navy uppercase mb-1">Asal Sekolah (SMP)</label>
+                                <input type="text" x-model="ppdbForm.asalSekolah" required class="w-full px-4 py-2.5 rounded-md border border-navy/20 focus:outline-none focus:border-amber text-sm" placeholder="Nama SMP asal">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-navy uppercase mb-1">Jalur Pendaftaran</label>
+                                <select x-model="ppdbForm.jalur" class="w-full px-4 py-2.5 rounded-md border border-navy/20 focus:outline-none focus:border-amber text-sm bg-white">
+                                    <option value="reguler">Jalur Reguler</option>
+                                    <option value="prestasi">Jalur Prestasi</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-navy uppercase mb-1">Nomor WhatsApp Orang Tua / Wali</label>
+                            <input type="text" x-model="ppdbForm.whatsapp" required class="w-full px-4 py-2.5 rounded-md border border-navy/20 focus:outline-none focus:border-amber text-sm" placeholder="Contoh: 081234567890">
+                        </div>
+                        <button type="submit" class="w-full bg-amber hover:bg-amber-dark text-white font-semibold py-3 rounded-md transition text-sm shadow-sm">
+                            Kirim Formulir Pendaftaran PPDB
+                        </button>
+                    </form>
+                    <div x-show="ppdbSuccess" x-cloak class="p-4 bg-sage/20 border border-sage text-navy rounded-lg text-sm font-medium">
+                        Terima kasih! Formulir pendaftaran Anda berhasil disimpan. Nomor registrasi Anda adalah <span class="font-bold">PPDB-2026-8921</span>. Panitia akan segera menghubungi via WhatsApp.
+                    </div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-4 space-y-6">
+                <div class="bg-white p-6 rounded-xl border border-navy/10 space-y-4">
+                    <h3 class="font-serif font-bold text-lg text-navy">Jadwal Seleksi PPDB</h3>
+                    <ul class="space-y-3 text-xs text-slateCustom">
+                        <li class="flex justify-between pb-2 border-b border-navy/5"><span>Pendaftaran Online</span> <span class="font-semibold text-navy">1 Jun - 25 Jun 2026</span></li>
+                        <li class="flex justify-between pb-2 border-b border-navy/5"><span>Verifikasi Berkas</span> <span class="font-semibold text-navy">26 Jun - 28 Jun 2026</span></li>
+                        <li class="flex justify-between pb-2 border-b border-navy/5"><span>Tes Akademik CBT</span> <span class="font-semibold text-navy">02 Juli 2026</span></li>
+                        <li class="flex justify-between"><span>Pengumuman Kelulusan</span> <span class="font-semibold text-navy">08 Juli 2026</span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <main x-show="currentView === 'kontak'" x-cloak class="py-16 px-4 sm:px-8 max-w-7xl mx-auto space-y-12">
+        <div class="max-w-3xl space-y-4">
+            <span class="text-xs font-bold uppercase tracking-widest text-slateCustom">Layanan Informasi</span>
+            <h1 class="font-serif text-4xl sm:text-5xl font-bold text-navy">Hubungi Tata Usaha Sekolah</h1>
+            <p class="text-slateCustom text-lg">Kami siap membantu pertanyaan seputar layanan akademik, administrasi siswa, dan informasi PPDB.</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            <div class="bg-white p-8 rounded-xl border border-navy/10 space-y-6">
+                <h3 class="font-serif text-2xl font-bold text-navy">Informasi Kontak Resmi</h3>
+                <div class="space-y-4 text-sm text-slateCustom">
+                    <div class="flex items-start gap-3">
+                        <svg class="w-5 h-5 text-amber shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path></svg>
+                        <p>Jl. Pendidikan Raya No. 45, Padang, Sumatera Barat, 25152</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <svg class="w-5 h-5 text-amber shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+                        <p>(0751) 892045 / WhatsApp TU: 0811-6677-8899</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <svg class="w-5 h-5 text-amber shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                        <p>humas@sman1insancendekia.sch.id</p>
+                    </div>
+                </div>
+                <div class="pt-4">
+                    <a href="https://wa.me/6281166778899?text=Assalamu%27alaikum%2C%20saya%20ingin%20bertanya%20mengenai%20informasi%20sekolah%20dan%20PPDB." target="_blank" class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-6 py-3 rounded-md transition text-sm">
+                        <span>Chat WhatsApp Tata Usaha</span>
+                    </a>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl overflow-hidden border border-navy/10 min-h-[350px] flex items-center justify-center bg-ivory text-slateCustom">
+                <div class="text-center p-6 space-y-2">
+                    <svg class="w-12 h-12 text-amber mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path></svg>
+                    <p class="font-semibold text-navy">Peta Lokasi SMAN 1 Insan Cendekia</p>
+                    <p class="text-xs">Integrasi Google Maps aktif berdasarkan koordinat resmi sekolah.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <main x-show="currentView === 'admin'" x-cloak class="bg-ivory min-h-screen py-8 px-4 sm:px-8">
+        <div class="max-w-7xl mx-auto space-y-8">
+            <!-- Admin Top Bar -->
+            <div class="bg-navy text-white p-6 rounded-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <span class="text-xs bg-amber text-white font-semibold px-2.5 py-1 rounded">CMS Heci.Tech — Admin Dashboard</span>
+                    <h1 class="font-serif text-2xl font-bold mt-2">Selamat Datang, Admin Utama (Dr. H. Ahmad Fauzi)</h1>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button @click="currentView = 'home'" class="bg-white/10 hover:bg-white/20 text-white text-xs font-semibold px-4 py-2 rounded transition">
+                        Kembali ke Website Publik
+                    </button>
+                </div>
+            </div>
+
+            <!-- Admin Stats & Tabs -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div class="bg-white p-6 rounded-xl border border-navy/10">
+                    <p class="text-xs text-slateCustom uppercase font-semibold">Total Berita & Artikel</p>
+                    <p class="font-serif text-3xl font-bold text-navy mt-1">24</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl border border-navy/10">
+                    <p class="text-xs text-slateCustom uppercase font-semibold">Menunggu Persetujuan</p>
+                    <p class="font-serif text-3xl font-bold text-amber mt-1">3</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl border border-navy/10">
+                    <p class="text-xs text-slateCustom uppercase font-semibold">Pendaftar PPDB 2026</p>
+                    <p class="font-serif text-3xl font-bold text-navy mt-1">142</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl border border-navy/10">
+                    <p class="text-xs text-slateCustom uppercase font-semibold">Status Sistem</p>
+                    <p class="text-xs font-semibold text-emerald-600 mt-2 flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-600"></span> Aktif & Aman</p>
+                </div>
+            </div>
+
+            <!-- Content Approval Workflow Table -->
+            <div class="bg-white rounded-xl border border-navy/10 p-6 space-y-6">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h3 class="font-serif text-xl font-bold text-navy">Workflow Persetujuan Konten (Operator & Admin)</h3>
+                        <p class="text-xs text-slateCustom">Tinjau dan setujui berita atau pengumuman yang diajukan oleh operator sebelum terbit ke publik.</p>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-ivory text-xs uppercase text-slateCustom font-semibold border-b border-navy/10">
+                            <tr>
+                                <th class="p-3">Judul Konten</th>
+                                <th class="p-3">Kategori</th>
+                                <th class="p-3">Pengaju</th>
+                                <th class="p-3">Status</th>
+                                <th class="p-3 text-right">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-navy/10 text-slateCustom">
+                            <tr>
+                                <td class="p-3 font-semibold text-navy">Jadwal Ujian Semester Ganjil 2026/2027</td>
+                                <td class="p-3">Pengumuman</td>
+                                <td class="p-3">Rahmat Hidayat (Operator)</td>
+                                <td class="p-3"><span class="bg-amber/10 text-amber px-2 py-0.5 rounded text-xs font-semibold">Menunggu Review</span></td>
+                                <td class="p-3 text-right space-x-2">
+                                    <button @click="showToast('Konten berhasil disetujui dan diterbitkan ke website publik!')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-1.5 rounded">Setujui</button>
+                                    <button @click="showToast('Konten dikembalikan untuk revisi.')" class="bg-rose-600 hover:bg-rose-700 text-white text-xs px-3 py-1.5 rounded">Tolak</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 font-semibold text-navy">Prestasi Ekstrakurikuler Paskibra Tingkat Provinsi</td>
+                                <td class="p-3">Berita</td>
+                                <td class="p-3">Siti Rahma (Operator)</td>
+                                <td class="p-3"><span class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded text-xs font-semibold">Terbit</span></td>
+                                <td class="p-3 text-right">
+                                    <span class="text-xs text-slateCustom italic">Sudah Dipublikasikan</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-navy text-white pt-16 pb-12 border-t border-white/10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-8 grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+            <div class="space-y-4 md:col-span-2">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-amber text-white flex items-center justify-center font-serif text-lg font-bold">
+                        IC
+                    </div>
+                    <div>
+                        <h2 class="font-serif font-bold text-lg text-white">SMA Negeri 1 Insan Cendekia</h2>
+                        <p class="text-xs text-slate-300 uppercase tracking-wider">Padang, Sumatera Barat</p>
+                    </div>
+                </div>
+                <p class="text-slate-300 text-sm leading-relaxed max-w-md">
+                    Pusat informasi resmi institusi pendidikan modern yang berdedikasi menghasilkan lulusan unggul, berakhlak mulia, dan siap menyongsong masa depan gemilang.
+                </p>
+            </div>
+            <div class="space-y-3">
+                <h3 class="font-serif font-bold text-base text-amber">Tautan Cepat</h3>
+                <ul class="space-y-2 text-sm text-slate-300">
+                    <li><a href="#" @click.prevent="currentView = 'profil'" class="hover:text-amber transition">Profil Sekolah</a></li>
+                    <li><a href="#" @click.prevent="currentView = 'akademik'" class="hover:text-amber transition">Kalender Akademik</a></li>
+                    <li><a href="#" @click.prevent="currentView = 'ppdb'" class="hover:text-amber transition">Penerimaan PPDB 2026</a></li>
+                    <li><a href="#" @click.prevent="currentView = 'kontak'" class="hover:text-amber transition">Kontak & Alamat</a></li>
+                </ul>
+            </div>
+            <div class="space-y-3">
+                <h3 class="font-serif font-bold text-base text-amber">Layanan & Akses</h3>
+                <ul class="space-y-2 text-sm text-slate-300">
+                    <li><a href="#" @click.prevent="currentView = 'admin'" class="hover:text-amber transition">Login CMS Admin / Operator</a></li>
+                    <li><a href="#" @click.prevent="currentView = 'berita'" class="hover:text-amber transition">Arsip Pengumuman Resmi</a></li>
+                    <li><a href="#" @click.prevent="currentView = 'galeri'" class="hover:text-amber transition">Galeri & Dokumentasi</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-8 pt-8 border-t border-white/10 flex flex-col sm:flex-row justify-between items-center text-xs text-slate-400 gap-4">
+            <p>&copy; 2026 SMAN 1 Insan Cendekia Padang. Hak Cipta Dilindungi.</p>
+            <p>Website Template by <span class="text-amber font-semibold">Heci.Tech</span> — Sekolah Digital Platform</p>
+        </div>
+    </footer>
+
+    <script>
+        function schoolApp() {
+            return {
+                currentView: 'home',
+                mobileMenuOpen: false,
+                ppdbTab: 'info',
+                ppdbSuccess: false,
+                ppdbForm: {
+                    nama: '',
+                    nisn: '',
+                    asalSekolah: '',
+                    jalur: 'reguler',
+                    whatsapp: ''
+                },
+                submitPPDB() {
+                    if(!this.ppdbForm.nama || !this.ppdbForm.nisn) {
+                        this.showToast('Mohon lengkapi formulir pendaftaran.');
+                        return;
+                    }
+                    this.ppdbSuccess = true;
+                },
+                showToast(message) {
+                    const toast = document.createElement('div');
+                    toast.className = 'fixed bottom-5 right-5 z-50 bg-navy text-white px-5 py-3 rounded-lg shadow-xl text-sm font-medium border-l-4 border-amber transition duration-300';
+                    toast.innerText = message;
+                    document.body.appendChild(toast);
+                    setTimeout(() => {
+                        toast.style.opacity = '0';
+                        setTimeout(() => toast.remove(), 300);
+                    }, 3000);
+                }
+            }
+        }
+    </script>
+</body>
+</html>

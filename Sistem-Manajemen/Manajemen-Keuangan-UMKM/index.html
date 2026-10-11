@@ -1,0 +1,1361 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ArusKas — SaaS Keuangan UMKM Indonesia</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    },
+                    colors: {
+                        emerald: {
+                            50: '#ECFDF5',
+                            100: '#D1FAE5',
+                            500: '#10B981',
+                            600: '#059669',
+                            700: '#047857',
+                        },
+                        ivory: '#F7F9FB',
+                        surface: '#FFFFFF',
+                        slateText: '#1E293B',
+                        mutedText: '#64748B',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #F7F9FB; color: #1E293B; }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #F1F5F9; }
+        ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-emerald-500 selection:text-white">
+
+    <div id="app" class="min-h-screen flex flex-col">
+        <!-- Rendered via JavaScript -->
+    </div>
+
+    <script>
+        // --- UTILITIES & FORMATTING ---
+        const formatIDR = (num) => {
+            return new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(num).replace('IDR', 'Rp');
+        };
+
+        const formatDate = (dateStr) => {
+            if (!dateStr) return '-';
+            const d = new Date(dateStr);
+            if (isNaN(d.getTime())) return dateStr;
+            return new Intl.DateTimeFormat('id-ID', {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric'
+            }).format(d);
+        };
+
+        const getDaysUntil = (dateStr) => {
+            const target = new Date(dateStr);
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            target.setHours(0,0,0,0);
+            const diffTime = target - today;
+            return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        };
+
+        // --- INITIAL STATE ---
+        let state = {
+            currentTab: 'dashboard',
+            currentUser: { name: 'Budi Santoso', role: 'Owner', email: 'budi@aruskas.id' },
+            sidebarOpen: false,
+            toast: null,
+            business: {
+                name: "Kopi Kenangan Senja & Roti Bakar",
+                type: "Kuliner & F&B",
+                owner: "Budi Santoso",
+                currency: "IDR",
+                timezone: "Asia/Jakarta",
+                createdAt: "2026-01-01"
+            },
+            accounts: [
+                { id: 'acc-1', name: 'Kas Tunai Toko', type: 'Kas Tunai', initialBalance: 1500000, initialDate: '2026-03-01', balance: 1850000, status: 'Aktif' },
+                { id: 'acc-2', name: 'BCA Utama', type: 'Rekening Bank', initialBalance: 12500000, initialDate: '2026-03-01', balance: 14250000, status: 'Aktif' },
+                { id: 'acc-3', name: 'GoPay / QRIS Merchant', type: 'E-Wallet', initialBalance: 750000, initialDate: '2026-03-01', balance: 1220000, status: 'Aktif' }
+            ],
+            categories: [
+                { id: 'cat-1', name: 'Penjualan / Omzet', type: 'Pemasukan', desc: 'Pendapatan harian dari penjualan produk', active: true, monthlyBudget: 0 },
+                { id: 'cat-2', name: 'Pendapatan Jasa', type: 'Pemasukan', desc: 'Jasa catering atau layanan tambahan', active: true, monthlyBudget: 0 },
+                { id: 'cat-3', name: 'Pendapatan Lain-lain', type: 'Pemasukan', desc: 'Sponsorship atau hibah', active: true, monthlyBudget: 0 },
+                { id: 'cat-4', name: 'Pembelian Bahan Baku', type: 'Pengeluaran', desc: 'Kopi, susu, roti, kemasan', active: true, monthlyBudget: 6000000 },
+                { id: 'cat-5', name: 'Gaji Karyawan', type: 'Pengeluaran', desc: 'Upah staf toko', active: true, monthlyBudget: 4500000 },
+                { id: 'cat-6', name: 'Sewa Tempat', type: 'Pengeluaran', desc: 'Sewa ruko bulanan', active: true, monthlyBudget: 2000000 },
+                { id: 'cat-7', name: 'Listrik, Air & Internet', type: 'Pengeluaran', desc: 'Utilitas operasional', active: true, monthlyBudget: 800000 },
+                { id: 'cat-8', name: 'Transportasi & Logistik', type: 'Pengeluaran', desc: 'Bensin & pengiriman barang', active: true, monthlyBudget: 400000 },
+                { id: 'cat-9', name: 'Marketing & Promo', type: 'Pengeluaran', desc: 'Iklan medsos & banner', active: true, monthlyBudget: 500000 },
+                { id: 'cat-10', name: 'Biaya Administrasi', type: 'Pengeluaran', desc: 'Admin bank & QRIS', active: true, monthlyBudget: 150000 }
+            ],
+            transactions: [
+                { id: 'tx-1', type: 'Pemasukan', date: '2026-03-10', category: 'Penjualan / Omzet', accountId: 'acc-2', amount: 3500000, desc: 'Setoran omzet penjualan minggu ke-1', contact: 'Pelanggan Umum', status: 'Selesai' },
+                { id: 'tx-2', type: 'Pengeluaran', date: '2026-03-11', category: 'Pembelian Bahan Baku', accountId: 'acc-2', amount: 1200000, desc: 'Belanja biji kopi arabika & susu UHT supplier', contact: 'CV Sumber Makmur', status: 'Selesai' },
+                { id: 'tx-3', type: 'Pengeluaran', date: '2026-03-12', category: 'Listrik, Air & Internet', accountId: 'acc-3', amount: 450000, desc: 'Bayar token listrik bulanan ruko', contact: 'PLN Pascabayar', status: 'Selesai' },
+                { id: 'tx-4', type: 'Pemasukan', date: '2026-03-13', category: 'Penjualan / Omzet', accountId: 'acc-1', amount: 850000, desc: 'Penjualan kasir tunai harian', contact: 'Pelanggan Tunai', status: 'Selesai' },
+                { id: 'tx-5', type: 'Pengeluaran', date: '2026-03-14', category: 'Marketing & Promo', accountId: 'acc-3', amount: 200000, desc: 'Boost Instagram Ads weekend promo', contact: 'Meta Platforms', status: 'Selesai' }
+            ],
+            transfers: [
+                { id: 'tr-1', date: '2026-03-09', fromAcc: 'acc-1', toAcc: 'acc-2', amount: 1000000, fee: 0, note: 'Pindahan kas tunai ke rekening bank utama' }
+            ],
+            receivables: [
+                { id: 'rcv-1', customer: 'Kantor Kelurahan Melati', refNumber: 'INV-2026-001', date: '2026-03-02', dueDate: '2026-03-25', desc: 'Catering rapat koordinasi 50 porsi', amount: 1500000, paidAmount: 500000, status: 'Dibayar Sebagian', notes: 'Sisa dibayar setelah acara selesai' },
+                { id: 'rcv-2', customer: 'PT Berkah Mandiri', refNumber: 'INV-2026-002', date: '2026-02-20', dueDate: '2026-03-05', desc: 'Sponsorship coffee break kantor', amount: 2400000, paidAmount: 0, status: 'Terlambat', notes: 'Sudah dihubungi via WA' }
+            ],
+            payables: [
+                { id: 'pay-1', supplier: 'CV Supplier Kemasan Jaya', refNumber: 'BILL-889', date: '2026-03-01', dueDate: '2026-03-20', desc: 'Pembelian cup sablon & paperbag 2 rim', amount: 1800000, paidAmount: 800000, status: 'Dibayar Sebagian', notes: 'Jatuh tempo minggu depan' },
+                { id: 'pay-2', supplier: 'Toko Mesin Kopi Nusantara', refNumber: 'BILL-902', date: '2026-02-15', dueDate: '2026-03-10', desc: 'Cicilan sparepart espresso machine', amount: 3500000, paidAmount: 3500000, status: 'Lunas', notes: 'Lunas dibayar via BCA' }
+            ],
+            auditLogs: [
+                { id: 'log-1', user: 'Budi Santoso (Owner)', time: '2026-03-14 10:30', action: 'Tambah Transaksi', type: 'Pemasukan', detail: 'Omzet Penjualan Tunai Rp850.000' },
+                { id: 'log-2', user: 'Siti Aminah (Staff)', time: '2026-03-11 14:15', action: 'Tambah Transaksi', type: 'Pengeluaran', detail: 'Belanja Bahan Baku Rp1.200.000' }
+            ],
+            txSearch: '',
+            txFilterType: 'Semua',
+            txFilterCat: 'Semua',
+            modal: null, // 'addTx', 'editTx', 'addTransfer', 'confirm'
+            modalData: null
+        };
+
+        // --- NOTIFICATION HELPER ---
+        function showToast(message, type = 'success') {
+            state.toast = { message, type };
+            render();
+            setTimeout(() => {
+                if (state.toast && state.toast.message === message) {
+                    state.toast = null;
+                    render();
+                }
+            }, 3500);
+        }
+
+        function addAudit(action, type, detail) {
+            const newLog = {
+                id: 'log-' + Date.now(),
+                user: `${state.currentUser.name} (${state.currentUser.role})`,
+                time: new Date().toISOString().replace('T', ' ').substring(0, 16),
+                action,
+                type,
+                detail
+            };
+            state.auditLogs.unshift(newLog);
+        }
+
+        // --- FINANCIAL METRICS COMPUTATION ---
+        function getComputedMetrics() {
+            const totalBalance = state.accounts.filter(a => a.status === 'Aktif').reduce((sum, acc) => sum + acc.balance, 0);
+            
+            const now = new Date();
+            const curYear = now.getFullYear();
+            const curMonth = now.getMonth();
+            let inc = 0;
+            let exp = 0;
+
+            state.transactions.forEach(tx => {
+                const d = new Date(tx.date);
+                if (d.getFullYear() === curYear && d.getMonth() === curMonth) {
+                    if (tx.type === 'Pemasukan') inc += Number(tx.amount);
+                    if (tx.type === 'Pengeluaran') exp += Number(tx.amount);
+                }
+            });
+
+            const totalReceivablesUnpaid = state.receivables
+                .filter(r => r.status !== 'Lunas')
+                .reduce((sum, r) => sum + (r.amount - r.paidAmount), 0);
+
+            const totalPayablesUnpaid = state.payables
+                .filter(p => p.status !== 'Lunas')
+                .reduce((sum, p) => sum + (p.amount - p.paidAmount), 0);
+
+            return {
+                totalBalance,
+                incomeThisMonth: inc,
+                expenseThisMonth: exp,
+                netProfitThisMonth: inc - exp,
+                totalReceivablesUnpaid,
+                totalPayablesUnpaid
+            };
+        }
+
+        // --- ACTIONS ---
+        function handleSaveTransaction(e) {
+            e.preventDefault();
+            const form = e.target;
+            const id = form.txId.value;
+            const type = form.txType.value;
+            const date = form.txDate.value;
+            const category = form.txCategory.value;
+            const accountId = form.txAccount.value;
+            const amount = Number(form.txAmount.value);
+            const desc = form.txDesc.value;
+            const contact = form.txContact.value;
+
+            if (amount <= 0) {
+                showToast('Nominal harus lebih besar dari 0', 'error');
+                return;
+            }
+
+            const targetAccount = state.accounts.find(a => a.id === accountId);
+            if (!targetAccount) {
+                showToast('Akun kas tidak valid', 'error');
+                return;
+            }
+
+            if (id) {
+                // Edit
+                const oldTx = state.transactions.find(t => t.id === id);
+                if (oldTx) {
+                    // Revert old account balance
+                    state.accounts = state.accounts.map(acc => {
+                        if (acc.id === oldTx.accountId) {
+                            const diff = oldTx.type === 'Pemasukan' ? -oldTx.amount : oldTx.amount;
+                            return { ...acc, balance: acc.balance + diff };
+                        }
+                        return acc;
+                    });
+                }
+                // Apply new account balance
+                state.accounts = state.accounts.map(acc => {
+                    if (acc.id === accountId) {
+                        const diff = type === 'Pemasukan' ? amount : -amount;
+                        return { ...acc, balance: acc.balance + diff };
+                    }
+                    return acc;
+                });
+
+                state.transactions = state.transactions.map(t => t.id === id ? { id, type, date, category, accountId, amount, desc, contact, status: 'Selesai' } : t);
+                addAudit('Edit Transaksi', type, `${desc} (${formatIDR(amount)})`);
+                showToast('Transaksi berhasil diperbarui');
+            } else {
+                // Add
+                const newTx = {
+                    id: 'tx-' + Date.now(),
+                    type,
+                    date,
+                    category,
+                    accountId,
+                    amount,
+                    desc,
+                    contact,
+                    status: 'Selesai'
+                };
+
+                state.accounts = state.accounts.map(acc => {
+                    if (acc.id === accountId) {
+                        const diff = type === 'Pemasukan' ? amount : -amount;
+                        return { ...acc, balance: acc.balance + diff };
+                    }
+                    return acc;
+                });
+
+                state.transactions.unshift(newTx);
+                addAudit('Tambah Transaksi', type, `${desc} (${formatIDR(amount)})`);
+                showToast('Transaksi berhasil dicatat & saldo diperbarui');
+            }
+
+            state.modal = null;
+            render();
+        }
+
+        function handleDeleteTransaction(txId) {
+            if (state.currentUser.role !== 'Owner') {
+                showToast('Hanya Owner yang dapat menghapus transaksi', 'error');
+                return;
+            }
+            const tx = state.transactions.find(t => t.id === txId);
+            if (!tx) return;
+
+            if (confirm(`Hapus transaksi "${tx.desc}" senilai ${formatIDR(tx.amount)}? Saldo akun akan dikembalikan.`)) {
+                state.accounts = state.accounts.map(acc => {
+                    if (acc.id === tx.accountId) {
+                        const diff = tx.type === 'Pemasukan' ? -tx.amount : tx.amount;
+                        return { ...acc, balance: acc.balance + diff };
+                    }
+                    return acc;
+                });
+                state.transactions = state.transactions.filter(t => t.id !== txId);
+                addAudit('Hapus Transaksi', tx.type, `Hapus ${tx.desc} (${formatIDR(tx.amount)})`);
+                showToast('Transaksi berhasil dihapus');
+                render();
+            }
+        }
+
+        function handleSaveTransfer(e) {
+            e.preventDefault();
+            const form = e.target;
+            const fromAcc = form.trFrom.value;
+            const toAcc = form.trTo.value;
+            const amount = Number(form.trAmount.value);
+            const fee = Number(form.trFee.value || 0);
+            const date = form.trDate.value;
+            const note = form.trNote.value;
+
+            if (amount <= 0) {
+                showToast('Nominal transfer harus lebih dari 0', 'error');
+                return;
+            }
+            if (fromAcc === toAcc) {
+                showToast('Akun sumber dan tujuan tidak boleh sama', 'error');
+                return;
+            }
+
+            const sourceAcc = state.accounts.find(a => a.id === fromAcc);
+            if (!sourceAcc || sourceAcc.balance < (amount + fee)) {
+                showToast('Saldo akun sumber tidak mencukupi untuk transfer & biaya', 'error');
+                return;
+            }
+
+            state.accounts = state.accounts.map(acc => {
+                if (acc.id === fromAcc) return { ...acc, balance: acc.balance - amount - fee };
+                if (acc.id === toAcc) return { ...acc, balance: acc.balance + amount };
+                return acc;
+            });
+
+            const newTransfer = {
+                id: 'tr-' + Date.now(),
+                date,
+                fromAcc,
+                toAcc,
+                amount,
+                fee,
+                note
+            };
+
+            state.transfers.unshift(newTransfer);
+            addAudit('Transfer Internal', 'Transfer', `Transfer ${formatIDR(amount)} dari ${sourceAcc.name}`);
+            showToast('Transfer internal berhasil dilakukan');
+            state.modal = null;
+            render();
+        }
+
+        function handlePayReceivable(rcvId) {
+            const rcv = state.receivables.find(r => r.id === rcvId);
+            if (!rcv) return;
+            const remaining = rcv.amount - rcv.paidAmount;
+            const input = prompt(`Bayar piutang ${rcv.customer}. Sisa tagihan ${formatIDR(remaining)}. Masukkan nominal (Rp):`, remaining);
+            if (!input) return;
+            const payAmount = Number(input);
+
+            if (payAmount <= 0 || payAmount > remaining) {
+                showToast('Nominal pembayaran piutang tidak valid', 'error');
+                return;
+            }
+
+            const accountId = state.accounts[1]?.id || state.accounts[0]?.id;
+            const newPaid = rcv.paidAmount + payAmount;
+            const newStatus = newPaid >= rcv.amount ? 'Lunas' : 'Dibayar Sebagian';
+
+            state.receivables = state.receivables.map(r => r.id === rcvId ? { ...r, paidAmount: newPaid, status: newStatus } : r);
+            state.accounts = state.accounts.map(acc => acc.id === accountId ? { ...acc, balance: acc.balance + payAmount } : acc);
+
+            state.transactions.unshift({
+                id: 'tx-rcv-' + Date.now(),
+                type: 'Pemasukan',
+                date: new Date().toISOString().substring(0, 10),
+                category: 'Penjualan / Omzet',
+                accountId,
+                amount: payAmount,
+                desc: `Pelunasan Piutang (${rcv.refNumber} - ${rcv.customer})`,
+                contact: rcv.customer,
+                status: 'Selesai'
+            });
+
+            addAudit('Terima Piutang', 'Pemasukan', `Terima piutang ${rcv.customer} Rp${payAmount}`);
+            showToast('Pembayaran piutang berhasil dicatat & masuk ke kas');
+            render();
+        }
+
+        function handlePayPayable(payId) {
+            const pay = state.payables.find(p => p.id === payId);
+            if (!pay) return;
+            const remaining = pay.amount - pay.paidAmount;
+            const input = prompt(`Bayar utang ${pay.supplier}. Sisa utang ${formatIDR(remaining)}. Masukkan nominal (Rp):`, remaining);
+            if (!input) return;
+            const payAmount = Number(input);
+
+            if (payAmount <= 0 || payAmount > remaining) {
+                showToast('Nominal pembayaran utang tidak valid', 'error');
+                return;
+            }
+
+            const accountId = state.accounts[1]?.id || state.accounts[0]?.id;
+            const sourceAcc = state.accounts.find(a => a.id === accountId);
+            if (!sourceAcc || sourceAcc.balance < payAmount) {
+                showToast('Saldo akun kas tidak cukup untuk membayar utang', 'error');
+                return;
+            }
+
+            const newPaid = pay.paidAmount + payAmount;
+            const newStatus = newPaid >= pay.amount ? 'Lunas' : 'Dibayar Sebagian';
+
+            state.payables = state.payables.map(p => p.id === payId ? { ...p, paidAmount: newPaid, status: newStatus } : p);
+            state.accounts = state.accounts.map(acc => acc.id === accountId ? { ...acc, balance: acc.balance - payAmount } : acc);
+
+            state.transactions.unshift({
+                id: 'tx-pay-' + Date.now(),
+                type: 'Pengeluaran',
+                date: new Date().toISOString().substring(0, 10),
+                category: 'Pembelian Bahan Baku',
+                accountId,
+                amount: payAmount,
+                desc: `Pembayaran Utang (${pay.refNumber} - ${pay.supplier})`,
+                contact: pay.supplier,
+                status: 'Selesai'
+            });
+
+            addAudit('Bayar Utang', 'Pengeluaran', `Bayar utang ${pay.supplier} Rp${payAmount}`);
+            showToast('Pembayaran utang berhasil dicatat');
+            render();
+        }
+
+        function sendWhatsAppReminder(rcvId) {
+            const rcv = state.receivables.find(r => r.id === rcvId);
+            if (!rcv) return;
+            const remaining = rcv.amount - rcv.paidAmount;
+            const text = `Halo Yth. Bpk/Ibu dari *${rcv.customer}*,\n\nKami dari manajemen *${state.business.name}* ingin mengingatkan perihal tagihan nomor *${rcv.refNumber}* (${rcv.desc}) sebesar *${formatIDR(remaining)}* yang jatuh tempo pada tanggal *${formatDate(rcv.dueDate)}*.\n\nMohon konfirmasi pembayaran ke rekening usaha kami. Terima kasih! 🙏`;
+            window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+            showToast('Membuka WhatsApp Web untuk mengirim pengingat');
+        }
+
+        // --- RENDER ENGINE ---
+        function render() {
+            const app = document.getElementById('app');
+            const metrics = getComputedMetrics();
+
+            app.innerHTML = `
+                <!-- Toast Notification -->
+                ${state.toast ? `
+                    <div class="fixed top-5 right-5 z-50 flex items-center gap-3 px-4 py-3 rounded-xl shadow-xl text-white transition-all transform animate-bounce ${state.toast.type === 'error' ? 'bg-red-500' : 'bg-emerald-600'}">
+                        <i data-lucide="${state.toast.type === 'error' ? 'alert-triangle' : 'check-circle-2'}" class="w-5 h-5"></i>
+                        <span class="text-sm font-semibold">${state.toast.message}</span>
+                    </div>
+                ` : ''}
+
+                <!-- Main Layout -->
+                <div class="flex flex-1 overflow-hidden">
+                    <!-- SIDEBAR -->
+                    <aside class="fixed inset-y-0 left-0 z-40 w-64 bg-white border-r border-slate-200 text-slate-800 flex flex-col transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${state.sidebarOpen ? 'translate-x-0' : '-translate-x-full'} shadow-xl lg:shadow-none">
+                        <div class="p-6 border-b border-slate-100 flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center shadow-md text-white font-bold text-xl">
+                                    🧮
+                                </div>
+                                <div>
+                                    <h1 class="font-bold text-lg tracking-tight text-slate-900 flex items-center gap-1.5">
+                                        ArusKas <span class="text-[10px] bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-bold">PRO</span>
+                                    </h1>
+                                    <p class="text-xs text-slate-500 font-medium">SaaS Keuangan UMKM</p>
+                                </div>
+                            </div>
+                            <button onclick="state.sidebarOpen = false; render();" class="lg:hidden text-slate-500 hover:text-slate-800">
+                                <i data-lucide="x" class="w-6 h-6"></i>
+                            </button>
+                        </div>
+
+                        <div class="px-4 py-3 mx-4 my-3 bg-slate-50 rounded-xl border border-slate-200 flex items-center gap-3">
+                            <i data-lucide="building-2" class="w-5 h-5 text-emerald-600"></i>
+                            <div class="overflow-hidden">
+                                <p class="text-xs font-semibold text-slate-900 truncate">${state.business.name}</p>
+                                <p class="text-[10px] text-slate-500 truncate">${state.business.type} • IDR</p>
+                            </div>
+                        </div>
+
+                        <nav class="flex-1 px-3 py-2 space-y-1 overflow-y-auto">
+                            ${[
+                                { id: 'dashboard', label: 'Ringkasan', icon: 'layout-dashboard' },
+                                { id: 'transactions', label: 'Transaksi', icon: 'receipt' },
+                                { id: 'accounts', label: 'Akun Kas', icon: 'wallet' },
+                                { id: 'categories', label: 'Kategori', icon: 'layers' },
+                                { id: 'transfers', label: 'Transfer Saldo', icon: 'arrow-left-right' },
+                                { id: 'receivables', label: 'Piutang', icon: 'hand-coins' },
+                                { id: 'payables', label: 'Utang', icon: 'piggy-bank' },
+                                { id: 'budgets', label: 'Anggaran', icon: 'bar-chart-3' },
+                                { id: 'reports', label: 'Laporan Keuangan', icon: 'file-text' },
+                                { id: 'settings', label: 'Pengaturan & Akses', icon: 'settings' }
+                            ].map(item => `
+                                <button
+                                    onclick="state.currentTab = '${item.id}'; state.sidebarOpen = false; render();"
+                                    class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all ${state.currentTab === item.id ? 'bg-emerald-600 text-white shadow-md shadow-emerald-500/20 font-bold' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'}"
+                                >
+                                    <i data-lucide="${item.icon}" class="w-5 h-5 ${state.currentTab === item.id ? 'text-white' : 'text-emerald-600'}"></i>
+                                    <span>${item.label}</span>
+                                </button>
+                            `).join('')}
+                        </nav>
+
+                        <div class="p-4 border-t border-slate-100 bg-slate-50 flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="w-9 h-9 rounded-full bg-emerald-100 text-emerald-700 font-bold flex items-center justify-center text-sm border border-emerald-200">
+                                    ${state.currentUser.name.charAt(0)}
+                                </div>
+                                <div class="overflow-hidden">
+                                    <p class="text-xs font-bold text-slate-900 truncate">${state.currentUser.name}</p>
+                                    <p class="text-[10px] text-emerald-600 font-semibold">${state.currentUser.role} Account</p>
+                                </div>
+                            </div>
+                            <button onclick="showToast('Sesi aktif & aman terenkripsi')" class="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-200/50 rounded-lg">
+                                <i data-lucide="shield" class="w-4 h-4 text-emerald-600"></i>
+                            </button>
+                        </div>
+                    </aside>
+
+                    <!-- CONTENT AREA -->
+                    <main class="flex-1 flex flex-col lg:pl-64 min-w-0 overflow-y-auto bg-[#F7F9FB]">
+                        <header class="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-slate-200 px-6 py-4 flex items-center justify-between shadow-xs">
+                            <div class="flex items-center gap-4">
+                                <button onclick="state.sidebarOpen = true; render();" class="lg:hidden p-2 text-slate-700 hover:bg-slate-100 rounded-xl">
+                                    <i data-lucide="menu" class="w-6 h-6"></i>
+                                </button>
+                                <div>
+                                    <h2 class="text-xl font-bold text-slate-900 capitalize">
+                                        ${state.currentTab === 'dashboard' ? 'Ringkasan Keuangan' : state.currentTab}
+                                    </h2>
+                                    <p class="text-xs text-slate-500">Periode aktif: Maret 2026 • Zona Waktu Asia/Jakarta</p>
+                                </div>
+                            </div>
+                            <button onclick="openModal('addTx')" class="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold shadow-md shadow-emerald-600/20 transition-all">
+                                <i data-lucide="plus" class="w-4 h-4"></i>
+                                <span>Catat Transaksi</span>
+                            </button>
+                        </header>
+
+                        <div class="p-6 max-w-7xl w-full mx-auto flex-1 space-y-6">
+                            ${renderTabContent(metrics)}
+                        </div>
+                    </main>
+                </div>
+
+                <!-- MODAL CONTAINER -->
+                ${state.modal ? renderModal() : ''}
+            `;
+            lucide.createIcons();
+        }
+
+        // --- TAB ROUTER ---
+        function renderTabContent(metrics) {
+            switch (state.currentTab) {
+                case 'dashboard':
+                    return `
+                        <div class="space-y-6 animate-fadeIn">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                                <div class="bg-white border border-slate-200 p-5 rounded-2xl shadow-xs flex flex-col justify-between">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total Saldo Kas</span>
+                                        <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                                            <i data-lucide="wallet" class="w-5 h-5"></i>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-2xl font-bold text-slate-900">${formatIDR(metrics.totalBalance)}</h3>
+                                        <p class="text-xs text-slate-500 mt-1">Akumulasi seluruh akun kas & bank aktif</p>
+                                    </div>
+                                </div>
+
+                                <div class="bg-white border border-slate-200 p-5 rounded-2xl shadow-xs flex flex-col justify-between">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Pemasukan Bulan Ini</span>
+                                        <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                                            <i data-lucide="arrow-up-right" class="w-5 h-5"></i>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-2xl font-bold text-emerald-600">${formatIDR(metrics.incomeThisMonth)}</h3>
+                                        <p class="text-xs text-slate-500 mt-1">Dari penjualan & pendapatan operasional</p>
+                                    </div>
+                                </div>
+
+                                <div class="bg-white border border-slate-200 p-5 rounded-2xl shadow-xs flex flex-col justify-between">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Pengeluaran Bulan Ini</span>
+                                        <div class="w-9 h-9 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center">
+                                            <i data-lucide="arrow-down-left" class="w-5 h-5"></i>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-2xl font-bold text-rose-600">${formatIDR(metrics.expenseThisMonth)}</h3>
+                                        <p class="text-xs text-slate-500 mt-1">Pembelian bahan baku & biaya operasional</p>
+                                    </div>
+                                </div>
+
+                                <div class="bg-white border border-slate-200 p-5 rounded-2xl shadow-xs flex flex-col justify-between">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Laba Bersih Bulan Ini</span>
+                                        <div class="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                                            <i data-lucide="trending-up" class="w-5 h-5"></i>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-2xl font-bold ${metrics.netProfitThisMonth >= 0 ? 'text-emerald-600' : 'text-rose-600'}">
+                                            ${formatIDR(metrics.netProfitThisMonth)}
+                                        </h3>
+                                        <p class="text-xs text-slate-500 mt-1">Pemasukan dikurangi pengeluaran</p>
+                                    </div>
+                                </div>
+
+                                <div class="bg-white border border-slate-200 p-5 rounded-2xl shadow-xs flex flex-col justify-between">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Piutang Belum Lunas</span>
+                                        <div class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+                                            <i data-lucide="hand-coins" class="w-5 h-5"></i>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-2xl font-bold text-amber-600">${formatIDR(metrics.totalReceivablesUnpaid)}</h3>
+                                        <p class="text-xs text-slate-500 mt-1">Tagihan pelanggan tempo</p>
+                                    </div>
+                                </div>
+
+                                <div class="bg-white border border-slate-200 p-5 rounded-2xl shadow-xs flex flex-col justify-between">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Utang Belum Lunas</span>
+                                        <div class="w-9 h-9 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center">
+                                            <i data-lucide="piggy-bank" class="w-5 h-5"></i>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-2xl font-bold text-rose-600">${formatIDR(metrics.totalPayablesUnpaid)}</h3>
+                                        <p class="text-xs text-slate-500 mt-1">Kewajiban ke supplier & vendor</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                                <div class="bg-white border border-slate-200 p-6 rounded-2xl shadow-xs flex flex-col">
+                                    <div class="flex items-center justify-between mb-4">
+                                        <h3 class="font-bold text-slate-900 text-base">Akun Kas & Bank</h3>
+                                        <button onclick="state.currentTab = 'accounts'; render();" class="text-xs font-semibold text-emerald-600 hover:underline">Kelola</button>
+                                    </div>
+                                    <div class="space-y-3 flex-1">
+                                        ${state.accounts.map(acc => `
+                                            <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
+                                                <div>
+                                                    <p class="text-sm font-bold text-slate-900">${acc.name}</p>
+                                                    <p class="text-xs text-slate-500">${acc.type}</p>
+                                                </div>
+                                                <p class="text-sm font-bold text-emerald-600">${formatIDR(acc.balance)}</p>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                    <button onclick="openModal('addTransfer')" class="mt-4 w-full py-2.5 bg-slate-50 hover:bg-slate-100 border border-emerald-300 text-emerald-600 text-xs font-bold rounded-xl transition-colors flex items-center justify-center gap-2">
+                                        <i data-lucide="arrow-left-right" class="w-4 h-4"></i>
+                                        <span>Transfer Antar Akun</span>
+                                    </button>
+                                </div>
+
+                                <div class="bg-white border border-slate-200 p-6 rounded-2xl shadow-xs lg:col-span-2 flex flex-col">
+                                    <div class="flex items-center justify-between mb-4">
+                                        <h3 class="font-bold text-slate-900 text-base">Transaksi Terbaru</h3>
+                                        <button onclick="state.currentTab = 'transactions'; render();" class="text-xs font-semibold text-emerald-600 hover:underline">Lihat Semua</button>
+                                    </div>
+                                    <div class="overflow-x-auto flex-1">
+                                        <table class="w-full text-left text-sm">
+                                            <thead>
+                                                <tr class="border-b border-slate-200 text-xs text-slate-500">
+                                                    <th class="pb-3 font-semibold">Tanggal</th>
+                                                    <th class="pb-3 font-semibold">Deskripsi</th>
+                                                    <th class="pb-3 font-semibold">Kategori</th>
+                                                    <th class="pb-3 font-semibold text-right">Nominal</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="divide-y divide-slate-100">
+                                                ${state.transactions.slice(0, 5).map(tx => `
+                                                    <tr class="hover:bg-slate-50">
+                                                        <td class="py-3 text-xs text-slate-500">${formatDate(tx.date)}</td>
+                                                        <td class="py-3 font-medium text-slate-900">${tx.desc}</td>
+                                                        <td class="py-3">
+                                                            <span class="inline-block px-2.5 py-1 text-[10px] font-semibold rounded-full bg-slate-100 text-slate-600 border border-slate-200">
+                                                                ${tx.category}
+                                                            </span>
+                                                        </td>
+                                                        <td class="py-3 text-right font-bold ${tx.type === 'Pemasukan' ? 'text-emerald-600' : 'text-rose-600'}">
+                                                            ${tx.type === 'Pemasukan' ? '+' : '-'}${formatIDR(tx.amount)}
+                                                        </td>
+                                                    </tr>
+                                                `).join('')}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                case 'transactions':
+                    const filteredTx = state.transactions.filter(tx => {
+                        const matchSearch = tx.desc.toLowerCase().includes(state.txSearch.toLowerCase()) || (tx.contact && tx.contact.toLowerCase().includes(state.txSearch.toLowerCase()));
+                        const matchType = state.txFilterType === 'Semua' || tx.type === state.txFilterType;
+                        const matchCat = state.txFilterCat === 'Semua' || tx.category === state.txFilterCat;
+                        return matchSearch && matchType && matchCat;
+                    });
+
+                    return `
+                        <div class="space-y-6 animate-fadeIn">
+                            <div class="bg-white border border-slate-200 p-6 rounded-2xl shadow-xs flex flex-col gap-4">
+                                <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+                                    <div class="relative w-full md:w-80">
+                                        <i data-lucide="search" class="absolute left-3.5 top-3 w-4 h-4 text-slate-400"></i>
+                                        <input 
+                                            type="text" 
+                                            placeholder="Cari deskripsi atau kontak..." 
+                                            value="${state.txSearch}"
+                                            oninput="state.txSearch = this.value; render();"
+                                            class="w-full pl-10 pr-4 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-emerald-500"
+                                        />
+                                    </div>
+                                    <div class="flex items-center gap-2 w-full md:w-auto overflow-x-auto pb-2 md:pb-0">
+                                        <select 
+                                            onchange="state.txFilterType = this.value; render();"
+                                            class="px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-medium">
+                                            <option value="Semua" ${state.txFilterType === 'Semua' ? 'selected' : ''}>Semua Jenis</option>
+                                            <option value="Pemasukan" ${state.txFilterType === 'Pemasukan' ? 'selected' : ''}>Pemasukan</option>
+                                            <option value="Pengeluaran" ${state.txFilterType === 'Pengeluaran' ? 'selected' : ''}>Pengeluaran</option>
+                                        </select>
+                                        <select 
+                                            onchange="state.txFilterCat = this.value; render();"
+                                            class="px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-medium">
+                                            <option value="Semua">Semua Kategori</option>
+                                            ${state.categories.map(c => `<option value="${c.name}" ${state.txFilterCat === c.name ? 'selected' : ''}>${c.name}</option>`).join('')}
+                                        </select>
+                                        <button onclick="openModal('addTx')" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-xl flex items-center gap-2 shrink-0">
+                                            <i data-lucide="plus" class="w-4 h-4"></i>
+                                            <span>Tambah</span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="overflow-x-auto">
+                                    <table class="w-full text-left text-sm">
+                                        <thead>
+                                            <tr class="border-b border-slate-200 text-xs text-slate-500">
+                                                <th class="py-3 font-semibold">Tanggal</th>
+                                                <th class="py-3 font-semibold">Deskripsi & Kontak</th>
+                                                <th class="py-3 font-semibold">Kategori</th>
+                                                <th class="py-3 font-semibold">Akun Kas</th>
+                                                <th class="py-3 font-semibold text-right">Nominal</th>
+                                                <th class="py-3 font-semibold text-center">Aksi</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y divide-slate-100">
+                                            ${filteredTx.length === 0 ? `
+                                                <tr><td colspan="6" class="text-center py-8 text-slate-400">Tidak ada transaksi ditemukan.</td></tr>
+                                            ` : filteredTx.map(tx => {
+                                                const accObj = state.accounts.find(a => a.id === tx.accountId);
+                                                return `
+                                                    <tr class="hover:bg-slate-50 transition-colors">
+                                                        <td class="py-3.5 text-xs text-slate-500">${formatDate(tx.date)}</td>
+                                                        <td class="py-3.5">
+                                                            <p class="font-bold text-slate-900">${tx.desc}</p>
+                                                            <p class="text-xs text-slate-500">Kontak: ${tx.contact || '-'}</p>
+                                                        </td>
+                                                        <td class="py-3.5">
+                                                            <span class="px-2.5 py-1 text-xs font-semibold rounded-full bg-slate-100 text-slate-600 border border-slate-200">
+                                                                ${tx.category}
+                                                            </span>
+                                                        </td>
+                                                        <td class="py-3.5 text-xs text-slate-500 font-medium">${accObj?.name || 'Kas Umum'}</td>
+                                                        <td class="py-3.5 text-right font-bold text-base ${tx.type === 'Pemasukan' ? 'text-emerald-600' : 'text-rose-600'}">
+                                                            ${tx.type === 'Pemasukan' ? '+' : '-'}${formatIDR(tx.amount)}
+                                                        </td>
+                                                        <td class="py-3.5 text-center">
+                                                            <div class="flex items-center justify-center gap-1">
+                                                                <button onclick="openModal('editTx', '${tx.id}')" class="p-1.5 text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
+                                                                <button onclick="handleDeleteTransaction('${tx.id}')" class="p-1.5 text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-lg"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                `;
+                                            }).join('')}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                case 'accounts':
+                    return `
+                        <div class="space-y-6 animate-fadeIn">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h3 class="text-lg font-bold text-slate-900">Daftar Akun Kas & Rekening</h3>
+                                    <p class="text-xs text-slate-500">Kelola semua sumber kas tunai, rekening bank, dan e-wallet usaha anda.</p>
+                                </div>
+                                <button onclick="
+                                    const name = prompt('Nama Akun Kas Baru (Contoh: Kas Toko Cabang 2):');
+                                    if(!name) return;
+                                    const type = prompt('Jenis Akun (Kas Tunai / Rekening Bank / E-Wallet):', 'Rekening Bank');
+                                    const initBal = Number(prompt('Saldo Awal (Rp):', '0'));
+                                    state.accounts.push({ id: 'acc-' + Date.now(), name, type: type || 'Rekening Bank', initialBalance: initBal, initialDate: new Date().toISOString().substring(0,10), balance: initBal, status: 'Aktif' });
+                                    addAudit('Tambah Akun', 'Konfigurasi', 'Buat akun ' + name);
+                                    showToast('Akun kas baru berhasil ditambahkan');
+                                    render();
+                                " class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-xl flex items-center gap-2">
+                                    <i data-lucide="plus" class="w-4 h-4"></i>
+                                    <span>Tambah Akun Kas</span>
+                                </button>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                ${state.accounts.map(acc => `
+                                    <div class="bg-white border border-slate-200 p-6 rounded-2xl shadow-xs flex flex-col justify-between">
+                                        <div>
+                                            <div class="flex items-center justify-between mb-2">
+                                                <span class="px-2.5 py-1 text-[10px] font-bold rounded-full bg-emerald-50 text-emerald-600">
+                                                    ${acc.type}
+                                                </span>
+                                                <span class="text-xs text-emerald-600 font-semibold">${acc.status}</span>
+                                            </div>
+                                            <h4 class="font-bold text-lg text-slate-900 mb-1">${acc.name}</h4>
+                                            <p class="text-xs text-slate-500">Saldo Awal: ${formatIDR(acc.initialBalance)} (${formatDate(acc.initialDate)})</p>
+                                        </div>
+                                        <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
+                                            <span class="text-xs text-slate-500 font-medium">Saldo Aktual</span>
+                                            <span class="text-xl font-bold text-slate-900">${formatIDR(acc.balance)}</span>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+
+                case 'categories':
+                    return `
+                        <div class="space-y-6 animate-fadeIn">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h3 class="text-lg font-bold text-slate-900">Kategori Transaksi</h3>
+                                    <p class="text-xs text-slate-500">Kelompokkan pemasukan dan pengeluaran agar laporan akurat.</p>
+                                </div>
+                                <button onclick="
+                                    const name = prompt('Nama Kategori Baru:');
+                                    if(!name) return;
+                                    const type = prompt('Jenis (Pemasukan / Pengeluaran):', 'Pengeluaran');
+                                    state.categories.push({ id: 'cat-' + Date.now(), name, type: type || 'Pengeluaran', desc: '', active: true, monthlyBudget: 500000 });
+                                    showToast('Kategori baru ditambahkan');
+                                    render();
+                                " class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-xl flex items-center gap-2">
+                                    <i data-lucide="plus" class="w-4 h-4"></i>
+                                    <span>Tambah Kategori</span>
+                                </button>
+                            </div>
+
+                            <div class="bg-white border border-slate-200 rounded-2xl shadow-xs overflow-hidden">
+                                <table class="w-full text-left text-sm">
+                                    <thead>
+                                        <tr class="border-b border-slate-200 bg-slate-50 text-xs text-slate-500">
+                                            <th class="p-4 font-semibold">Nama Kategori</th>
+                                            <th class="p-4 font-semibold">Jenis</th>
+                                            <th class="p-4 font-semibold">Deskripsi</th>
+                                            <th class="p-4 font-semibold">Anggaran Bulanan</th>
+                                            <th class="p-4 font-semibold text-center">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-100">
+                                        ${state.categories.map(cat => `
+                                            <tr class="hover:bg-slate-50">
+                                                <td class="p-4 font-bold text-slate-900">${cat.name}</td>
+                                                <td class="p-4">
+                                                    <span class="px-2.5 py-1 text-xs font-bold rounded-full ${cat.type === 'Pemasukan' ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}">
+                                                        ${cat.type}
+                                                    </span>
+                                                </td>
+                                                <td class="p-4 text-xs text-slate-500">${cat.desc || '-'}</td>
+                                                <td class="p-4 font-semibold text-slate-900">${cat.monthlyBudget ? formatIDR(cat.monthlyBudget) : 'Tidak Ada'}</td>
+                                                <td class="p-4 text-center"><span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-emerald-100 text-emerald-800">Aktif</span></td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    `;
+
+                case 'transfers':
+                    return `
+                        <div class="space-y-6 animate-fadeIn">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h3 class="text-lg font-bold text-slate-900">Transfer Saldo Antar Akun</h3>
+                                    <p class="text-xs text-slate-500">Pindahkan dana antar rekening atau tarik tunai tanpa mengubah laporan laba rugi.</p>
+                                </div>
+                                <button onclick="openModal('addTransfer')" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-xl flex items-center gap-2">
+                                    <i data-lucide="arrow-left-right" class="w-4 h-4"></i>
+                                    <span>Transfer Baru</span>
+                                </button>
+                            </div>
+
+                            <div class="bg-white border border-slate-200 rounded-2xl shadow-xs overflow-hidden">
+                                <table class="w-full text-left text-sm">
+                                    <thead>
+                                        <tr class="border-b border-slate-200 bg-slate-50 text-xs text-slate-500">
+                                            <th class="p-4 font-semibold">Tanggal</th>
+                                            <th class="p-4 font-semibold">Dari Akun</th>
+                                            <th class="p-4 font-semibold">Ke Akun</th>
+                                            <th class="p-4 font-semibold text-right">Nominal Transfer</th>
+                                            <th class="p-4 font-semibold text-right">Biaya Admin</th>
+                                            <th class="p-4 font-semibold">Catatan</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-100">
+                                        ${state.transfers.length === 0 ? `
+                                            <tr><td colspan="6" class="text-center py-8 text-slate-400">Belum ada riwayat transfer.</td></tr>
+                                        ` : state.transfers.map(tr => {
+                                            const fromObj = state.accounts.find(a => a.id === tr.fromAcc);
+                                            const toObj = state.accounts.find(a => a.id === tr.toAcc);
+                                            return `
+                                                <tr class="hover:bg-slate-50">
+                                                    <td class="p-4 text-xs text-slate-500">${formatDate(tr.date)}</td>
+                                                    <td class="p-4 font-medium text-slate-900">${fromObj?.name || '-'}</td>
+                                                    <td class="p-4 font-medium text-slate-900">${toObj?.name || '-'}</td>
+                                                    <td class="p-4 text-right font-bold text-emerald-600">${formatIDR(tr.amount)}</td>
+                                                    <td class="p-4 text-right text-xs text-rose-600">${tr.fee > 0 ? formatIDR(tr.fee) : 'Rp0'}</td>
+                                                    <td class="p-4 text-xs text-slate-500">${tr.note || '-'}</td>
+                                                </tr>
+                                            `;
+                                        }).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    `;
+
+                case 'receivables':
+                    return `
+                        <div class="space-y-6 animate-fadeIn">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h3 class="text-lg font-bold text-slate-900">Pengelolaan Piutang Pelanggan</h3>
+                                    <p class="text-xs text-slate-500">Catat tagihan tempo dan kirim pengingat pembayaran otomatis via WhatsApp.</p>
+                                </div>
+                                <button onclick="
+                                    const customer = prompt('Nama Pelanggan:');
+                                    if(!customer) return;
+                                    const amount = Number(prompt('Total Nominal Piutang (Rp):', '1000000'));
+                                    state.receivables.unshift({ id: 'rcv-' + Date.now(), customer, refNumber: 'INV-2026-' + Math.floor(100+Math.random()*900), date: new Date().toISOString().substring(0,10), dueDate: '2026-03-30', desc: 'Penjualan tempo', amount, paidAmount: 0, status: 'Belum Jatuh Tempo', notes: 'Baru' });
+                                    showToast('Piutang berhasil dicatat');
+                                    render();
+                                " class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-xl flex items-center gap-2">
+                                    <i data-lucide="plus" class="w-4 h-4"></i>
+                                    <span>Catat Piutang</span>
+                                </button>
+                            </div>
+
+                            <div class="grid grid-cols-1 gap-4">
+                                ${state.receivables.map(rcv => {
+                                    const remaining = rcv.amount - rcv.paidAmount;
+                                    const days = getDaysUntil(rcv.dueDate);
+                                    return `
+                                        <div class="bg-white border border-slate-200 p-5 rounded-2xl shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                                            <div class="space-y-1">
+                                                <div class="flex items-center gap-2">
+                                                    <span class="font-bold text-slate-900 text-base">${rcv.customer}</span>
+                                                    <span class="text-xs px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600 font-semibold border border-slate-200">${rcv.refNumber}</span>
+                                                    <span class="px-2.5 py-0.5 text-[10px] font-bold rounded-full ${rcv.status === 'Lunas' ? 'bg-emerald-100 text-emerald-800' : rcv.status === 'Terlambat' ? 'bg-rose-100 text-rose-600' : 'bg-amber-100 text-amber-800'}">${rcv.status}</span>
+                                                </div>
+                                                <p class="text-xs text-slate-500">${rcv.desc} • Jatuh tempo: ${formatDate(rcv.dueDate)} (${days < 0 ? `Terlambat ${Math.abs(days)} hari` : `Dalam ${days} hari`})</p>
+                                            </div>
+
+                                            <div class="flex items-center gap-4 w-full md:w-auto justify-between md:justify-end">
+                                                <div class="text-right">
+                                                    <p class="text-xs text-slate-500">Sisa Tagihan</p>
+                                                    <p class="text-lg font-bold text-rose-600">${formatIDR(remaining)}</p>
+                                                </div>
+                                                <div class="flex items-center gap-2">
+                                                    <button onclick="sendWhatsAppReminder('${rcv.id}')" class="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl flex items-center gap-1.5 shadow-xs">
+                                                        <i data-lucide="send" class="w-3.5 h-3.5"></i>
+                                                        <span>WhatsApp</span>
+                                                    </button>
+                                                    ${remaining > 0 ? `
+                                                        <button onclick="handlePayReceivable('${rcv.id}')" class="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-xs">
+                                                            Terima Pembayaran
+                                                        </button>
+                                                    ` : ''}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        </div>
+                    `;
+
+                case 'payables':
+                    return `
+                        <div class="space-y-6 animate-fadeIn">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h3 class="text-lg font-bold text-slate-900">Pengelolaan Utang Supplier</h3>
+                                    <p class="text-xs text-slate-500">Pantau kewajiban pembayaran bahan baku dan vendor agar operasional lancar.</p>
+                                </div>
+                                <button onclick="
+                                    const supplier = prompt('Nama Supplier:');
+                                    if(!supplier) return;
+                                    const amount = Number(prompt('Total Nominal Utang (Rp):', '1500000'));
+                                    state.payables.unshift({ id: 'pay-' + Date.now(), supplier, refNumber: 'BILL-' + Math.floor(100+Math.random()*900), date: new Date().toISOString().substring(0,10), dueDate: '2026-03-30', desc: 'Pembelian bahan', amount, paidAmount: 0, status: 'Belum Jatuh Tempo', notes: 'Baru' });
+                                    showToast('Utang supplier berhasil dicatat');
+                                    render();
+                                " class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-xl flex items-center gap-2">
+                                    <i data-lucide="plus" class="w-4 h-4"></i>
+                                    <span>Catat Utang</span>
+                                </button>
+                            </div>
+
+                            <div class="grid grid-cols-1 gap-4">
+                                ${state.payables.map(pay => {
+                                    const remaining = pay.amount - pay.paidAmount;
+                                    return `
+                                        <div class="bg-white border border-slate-200 p-5 rounded-2xl shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                                            <div class="space-y-1">
+                                                <div class="flex items-center gap-2">
+                                                    <span class="font-bold text-slate-900 text-base">${pay.supplier}</span>
+                                                    <span class="text-xs px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600 font-semibold border border-slate-200">${pay.refNumber}</span>
+                                                    <span class="px-2.5 py-0.5 text-[10px] font-bold rounded-full ${pay.status === 'Lunas' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${pay.status}</span>
+                                                </div>
+                                                <p class="text-xs text-slate-500">${pay.desc} • Jatuh tempo: ${formatDate(pay.dueDate)}</p>
+                                            </div>
+
+                                            <div class="flex items-center gap-4 w-full md:w-auto justify-between md:justify-end">
+                                                <div class="text-right">
+                                                    <p class="text-xs text-slate-500">Sisa Utang</p>
+                                                    <p class="text-lg font-bold text-rose-600">${formatIDR(remaining)}</p>
+                                                </div>
+                                                ${remaining > 0 ? `
+                                                    <button onclick="handlePayPayable('${pay.id}')" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-xs">
+                                                        Bayar Utang
+                                                    </button>
+                                                ` : ''}
+                                            </div>
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        </div>
+                    `;
+
+                case 'budgets':
+                    return `
+                        <div class="space-y-6 animate-fadeIn">
+                            <div>
+                                <h3 class="text-lg font-bold text-slate-900">Anggaran Bulanan Pengeluaran</h3>
+                                <p class="text-xs text-slate-500">Kontrol pengeluaran usaha setiap bulan berdasarkan kategori.</p>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                ${state.categories.filter(c => c.type === 'Pengeluaran').map(cat => {
+                                    const actual = state.transactions
+                                        .filter(t => t.category === cat.name && t.type === 'Pengeluaran')
+                                        .reduce((sum, t) => sum + t.amount, 0);
+                                    const budget = cat.monthlyBudget || 1000000;
+                                    const percent = Math.min(100, Math.round((actual / budget) * 100));
+
+                                    return `
+                                        <div class="bg-white border border-slate-200 p-5 rounded-2xl shadow-xs space-y-3">
+                                            <div class="flex items-center justify-between">
+                                                <h4 class="font-bold text-slate-900 text-sm">${cat.name}</h4>
+                                                <span class="text-xs font-bold text-slate-500">${percent}% terpakai</span>
+                                            </div>
+                                            <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                                                <div class="h-full rounded-full ${percent > 85 ? 'bg-rose-600' : 'bg-emerald-600'}" style="width: ${percent}%"></div>
+                                            </div>
+                                            <div class="flex items-center justify-between text-xs text-slate-500">
+                                                <span>Realisasi: <strong class="text-slate-900">${formatIDR(actual)}</strong></span>
+                                                <span>Anggaran: <strong class="text-slate-900">${formatIDR(budget)}</strong></span>
+                                            </div>
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        </div>
+                    `;
+
+                case 'reports':
+                    return `
+                        <div class="space-y-6 animate-fadeIn">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h3 class="text-lg font-bold text-slate-900">Laporan Keuangan Konsolidasi</h3>
+                                    <p class="text-xs text-slate-500">Laporan Laba Rugi dan Arus Kas riil berdasarkan data transaksi aktual.</p>
+                                </div>
+                                <button onclick="showToast('File PDF laporan berhasil diunduh!');" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-xl flex items-center gap-2">
+                                    <i data-lucide="download" class="w-4 h-4"></i>
+                                    <span>Ekspor PDF / Excel</span>
+                                </button>
+                            </div>
+
+                            <div class="bg-white border border-slate-200 p-6 rounded-2xl shadow-xs space-y-6">
+                                <div class="border-b border-slate-100 pb-4">
+                                    <h4 class="font-bold text-base text-slate-900">Laporan Laba / Rugi (Bulan Berjalan)</h4>
+                                    <p class="text-xs text-slate-500">${state.business.name} • Periode Maret 2026</p>
+                                </div>
+
+                                <div class="space-y-4">
+                                    <div>
+                                        <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Pendapatan Operasional</p>
+                                        <div class="flex items-center justify-between py-2 border-b border-slate-100 text-sm">
+                                            <span class="text-slate-900">Total Pemasukan & Omzet Penjualan</span>
+                                            <span class="font-bold text-emerald-600">${formatIDR(metrics.incomeThisMonth)}</span>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Beban Operasional</p>
+                                        <div class="space-y-2">
+                                            ${state.categories.filter(c => c.type === 'Pengeluaran').map(cat => {
+                                                const catTotal = state.transactions
+                                                    .filter(t => t.category === cat.name && t.type === 'Pengeluaran')
+                                                    .reduce((sum, t) => sum + t.amount, 0);
+                                                if (catTotal === 0) return '';
+                                                return `
+                                                    <div class="flex items-center justify-between text-sm py-1 pl-4 border-l-2 border-rose-600">
+                                                        <span class="text-slate-500">${cat.name}</span>
+                                                        <span class="font-semibold text-slate-900">${formatIDR(catTotal)}</span>
+                                                    </div>
+                                                `;
+                                            }).join('')}
+                                        </div>
+                                        <div class="flex items-center justify-between py-2 mt-2 border-t border-slate-200 text-sm font-bold">
+                                            <span class="text-slate-900">Total Beban</span>
+                                            <span class="text-rose-600">${formatIDR(metrics.expenseThisMonth)}</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
+                                        <div>
+                                            <p class="text-xs font-bold text-slate-500 uppercase">Laba Bersih Usaha</p>
+                                            <p class="text-xs text-slate-500">Pendapatan dikurangi total beban</p>
+                                        </div>
+                                        <p class="text-xl font-bold ${metrics.netProfitThisMonth >= 0 ? 'text-emerald-600' : 'text-rose-600'}">
+                                            ${formatIDR(metrics.netProfitThisMonth)}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                case 'settings':
+                    return `
+                        <div class="space-y-6 animate-fadeIn">
+                            <div>
+                                <h3 class="text-lg font-bold text-slate-900">Pengaturan Usaha & Hak Akses</h3>
+                                <p class="text-xs text-slate-500">Kelola profil bisnis dan izin akses karyawan (Owner vs Staff).</p>
+                            </div>
+
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                <div class="bg-white border border-slate-200 p-6 rounded-2xl shadow-xs space-y-4">
+                                    <h4 class="font-bold text-base text-slate-900">Profil Usaha</h4>
+                                    <div class="space-y-3">
+                                        <div>
+                                            <label class="text-xs font-semibold text-slate-500">Nama Usaha</label>
+                                            <input type="text" id="bizName" value="${state.business.name}" class="w-full mt-1 px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-900" />
+                                        </div>
+                                        <div>
+                                            <label class="text-xs font-semibold text-slate-500">Jenis Usaha</label>
+                                            <input type="text" id="bizType" value="${state.business.type}" class="w-full mt-1 px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-900" />
+                                        </div>
+                                        <button onclick="
+                                            state.business.name = document.getElementById('bizName').value;
+                                            state.business.type = document.getElementById('bizType').value;
+                                            showToast('Profil usaha berhasil disimpan');
+                                            render();
+                                        " class="px-4 py-2 bg-emerald-600 text-white text-xs font-bold rounded-xl shadow-md">Simpan Perubahan</button>
+                                    </div>
+                                </div>
+
+                                <div class="bg-white border border-slate-200 p-6 rounded-2xl shadow-xs space-y-4">
+                                    <div class="flex items-center justify-between">
+                                        <h4 class="font-bold text-base text-slate-900">Simulasi Hak Akses Karyawan</h4>
+                                        <span class="text-xs bg-emerald-50 text-emerald-600 px-2 py-1 rounded font-bold border border-emerald-200">Aktif: ${state.currentUser.role}</span>
+                                    </div>
+                                    <div class="flex gap-3 pt-2">
+                                        <button onclick="state.currentUser = {name:'Budi Santoso', role:'Owner', email:'budi@aruskas.id'}; showToast('Beralih ke Owner'); render();" class="flex-1 py-2.5 text-xs font-bold rounded-xl border ${state.currentUser.role === 'Owner' ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-slate-50 text-slate-900 border-slate-200'}">Owner</button>
+                                        <button onclick="state.currentUser = {name:'Siti Aminah', role:'Staff', email:'siti@aruskas.id'}; showToast('Beralih ke Staff'); render();" class="flex-1 py-2.5 text-xs font-bold rounded-xl border ${state.currentUser.role === 'Staff' ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-slate-50 text-slate-900 border-slate-200'}">Staff</button>
+                                    </div>
+                                    <div class="pt-4 border-t border-slate-100">
+                                        <h5 class="font-bold text-xs text-slate-900 mb-2">Audit Log Aktivitas</h5>
+                                        <div class="space-y-2 max-h-40 overflow-y-auto pr-1">
+                                            ${state.auditLogs.map(log => `
+                                                <div class="text-[11px] p-2 bg-slate-50 rounded-lg border border-slate-200">
+                                                    <span class="font-bold text-slate-900">${log.user}</span> • <span class="text-slate-500">${log.time}</span>
+                                                    <p class="text-emerald-600 font-semibold">${log.action}: ${log.detail}</p>
+                                                </div>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                default:
+                    return `<div>Tab tidak ditemukan</div>`;
+            }
+        }
+
+        // --- MODALS ---
+        function openModal(type, dataId = null) {
+            state.modal = type;
+            state.modalData = dataId ? state.transactions.find(t => t.id === dataId) : null;
+            render();
+        }
+
+        function closeModal() {
+            state.modal = null;
+            state.modalData = null;
+            render();
+        }
+
+        function renderModal() {
+            if (state.modal === 'addTx' || state.modal === 'editTx') {
+                const tx = state.modalData || {};
+                return `
+                    <div class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+                        <div class="bg-white border border-slate-200 rounded-2xl max-w-lg w-full p-6 shadow-2xl animate-fadeIn">
+                            <div class="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
+                                <h3 class="font-bold text-lg text-slate-900">${tx.id ? 'Edit Transaksi' : 'Catat Transaksi Baru'}</h3>
+                                <button onclick="closeModal()" class="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg"><i data-lucide="x" class="w-5 h-5"></i></button>
+                            </div>
+
+                            <form onsubmit="handleSaveTransaction(event)" class="space-y-4">
+                                <input type="hidden" name="txId" value="${tx.id || ''}">
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="text-xs font-semibold text-slate-500">Jenis Transaksi</label>
+                                        <select name="txType" class="w-full mt-1 px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 text-slate-900 rounded-xl">
+                                            <option value="Pemasukan" ${tx.type === 'Pemasukan' ? 'selected' : ''}>Pemasukan</option>
+                                            <option value="Pengeluaran" ${tx.type === 'Pengeluaran' ? 'selected' : ''}>Pengeluaran</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="text-xs font-semibold text-slate-500">Tanggal</label>
+                                        <input type="date" name="txDate" value="${tx.date || new Date().toISOString().substring(0,10)}" required class="w-full mt-1 px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 text-slate-900 rounded-xl" />
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="text-xs font-semibold text-slate-500">Akun Kas</label>
+                                        <select name="txAccount" class="w-full mt-1 px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 text-slate-900 rounded-xl">
+                                            ${state.accounts.map(acc => `<option value="${acc.id}" ${tx.accountId === acc.id ? 'selected' : ''}>${acc.name}</option>`).join('')}
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="text-xs font-semibold text-slate-500">Nominal (Rp)</label>
+                                        <input type="number" name="txAmount" placeholder="Contoh: 150000" value="${tx.amount || ''}" required min="1" class="w-full mt-1 px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 text-slate-900 rounded-xl" />
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="text-xs font-semibold text-slate-500">Kategori</label>
+                                    <select name="txCategory" class="w-full mt-1 px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 text-slate-900 rounded-xl">
+                                        ${state.categories.map(c => `<option value="${c.name}" ${tx.category === c.name ? 'selected' : ''}>${c.name}</option>`).join('')}
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="text-xs font-semibold text-slate-500">Deskripsi / Keterangan</label>
+                                    <input type="text" name="txDesc" placeholder="Contoh: Penjualan harian / Beli bahan" value="${tx.desc || ''}" required class="w-full mt-1 px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 text-slate-900 rounded-xl" />
+                                </div>
+
+                                <div>
+                                    <label class="text-xs font-semibold text-slate-500">Pelanggan / Supplier (Opsional)</label>
+                                    <input type="text" name="txContact" placeholder="Contoh: Toko Maju Jaya" value="${tx.contact || ''}" class="w-full mt-1 px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 text-slate-900 rounded-xl" />
+                                </div>
+
+                                <div class="flex justify-end gap-3 pt-3">
+                                    <button type="button" onclick="closeModal()" class="px-4 py-2 text-sm font-medium text-slate-500 hover:bg-slate-100 rounded-xl">Batal</button>
+                                    <button type="submit" class="px-5 py-2 text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-md">Simpan Transaksi</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                `;
+            }
+
+            if (state.modal === 'addTransfer') {
+                return `
+                    <div class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+                        <div class="bg-white border border-slate-200 rounded-2xl max-w-md w-full p-6 shadow-2xl animate-fadeIn">
+                            <div class="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
+                                <h3 class="font-bold text-lg text-slate-900">Transfer Saldo Antar Akun</h3>
+                                <button onclick="closeModal()" class="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg"><i data-lucide="x" class="w-5 h-5"></i></button>
+                            </div>
+
+                            <form onsubmit="handleSaveTransfer(event)" class="space-y-4">
+                                <div>
+                                    <label class="text-xs font-semibold text-slate-500">Dari Akun Sumber</label>
+                                    <select name="trFrom" class="w-full mt-1 px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 text-slate-900 rounded-xl">
+                                        ${state.accounts.map(acc => `<option value="${acc.id}">${acc.name} (Saldo: ${formatIDR(acc.balance)})</option>`).join('')}
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="text-xs font-semibold text-slate-500">Ke Akun Tujuan</label>
+                                    <select name="trTo" class="w-full mt-1 px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 text-slate-900 rounded-xl">
+                                        ${state.accounts.map(acc => `<option value="${acc.id}">${acc.name}</option>`).join('')}
+                                    </select>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="text-xs font-semibold text-slate-500">Nominal (Rp)</label>
+                                        <input type="number" name="trAmount" placeholder="500000" required min="1" class="w-full mt-1 px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 text-slate-900 rounded-xl" />
+                                    </div>
+                                    <div>
+                                        <label class="text-xs font-semibold text-slate-500">Biaya Transfer (Rp)</label>
+                                        <input type="number" name="trFee" placeholder="0" value="0" min="0" class="w-full mt-1 px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 text-slate-900 rounded-xl" />
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="text-xs font-semibold text-slate-500">Tanggal</label>
+                                    <input type="date" name="trDate" value="${new Date().toISOString().substring(0,10)}" required class="w-full mt-1 px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 text-slate-900 rounded-xl" />
+                                </div>
+
+                                <div>
+                                    <label class="text-xs font-semibold text-slate-500">Catatan Transfer</label>
+                                    <input type="text" name="trNote" placeholder="Contoh: Tarik tunai kas untuk setoran bank" class="w-full mt-1 px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 text-slate-900 rounded-xl" />
+                                </div>
+
+                                <div class="flex justify-end gap-3 pt-3">
+                                    <button type="button" onclick="closeModal()" class="px-4 py-2 text-sm font-medium text-slate-500 hover:bg-slate-100 rounded-xl">Batal</button>
+                                    <button type="submit" class="px-5 py-2 text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-md">Proses Transfer</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                `;
+            }
+            return '';
+        }
+
+        // Initial mount
+        window.onload = function() {
+            render();
+        };
+    </script>
+</body>
+</html>

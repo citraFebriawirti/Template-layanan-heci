@@ -1,0 +1,1651 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SENJA TABLE — Kitchen & Coffee | Resto & Café Digital Experience</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        espresso: '#30231F',
+                        ivory: '#F8F5EF',
+                        terracotta: '#B85C38',
+                        olive: '#65745A',
+                        surface: '#FFFFFF',
+                        darkText: '#282522',
+                        mutedText: '#77716A',
+                        borderSubtle: '#E8E1D8'
+                    },
+                    fontFamily: {
+                        serif: ['Playfair Display', 'Georgia', 'serif'],
+                        sans: ['Plus Jakarta Sans', 'Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #F8F5EF;
+            color: #282522;
+        }
+        h1, h2, h3, h4, .font-serif {
+            font-family: 'Playfair Display', Georgia, serif;
+        }
+        /* Custom scrollbar for horizontal categories */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-ivory text-darkText antialiased selection:bg-terracotta selection:text-white">
+
+    <!-- Navigation Bar -->
+    <header id="site-header" class="sticky top-0 z-50 bg-ivory/90 backdrop-blur-md border-b border-borderSubtle transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <!-- Brand Logo -->
+            <a href="#beranda" class="flex items-center space-x-3 group">
+                <div class="w-10 h-10 rounded-full bg-espresso text-ivory flex items-center justify-center font-serif font-bold text-xl tracking-wider group-hover:bg-terracotta transition-colors">
+                    S
+                </div>
+                <div>
+                    <span class="font-serif text-xl font-bold tracking-wide block text-espresso">SENJA TABLE</span>
+                    <span class="text-[10px] uppercase tracking-widest text-mutedText block">Kitchen & Coffee</span>
+                </div>
+            </a>
+
+            <!-- Desktop Nav Links -->
+            <nav class="hidden md:flex items-center space-x-8 text-sm font-medium text-darkText">
+                <a href="#beranda" class="hover:text-terracotta transition-colors">Beranda</a>
+                <a href="#menu" class="hover:text-terracotta transition-colors">Menu</a>
+                <a href="#cerita" class="hover:text-terracotta transition-colors">Tentang Kami</a>
+                <a href="#promo" class="hover:text-terracotta transition-colors">Promo</a>
+                <a href="#lokasi" class="hover:text-terracotta transition-colors">Lokasi & Jam</a>
+            </nav>
+
+            <!-- Actions & Status -->
+            <div class="hidden md:flex items-center space-x-4">
+                <div id="branch-status-badge" class="flex items-center space-x-2 text-xs bg-surface border border-borderSubtle px-3 py-1.5 rounded-full">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span class="font-medium text-espresso" id="header-status-text">Buka Sekarang</span>
+                </div>
+                <button onclick="openReservationModal()" class="bg-espresso text-ivory px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-terracotta transition-all shadow-sm">
+                    Reservasi Meja
+                </button>
+                <button onclick="openAdminModal()" class="text-mutedText hover:text-espresso p-2 transition-colors" title="Admin CMS">
+                    <i class="fa-solid fa-gauge-high"></i>
+                </button>
+            </div>
+
+            <!-- Mobile Menu Toggle -->
+            <div class="flex items-center space-x-3 md:hidden">
+                <button onclick="openReservationModal()" class="bg-espresso text-ivory px-3 py-2 rounded-full text-xs font-semibold">
+                    Reservasi
+                </button>
+                <button onclick="toggleMobileMenu()" class="text-espresso p-2 text-xl">
+                    <i class="fa-solid fa-bars" id="mobile-menu-icon"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Dropdown -->
+        <div id="mobile-menu" class="hidden md:hidden bg-surface border-b border-borderSubtle px-6 py-4 space-y-3">
+            <a href="#beranda" onclick="toggleMobileMenu()" class="block font-medium text-espresso">Beranda</a>
+            <a href="#menu" onclick="toggleMobileMenu()" class="block font-medium text-espresso">Menu</a>
+            <a href="#cerita" onclick="toggleMobileMenu()" class="block font-medium text-espresso">Tentang Kami</a>
+            <a href="#promo" onclick="toggleMobileMenu()" class="block font-medium text-espresso">Promo</a>
+            <a href="#lokasi" onclick="toggleMobileMenu()" class="block font-medium text-espresso">Lokasi & Jam</a>
+            <div class="pt-3 border-t border-borderSubtle flex justify-between items-center">
+                <span class="text-xs text-mutedText" id="mobile-status-text">Memuat Status...</span>
+                <button onclick="openAdminModal(); toggleMobileMenu();" class="text-xs text-terracotta font-medium flex items-center space-x-1">
+                    <i class="fa-solid fa-gauge-high mr-1"></i> Admin CMS
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="beranda" class="relative pt-8 pb-16 md:pt-16 md:pb-24 overflow-hidden border-b border-borderSubtle">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                <!-- Left Text Content -->
+                <div class="lg:col-span-7 space-y-6">
+                    <div class="inline-flex items-center space-x-2 bg-white border border-borderSubtle px-3 py-1 rounded-full text-xs font-medium text-olive">
+                        <i class="fa-regular fa-clock"></i>
+                        <span id="hero-operating-info">Senin - Minggu: 10:00 - 22:00 WIB</span>
+                    </div>
+                    <h1 class="font-serif text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-espresso leading-[1.1]">
+                        Kehangatan Rasa di Setiap <span class="italic font-normal text-terracotta">Senja</span>.
+                    </h1>
+                    <p class="text-lg text-mutedText max-w-xl font-normal leading-relaxed">
+                        Menghadirkan hidangan Nusantara kontemporer, kopi artisanal pilihan, dan suasana hangat yang dirancang khusus untuk merayakan kebersamaan Anda.
+                    </p>
+                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center space-y-3 sm:space-y-0 sm:space-x-4 pt-2">
+                        <button onclick="openReservationModal()" class="bg-espresso text-ivory px-8 py-4 rounded-full text-base font-semibold hover:bg-terracotta transition-all text-center shadow-md">
+                            Reservasi Meja Sekarang
+                        </button>
+                        <a href="#menu" class="bg-transparent border border-espresso text-espresso px-8 py-4 rounded-full text-base font-semibold hover:bg-espresso hover:text-ivory transition-all text-center">
+                            Jelajahi Menu
+                        </a>
+                    </div>
+                    <!-- Quick highlights -->
+                    <div class="grid grid-cols-3 gap-4 pt-8 border-t border-borderSubtle">
+                        <div>
+                            <span class="block font-serif text-2xl font-bold text-espresso">100%</span>
+                            <span class="text-xs text-mutedText">Bahan Lokal Segar</span>
+                        </div>
+                        <div>
+                            <span class="block font-serif text-2xl font-bold text-espresso">Specialty</span>
+                            <span class="text-xs text-mutedText">Arabica Gayo & Flores</span>
+                        </div>
+                        <div>
+                            <span class="block font-serif text-2xl font-bold text-espresso">Indoor / Outdoor</span>
+                            <span class="text-xs text-mutedText">Area Nyaman & Luas</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Editorial Image Grid -->
+                <div class="lg:col-span-5 relative">
+                    <div class="relative z-10 rounded-2xl overflow-hidden shadow-2xl border-4 border-white aspect-[4/5]">
+                        <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=800&q=80" alt="Suasana Senja Table" class="w-full h-full object-cover hover:scale-105 transition-transform duration-700" onerror="this.src='https://placehold.co/800x1000/30231F/F8F5EF?text=Senja+Table'">
+                    </div>
+                    <!-- Floating badge card -->
+                    <div class="absolute -bottom-6 -left-6 z-20 bg-surface border border-borderSubtle p-5 rounded-xl shadow-xl max-w-xs hidden sm:block">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-12 h-12 rounded-full bg-terracotta/10 text-terracotta flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-award"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-serif font-bold text-sm text-espresso">Chef’s Signature</h4>
+                                <p class="text-xs text-mutedText">Bebek Goreng Sambal Matah & Kopi Susu Senja</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Menu Unggulan Section -->
+    <section class="py-20 bg-surface border-b border-borderSubtle">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row md:items-end justify-between mb-12">
+                <div>
+                    <span class="text-xs uppercase tracking-widest text-terracotta font-bold block mb-2">Pilihan Terbaik</span>
+                    <h2 class="font-serif text-3xl sm:text-4xl font-bold text-espresso">Menu Unggulan Senja</h2>
+                </div>
+                <div class="mt-4 md:mt-0">
+                    <a href="#menu" class="text-sm font-semibold text-espresso hover:text-terracotta inline-flex items-center space-x-2">
+                        <span>Lihat Seluruh Menu Digital</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Grid Featured Items -->
+            <div id="featured-menu-grid" class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Populated dynamically or static initial -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Promo Mingguan Section -->
+    <section id="promo" class="py-20 bg-ivory border-b border-borderSubtle">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-2xl mx-auto mb-16">
+                <span class="text-xs uppercase tracking-widest text-terracotta font-bold block mb-2">Penawaran Spesial</span>
+                <h2 class="font-serif text-3xl sm:text-4xl font-bold text-espresso mb-4">Promo Mingguan</h2>
+                <p class="text-mutedText text-sm">Nikmati pengalaman bersantap dengan penawaran menarik yang diperbarui secara berkala.</p>
+            </div>
+
+            <div id="promo-container" class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Populated via JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Restaurant Story Section -->
+    <section id="cerita" class="py-20 bg-surface border-b border-borderSubtle">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                <div class="lg:col-span-6 grid grid-cols-2 gap-4">
+                    <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=600&q=80" alt="Suasana Restoran" class="rounded-xl object-cover w-full h-64 shadow-md" onerror="this.src='https://placehold.co/600x400/30231F/F8F5EF?text=Interior'">
+                    <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=600&q=80" alt="Kopi Artisan" class="rounded-xl object-cover w-full h-64 shadow-md mt-8" onerror="this.src='https://placehold.co/600x400/30231F/F8F5EF?text=Coffee'">
+                </div>
+                <div class="lg:col-span-6 space-y-6">
+                    <span class="text-xs uppercase tracking-widest text-terracotta font-bold block">Filosofi Kami</span>
+                    <h2 class="font-serif text-3xl sm:text-4xl font-bold text-espresso leading-snug">
+                        Tempat Di Mana Senja Bertemu Cita Rasa Autentik.
+                    </h2>
+                    <p class="text-mutedText leading-relaxed">
+                        Didirikan atas kecintaan mendalam pada kuliner Nusantara dan budaya ngopi yang hangat, Senja Table hadir sebagai ruang pelarian dari riuhnya kota. Setiap hidangan diracik menggunakan rempah segar pilihan lokal, sementara biji kopi dipanggang pas untuk menemani sore hari Anda.
+                    </p>
+                    <div class="grid grid-cols-2 gap-6 pt-4">
+                        <div class="border-l-2 border-terracotta pl-4">
+                            <h4 class="font-serif font-bold text-espresso mb-1">Bahan Pilihan</h4>
+                            <p class="text-xs text-mutedText">Berasal langsung dari petani lokal terbaik di Indonesia.</p>
+                        </div>
+                        <div class="border-l-2 border-olive pl-4">
+                            <h4 class="font-serif font-bold text-espresso mb-1">Suasana Hangat</h4>
+                            <p class="text-xs text-mutedText">Desain interior yang tenang dan ramah keluarga.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Digital Menu Section -->
+    <section id="menu" class="py-20 bg-ivory border-b border-borderSubtle">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-2xl mx-auto mb-12">
+                <span class="text-xs uppercase tracking-widest text-terracotta font-bold block mb-2">Katalog Lengkap</span>
+                <h2 class="font-serif text-3xl sm:text-4xl font-bold text-espresso mb-4">Menu Digital Senja Table</h2>
+                <p class="text-mutedText text-sm">Gunakan pencarian dan filter di bawah untuk menemukan hidangan atau minuman favorit Anda.</p>
+            </div>
+
+            <!-- Search and Filters Bar -->
+            <div class="bg-surface p-4 sm:p-6 rounded-2xl border border-borderSubtle shadow-sm mb-10 space-y-4">
+                <div class="flex flex-col md:flex-row gap-4 justify-between items-center">
+                    <!-- Search Input -->
+                    <div class="relative w-full md:w-96">
+                        <span class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-mutedText">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </span>
+                        <input type="text" id="menu-search-input" oninput="filterMenuCatalog()" placeholder="Cari nama menu, misal: Nasi Goreng..." class="w-full pl-11 pr-4 py-3 bg-ivory border border-borderSubtle rounded-xl text-sm focus:outline-none focus:border-espresso transition-colors">
+                    </div>
+
+                    <!-- Category Tabs (Horizontal Scroll on Mobile) -->
+                    <div id="menu-category-tabs" class="flex items-center space-x-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 no-scrollbar">
+                        <button onclick="setMenuCategory('All')" class="category-btn px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap bg-espresso text-ivory transition-all">Semua</button>
+                    </div>
+                </div>
+
+                <!-- Label Filters -->
+                <div class="flex flex-wrap items-center gap-2 pt-3 border-t border-borderSubtle text-xs">
+                    <span class="font-medium text-mutedText mr-2">Filter Label:</span>
+                    <button onclick="toggleLabelFilter('All')" id="label-all" class="px-3 py-1.5 rounded-lg bg-espresso text-white font-medium transition-colors">Semua Label</button>
+                    <button onclick="toggleLabelFilter('Best Seller')" id="label-best" class="px-3 py-1.5 rounded-lg bg-ivory border border-borderSubtle text-espresso hover:border-espresso transition-colors">Best Seller</button>
+                    <button onclick="toggleLabelFilter('Pedas')" id="label-spicy" class="px-3 py-1.5 rounded-lg bg-ivory border border-borderSubtle text-espresso hover:border-espresso transition-colors">Pedas 🔥</button>
+                    <button onclick="toggleLabelFilter('Vegetarian')" id="label-veg" class="px-3 py-1.5 rounded-lg bg-ivory border border-borderSubtle text-espresso hover:border-espresso transition-colors">Vegetarian 🌿</button>
+                    <button onclick="toggleLabelFilter('Baru')" id="label-new" class="px-3 py-1.5 rounded-lg bg-ivory border border-borderSubtle text-espresso hover:border-espresso transition-colors">Baru ✨</button>
+                </div>
+            </div>
+
+            <!-- Menu Grid Container -->
+            <div id="digital-menu-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Dynamically Rendered -->
+            </div>
+
+            <!-- Empty State for Menu -->
+            <div id="menu-empty-state" class="hidden text-center py-16 bg-surface rounded-2xl border border-borderSubtle">
+                <div class="w-16 h-16 bg-ivory rounded-full flex items-center justify-center mx-auto mb-4 text-mutedText text-2xl">
+                    <i class="fa-solid fa-utensils"></i>
+                </div>
+                <h3 class="font-serif font-bold text-lg text-espresso mb-1">Menu Tidak Ditemukan</h3>
+                <p class="text-sm text-mutedText">Coba gunakan kata kunci lain atau ubah filter kategori Anda.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Location & Opening Hours Section -->
+    <section id="lokasi" class="py-20 bg-surface border-b border-borderSubtle">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-2xl mx-auto mb-16">
+                <span class="text-xs uppercase tracking-widest text-terracotta font-bold block mb-2">Kunjungi Kami</span>
+                <h2 class="font-serif text-3xl sm:text-4xl font-bold text-espresso mb-4">Cabang & Jam Operasional</h2>
+                <p class="text-mutedText text-sm">Pilih cabang terdekat untuk melihat alamat lengkap, kontak WhatsApp, dan jam operasional harian.</p>
+            </div>
+
+            <!-- Branch Selector Tabs -->
+            <div id="branch-selector-tabs" class="flex justify-center space-x-4 mb-10">
+                <!-- Populated dynamically -->
+            </div>
+
+            <!-- Branch Detail Card -->
+            <div class="bg-ivory border border-borderSubtle rounded-2xl p-6 sm:p-10 shadow-sm grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                <div class="lg:col-span-6 space-y-6">
+                    <div>
+                        <span class="text-xs font-semibold uppercase tracking-wider text-terracotta" id="active-branch-city">Jakarta Selatan</span>
+                        <h3 class="font-serif text-2xl sm:text-3xl font-bold text-espresso mt-1" id="active-branch-name">Senja Table Senopati</h3>
+                    </div>
+                    <p class="text-sm text-mutedText flex items-start space-x-3">
+                        <i class="fa-solid fa-location-dot text-terracotta mt-1 text-base"></i>
+                        <span id="active-branch-address">Jl. Senopati No. 42, Kebayoran Baru, Jakarta Selatan</span>
+                    </p>
+                    <p class="text-sm text-mutedText flex items-center space-x-3">
+                        <i class="fa-brands fa-whatsapp text-emerald-600 text-lg"></i>
+                        <span id="active-branch-phone">+62 812-3456-7890 (Reservasi & Informasi)</span>
+                    </p>
+                    <div class="pt-4 flex flex-wrap gap-3">
+                        <button onclick="openReservationModal()" class="bg-espresso text-ivory px-6 py-3 rounded-full text-sm font-semibold hover:bg-terracotta transition-all shadow-sm">
+                            Reservasi Cabang Ini
+                        </button>
+                        <a id="active-branch-map-link" href="https://maps.google.com" target="_blank" class="bg-surface border border-borderSubtle text-espresso px-6 py-3 rounded-full text-sm font-semibold hover:border-espresso transition-all inline-flex items-center space-x-2">
+                            <i class="fa-solid fa-map-location-dot"></i>
+                            <span>Buka di Google Maps</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Operating Hours Table -->
+                <div class="lg:col-span-6 bg-surface p-6 rounded-xl border border-borderSubtle">
+                    <h4 class="font-serif font-bold text-espresso text-base mb-4 flex items-center justify-between">
+                        <span>Jadwal Operasional Harian</span>
+                        <span id="live-open-badge" class="text-xs px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 font-medium">Buka Sekarang</span>
+                    </h4>
+                    <div id="operating-hours-list" class="space-y-2.5 text-sm">
+                        <!-- Populated via JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-espresso text-ivory py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 pb-12 border-b border-white/10">
+                <!-- Col 1: Brand Info -->
+                <div class="lg:col-span-2 space-y-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-full bg-terracotta text-ivory flex items-center justify-center font-serif font-bold text-xl">
+                            S
+                        </div>
+                        <span class="font-serif text-xl font-bold tracking-wide">SENJA TABLE</span>
+                    </div>
+                    <p class="text-sm text-ivory/70 max-w-sm leading-relaxed">
+                        Kitchen & Coffee modern berstandar premium yang didukung oleh Heci.Tech Digital Platform. Solusi digital terbaik untuk industri F&B profesional.
+                    </p>
+                    <div class="flex items-center space-x-4 pt-2">
+                        <a href="https://instagram.com" target="_blank" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-terracotta transition-colors text-ivory">
+                            <i class="fa-brands fa-instagram"></i>
+                        </a>
+                        <a href="https://whatsapp.com" target="_blank" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-terracotta transition-colors text-ivory">
+                            <i class="fa-brands fa-whatsapp"></i>
+                        </a>
+                        <a href="https://facebook.com" target="_blank" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-terracotta transition-colors text-ivory">
+                            <i class="fa-brands fa-facebook-f"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Col 2: Quick Links -->
+                <div class="space-y-4">
+                    <h4 class="font-serif font-bold text-sm tracking-wider uppercase text-terracotta">Navigasi</h4>
+                    <ul class="space-y-2 text-sm text-ivory/80">
+                        <li><a href="#beranda" class="hover:text-white transition-colors">Beranda</a></li>
+                        <li><a href="#menu" class="hover:text-white transition-colors">Menu Digital</a></li>
+                        <li><a href="#cerita" class="hover:text-white transition-colors">Tentang Kami</a></li>
+                        <li><a href="#promo" class="hover:text-white transition-colors">Promo Mingguan</a></li>
+                        <li><a href="#lokasi" class="hover:text-white transition-colors">Lokasi Cabang</a></li>
+                    </ul>
+                </div>
+
+                <!-- Col 3: Categories -->
+                <div class="space-y-4">
+                    <h4 class="font-serif font-bold text-sm tracking-wider uppercase text-terracotta">Kategori Menu</h4>
+                    <ul class="space-y-2 text-sm text-ivory/80" id="footer-category-list">
+                        <!-- Rendered via JS -->
+                    </ul>
+                </div>
+
+                <!-- Col 4: Legal & System -->
+                <div class="space-y-4">
+                    <h4 class="font-serif font-bold text-sm tracking-wider uppercase text-terracotta">Sistem & Platform</h4>
+                    <ul class="space-y-2 text-sm text-ivory/80">
+                        <li><a href="#" onclick="openAdminModal(); return false;" class="hover:text-white transition-colors flex items-center space-x-1"><i class="fa-solid fa-lock text-xs mr-1"></i> Admin CMS Login</a></li>
+                        <li><a href="#" onclick="openReservationModal(); return false;" class="hover:text-white transition-colors">Cek Status Reservasi</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Kebijakan Privasi</a></li>
+                        <li><a href="https://heci.tech" target="_blank" class="text-terracotta font-medium hover:underline">Powered by Heci.Tech</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-ivory/50">
+                <p>&copy; 2026 Senja Table — Kitchen & Coffee. All rights reserved.</p>
+                <p class="mt-2 sm:mt-0">Crafted with precision by Heci.Tech Hospitality Framework v4.2</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Reservation Modal (6 Steps Structured Flow) -->
+    <div id="reservation-modal" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-surface w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden border border-borderSubtle relative my-8">
+            <!-- Modal Header -->
+            <div class="bg-espresso text-ivory px-6 py-5 flex items-center justify-between">
+                <div>
+                    <span class="text-[10px] uppercase tracking-widest text-terracotta font-bold block">Sistem Reservasi Meja</span>
+                    <h3 class="font-serif text-xl font-bold" id="res-modal-title">Reservasi Senja Table</h3>
+                </div>
+                <button onclick="closeReservationModal()" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-terracotta transition-colors text-ivory">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Step Progress Indicator -->
+            <div class="bg-ivory px-6 py-3 border-b border-borderSubtle flex items-center justify-between text-xs font-semibold text-mutedText">
+                <span id="step-indicator-text">Langkah 1 dari 5: Pilih Cabang</span>
+                <div class="flex space-x-1.5" id="step-dots">
+                    <div class="w-2.5 h-2.5 rounded-full bg-terracotta" id="dot-1"></div>
+                    <div class="w-2.5 h-2.5 rounded-full bg-borderSubtle" id="dot-2"></div>
+                    <div class="w-2.5 h-2.5 rounded-full bg-borderSubtle" id="dot-3"></div>
+                    <div class="w-2.5 h-2.5 rounded-full bg-borderSubtle" id="dot-4"></div>
+                    <div class="w-2.5 h-2.5 rounded-full bg-borderSubtle" id="dot-5"></div>
+                </div>
+            </div>
+
+            <!-- Modal Body Content -->
+            <div class="p-6 sm:p-8 max-h-[70vh] overflow-y-auto" id="reservation-form-body">
+                <!-- STEP 1: Pilih Cabang -->
+                <div id="res-step-1" class="space-y-6">
+                    <h4 class="font-serif font-bold text-lg text-espresso">Pilih Cabang Restoran</h4>
+                    <div id="branch-options-container" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <!-- Populated via JS -->
+                    </div>
+                </div>
+
+                <!-- STEP 2: Pilih Jadwal & Kapasitas -->
+                <div id="res-step-2" class="space-y-6 hidden">
+                    <h4 class="font-serif font-bold text-lg text-espresso">Tentukan Jadwal & Tamu</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-mutedText uppercase mb-2">Tanggal Kunjungan</label>
+                            <input type="date" id="res-date" class="w-full p-3 bg-ivory border border-borderSubtle rounded-xl text-sm font-medium focus:outline-none focus:border-espresso">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-mutedText uppercase mb-2">Jumlah Tamu</label>
+                            <select id="res-guests" class="w-full p-3 bg-ivory border border-borderSubtle rounded-xl text-sm font-medium focus:outline-none focus:border-espresso">
+                                <option value="2">2 Orang (Meja Standar)</option>
+                                <option value="4">4 Orang (Meja Keluarga)</option>
+                                <option value="6">6 Orang (Meja Panjang)</option>
+                                <option value="8">8+ Orang (Private Area)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-mutedText uppercase mb-2">Area Tempat Duduk</label>
+                        <div class="grid grid-cols-2 gap-4">
+                            <label class="border border-borderSubtle p-4 rounded-xl flex items-center space-x-3 cursor-pointer hover:border-espresso transition-colors has-[:checked]:border-espresso has-[:checked]:bg-ivory">
+                                <input type="radio" name="res-area" value="Indoor (AC & Nyaman)" checked class="text-espresso">
+                                <div>
+                                    <span class="block font-semibold text-sm text-espresso">Indoor</span>
+                                    <span class="text-xs text-mutedText">Ber-AC, tenang, musik lembut</span>
+                                </div>
+                            </label>
+                            <label class="border border-borderSubtle p-4 rounded-xl flex items-center space-x-3 cursor-pointer hover:border-espresso transition-colors has-[:checked]:border-espresso has-[:checked]:bg-ivory">
+                                <input type="radio" name="res-area" value="Outdoor (Pemandangan Senja)" class="text-espresso">
+                                <div>
+                                    <span class="block font-semibold text-sm text-espresso">Outdoor</span>
+                                    <span class="text-xs text-mutedText">Semi-terbuka, suasana senja</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-mutedText uppercase mb-2">Pilih Slot Waktu Tersedia</label>
+                        <div id="time-slots-container" class="grid grid-cols-3 sm:grid-cols-4 gap-2.5">
+                            <!-- Populated via JS -->
+                        </div>
+                        <p class="text-xs text-mutedText mt-2" id="slot-validation-note">*Slot divalidasi secara real-time terhadap kapasitas cabang.</p>
+                    </div>
+                </div>
+
+                <!-- STEP 3: Informasi Pelanggan -->
+                <div id="res-step-3" class="space-y-4 hidden">
+                    <h4 class="font-serif font-bold text-lg text-espresso">Informasi Kontak Pemesan</h4>
+                    <div>
+                        <label class="block text-xs font-semibold text-mutedText uppercase mb-1">Nama Lengkap</label>
+                        <input type="text" id="res-name" placeholder="cth: Rian Utama" class="w-full p-3 bg-ivory border border-borderSubtle rounded-xl text-sm focus:outline-none focus:border-espresso">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-mutedText uppercase mb-1">Nomor WhatsApp (Aktif)</label>
+                        <input type="tel" id="res-whatsapp" placeholder="cth: 08123456789" class="w-full p-3 bg-ivory border border-borderSubtle rounded-xl text-sm focus:outline-none focus:border-espresso">
+                        <span class="text-[11px] text-mutedText mt-1 block">Konfirmasi otomatis dan pengingat H-1 akan dikirimkan ke nomor ini.</span>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-mutedText uppercase mb-1">Email (Opsional)</label>
+                        <input type="email" id="res-email" placeholder="cth: rian@example.com" class="w-full p-3 bg-ivory border border-borderSubtle rounded-xl text-sm focus:outline-none focus:border-espresso">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-mutedText uppercase mb-1">Catatan Khusus (Opsional)</label>
+                        <textarea id="res-notes" rows="2" placeholder="cth: Perayaan ulang tahun, butuh kursi bayi, dll." class="w-full p-3 bg-ivory border border-borderSubtle rounded-xl text-sm focus:outline-none focus:border-espresso"></textarea>
+                    </div>
+                </div>
+
+                <!-- STEP 4: Review Ringkasan -->
+                <div id="res-step-4" class="space-y-6 hidden">
+                    <h4 class="font-serif font-bold text-lg text-espresso">Ringkasan Reservasi Meja</h4>
+                    <div class="bg-ivory border border-borderSubtle rounded-2xl p-6 space-y-4 text-sm">
+                        <div class="flex justify-between border-b border-borderSubtle pb-3">
+                            <span class="text-mutedText">Cabang Restoran</span>
+                            <span class="font-bold text-espresso" id="review-branch">Senja Table Senopati</span>
+                        </div>
+                        <div class="flex justify-between border-b border-borderSubtle pb-3">
+                            <span class="text-mutedText">Tanggal & Waktu</span>
+                            <span class="font-bold text-espresso" id="review-datetime">-</span>
+                        </div>
+                        <div class="flex justify-between border-b border-borderSubtle pb-3">
+                            <span class="text-mutedText">Jumlah Tamu & Area</span>
+                            <span class="font-bold text-espresso" id="review-guests-area">-</span>
+                        </div>
+                        <div class="flex justify-between border-b border-borderSubtle pb-3">
+                            <span class="text-mutedText">Nama Pemesan</span>
+                            <span class="font-bold text-espresso" id="review-name">-</span>
+                        </div>
+                        <div class="flex justify-between border-b border-borderSubtle pb-3">
+                            <span class="text-mutedText">Nomor WhatsApp</span>
+                            <span class="font-bold text-espresso" id="review-whatsapp">-</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-mutedText">Catatan</span>
+                            <span class="font-medium text-espresso italic" id="review-notes">Tidak ada catatan</span>
+                        </div>
+                    </div>
+                    <div class="bg-amber-50 border border-amber-200 text-amber-800 p-4 rounded-xl text-xs leading-relaxed">
+                        <i class="fa-solid fa-circle-info mr-1"></i> Setelah dikirim, permintaan Anda akan diproses oleh staf kami. Status saat ini akan menjadi <strong>Pending (Menunggu Konfirmasi)</strong>.
+                    </div>
+                </div>
+
+                <!-- STEP 5: Success & Unique Code Generated -->
+                <div id="res-step-5" class="space-y-6 text-center hidden py-4">
+                    <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-2xl">
+                        <i class="fa-solid fa-check"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs uppercase tracking-widest text-olive font-bold block mb-1">Permintaan Berhasil Dikirim</span>
+                        <h4 class="font-serif text-2xl font-bold text-espresso">Reservasi Sedang Menunggu Konfirmasi</h4>
+                        <p class="text-sm text-mutedText mt-2 max-w-md mx-auto">
+                            Kode unik reservasi Anda telah diterbitkan. Simpan kode ini untuk pengecekan status atau konfirmasi kedatangan.
+                        </p>
+                    </div>
+                    <div class="bg-ivory border border-borderSubtle p-4 rounded-2xl max-w-xs mx-auto">
+                        <span class="text-[10px] uppercase text-mutedText block">Kode Reservasi Unik</span>
+                        <span class="font-mono text-xl font-bold text-terracotta tracking-wider" id="success-res-code">SNJ-2026-9812</span>
+                    </div>
+                    <p class="text-xs text-mutedText">Staf restoran akan menghubungi Anda via WhatsApp setelah verifikasi ketersediaan selesai.</p>
+                </div>
+            </div>
+
+            <!-- Modal Footer Controls -->
+            <div class="bg-ivory px-6 py-4 border-t border-borderSubtle flex items-center justify-between">
+                <button id="res-back-btn" onclick="prevReservationStep()" class="hidden bg-surface border border-borderSubtle text-espresso px-5 py-2.5 rounded-xl text-xs font-semibold hover:border-espresso transition-colors">
+                    Kembali
+                </button>
+                <div class="ml-auto flex space-x-3">
+                    <button onclick="closeReservationModal()" class="text-xs font-semibold text-mutedText hover:text-espresso px-4 py-2">
+                        Batal
+                    </button>
+                    <button id="res-next-btn" onclick="nextReservationStep()" class="bg-espresso text-ivory px-6 py-2.5 rounded-xl text-xs font-semibold hover:bg-terracotta transition-all shadow-sm">
+                        Lanjutkan
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin CMS Modal -->
+    <div id="admin-modal" class="fixed inset-0 z-50 hidden bg-black/70 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
+        <div class="bg-surface w-full max-w-6xl rounded-3xl shadow-2xl overflow-hidden border border-borderSubtle flex flex-col h-[90vh] my-auto">
+            <!-- Admin Top Header -->
+            <div class="bg-espresso text-ivoid px-6 py-4 flex items-center justify-between shrink-0">
+                <div class="flex items-center space-x-3">
+                    <div class="w-9 h-9 rounded-lg bg-terracotta text-white flex items-center justify-center font-bold text-sm">
+                        CMS
+                    </div>
+                    <div>
+                        <span class="font-serif font-bold text-base text-white">Senja Table — Admin Management System</span>
+                        <span class="text-[10px] text-ivory/60 block">Heci.Tech Enterprise Hospitality WMS v4.2</span>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <span class="hidden sm:inline-block text-xs bg-white/10 text-ivory px-3 py-1 rounded-full">Role: Administrator</span>
+                    <button onclick="closeAdminModal()" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-terracotta transition-colors text-ivory">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Admin Layout: Sidebar + Main Content -->
+            <div class="flex flex-1 overflow-hidden">
+                <!-- Sidebar -->
+                <div class="w-64 bg-ivory border-r border-borderSubtle hidden md:flex flex-col p-4 shrink-0 space-y-1">
+                    <span class="text-[10px] uppercase tracking-wider text-mutedFont font-bold px-3 py-1">Menu Utama</span>
+                    <button onclick="switchAdminTab('overview')" id="adm-tab-overview" class="admin-nav-btn w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-semibold bg-espresso text-ivory flex items-center space-x-3">
+                        <i class="fa-solid fa-gauge-high w-4"></i>
+                        <span>Dashboard Overview</span>
+                    </button>
+                    <button onclick="switchAdminTab('reservations')" id="adm-tab-reservations" class="admin-nav-btn w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-semibold text-darkText hover:bg-borderSubtle/50 flex items-center space-x-3">
+                        <i class="fa-solid fa-calendar-check w-4"></i>
+                        <span>Manajemen Reservasi</span>
+                    </button>
+                    <button onclick="switchAdminTab('menu')" id="adm-tab-menu" class="admin-nav-btn w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-semibold text-darkText hover:bg-borderSubtle/50 flex items-center space-x-3">
+                        <i class="fa-solid fa-utensils w-4"></i>
+                        <span>Menu & Kategori</span>
+                    </button>
+                    <button onclick="switchAdminTab('promo')" id="adm-tab-promo" class="admin-nav-btn w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-semibold text-darkText hover:bg-borderSubtle/50 flex items-center space-x-3">
+                        <i class="fa-solid fa-tag w-4"></i>
+                        <span>Promo Mingguan</span>
+                    </button>
+                    <button onclick="switchAdminTab('branches')" id="adm-tab-branches" class="admin-nav-btn w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-semibold text-darkText hover:bg-borderSubtle/50 flex items-center space-x-3">
+                        <i class="fa-solid fa-store w-4"></i>
+                        <span>Cabang & Kapasitas</span>
+                    </button>
+                    <button onclick="switchAdminTab('reports')" id="adm-tab-reports" class="admin-nav-btn w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-semibold text-darkText hover:bg-borderSubtle/50 flex items-center space-x-3">
+                        <i class="fa-solid fa-chart-line w-4"></i>
+                        <span>Laporan Reservasi</span>
+                    </button>
+                </div>
+
+                <!-- Main CMS Content Area -->
+                <div class="flex-1 overflow-y-auto p-6 bg-surface" id="admin-content-area">
+                    <!-- Rendered dynamically by tab -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast-notification" class="fixed bottom-6 right-6 z-50 hidden bg-espresso text-ivory px-5 py-3 rounded-2xl shadow-2xl flex items-center space-x-3 border border-white/10 transition-all duration-300">
+        <i class="fa-solid fa-circle-check text-emerald-400 text-lg" id="toast-icon"></i>
+        <div>
+            <span class="block font-bold text-xs" id="toast-title">Berhasil</span>
+            <span class="text-xs text-ivory/80" id="toast-message">Aksi berhasil dilakukan</span>
+        </div>
+    </div>
+
+    <!-- Application Logic & Seed Data -->
+    <script>
+        // --- SEED DATA & APPLICATION STATE ---
+        const appState = {
+            activeBranchId: 'senopati',
+            reservationStep: 1,
+            reservationData: {
+                branchId: 'senopati',
+                date: new Date().toISOString().split('T')[0],
+                time: '18:30',
+                guests: '2',
+                area: 'Indoor (AC & Nyaman)',
+                name: '',
+                whatsapp: '',
+                email: '',
+                notes: ''
+            },
+            menuCategoryFilter: 'All',
+            menuLabelFilter: 'All',
+            menuSearchQuery: '',
+            adminActiveTab: 'overview',
+            adminReservationFilterStatus: 'All'
+        };
+
+        const branchesData = [
+            {
+                id: 'senopati',
+                name: 'Senja Table Senopati',
+                city: 'Jakarta Selatan',
+                address: 'Jl. Senopati No. 42, Kebayoran Baru, Jakarta Selatan',
+                phone: '+62 812-3456-7890',
+                mapUrl: 'https://maps.google.com',
+                hours: {
+                    'Senin': '10:00 - 22:00',
+                    'Selasa': '10:00 - 22:00',
+                    'Rabu': '10:00 - 22:00',
+                    'Kamis': '10:00 - 22:00',
+                    'Jumat': '10:00 - 23:00',
+                    'Sabtu': '10:00 - 23:00',
+                    'Minggu': '09:00 - 22:00'
+                },
+                capacityPerSlot: 30
+            },
+            {
+                id: 'menteng',
+                name: 'Senja Table Menteng',
+                city: 'Jakarta Pusat',
+                address: 'Jl. Cikini Raya No. 15, Menteng, Jakarta Pusat',
+                phone: '+62 813-9876-5432',
+                mapUrl: 'https://maps.google.com',
+                hours: {
+                    'Senin': '10:00 - 22:00',
+                    'Selasa': '10:00 - 22:00',
+                    'Rabu': '10:00 - 22:00',
+                    'Kamis': '10:00 - 22:00',
+                    'Jumat': '10:00 - 23:00',
+                    'Sabtu': '10:00 - 23:00',
+                    'Minggu': '09:00 - 22:00'
+                },
+                capacityPerSlot: 25
+            },
+            {
+                id: 'bandung',
+                name: 'Senja Table Dago',
+                city: 'Bandung',
+                address: 'Jl. Ir. H. Juanda No. 120, Dago, Bandung',
+                phone: '+62 821-5544-3322',
+                mapUrl: 'https://maps.google.com',
+                hours: {
+                    'Senin': '10:00 - 21:00',
+                    'Selasa': '10:00 - 21:00',
+                    'Rabu': '10:00 - 21:00',
+                    'Kamis': '10:00 - 21:00',
+                    'Jumat': '10:00 - 22:00',
+                    'Sabtu': '10:00 - 22:00',
+                    'Minggu': '09:00 - 21:00'
+                },
+                capacityPerSlot: 35
+            }
+        ];
+
+        let menuCategoriesData = ['Makanan Utama', 'Kopi & Espresso', 'Minuman Non-Kopi', 'Dessert & Pastry', 'Appetizer'];
+
+        let menuItemsData = [
+            {
+                id: 1,
+                name: 'Bebek Goreng Sambal Matah Senja',
+                category: 'Makanan Utama',
+                price: 75000,
+                description: 'Bebek empuk dengan bumbu rempah meresap, disajikan bersama nasi hangat, sambal matah segar, dan kuah kaldu.',
+                image: 'https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=600&q=80',
+                labels: ['Best Seller', 'Pedas'],
+                isAvailable: true
+            },
+            {
+                id: 2,
+                name: 'Nasi Goreng Kampung Rempah',
+                category: 'Makanan Utama',
+                price: 52000,
+                description: 'Nasi goreng tradisional dengan kecombrang, suwiran ayam kampung, telur mata sapi, dan kerupuk udang.',
+                image: 'https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=600&q=80',
+                labels: ['Best Seller', 'Pedas'],
+                isAvailable: true
+            },
+            {
+                id: 3,
+                name: 'Kopi Susu Gayo Signature',
+                category: 'Kopi & Espresso',
+                price: 35000,
+                description: 'Espresso single origin Gayo Arabica berpadu sempurna dengan susu segar dan manisnya aren alami.',
+                image: 'https://images.unsplash.com/photo-1541167760496-1628856ab772?auto=format&fit=crop&w=600&q=80',
+                labels: ['Best Seller'],
+                isAvailable: true
+            },
+            {
+                id: 4,
+                name: 'Es Kopi Senja Pandan',
+                category: 'Kopi & Espresso',
+                price: 38000,
+                description: 'Kreasi kopi susu khas Senja dengan infusi sirup pandan asli dan aroma daun suji yang harum.',
+                image: 'https://images.unsplash.com/photo-1517701550927-30cf4ba1dba5?auto=format&fit=crop&w=600&q=80',
+                labels: ['Baru'],
+                isAvailable: true
+            },
+            {
+                id: 5,
+                name: 'Matcha Latte Artisan',
+                category: 'Minuman Non-Kopi',
+                price: 42000,
+                description: 'Pure ceremonial grade matcha bubuk Uji Jepang dengan susu creamy bertekstur halus.',
+                image: 'https://images.unsplash.com/photo-1536256263959-770b48d82b0a?auto=format&fit=crop&w=600&q=80',
+                labels: ['Vegetarian'],
+                isAvailable: true
+            },
+            {
+                id: 6,
+                name: 'Croissant Mentega & Selai Srikaya',
+                category: 'Dessert & Pastry',
+                price: 32000,
+                description: 'Pastry renyah berlapis mentega Perancis disajikan hangat bersama selai srikaya buatan rumah.',
+                image: 'https://images.unsplash.com/photo-1555507036-ab1f4038808a?auto=format&fit=crop&w=600&q=80',
+                labels: ['Vegetarian'],
+                isAvailable: true
+            },
+            {
+                id: 7,
+                name: 'Tahu Lada Salju',
+                category: 'Appetizer',
+                price: 30000,
+                description: 'Tahu sutra renyah digoreng dengan bumbu garam bawang putih, cabai merah, dan daun bawang segar.',
+                image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80',
+                labels: ['Pedas', 'Vegetarian'],
+                isAvailable: false
+            }
+        ];
+
+        let promotionsData = [
+            {
+                id: 1,
+                title: 'Paket Senja Berdua',
+                period: '1 Okt 2026 - 31 Okt 2026',
+                description: 'Nikmati 2 Makanan Utama pilihan + 2 Kopi Susu Senja dengan harga spesial hemat 15%.',
+                terms: 'Berlaku setiap hari pukul 14:00 - 18:00 WIB di seluruh cabang Senja Table.',
+                isActive: true
+            },
+            {
+                id: 2,
+                title: 'Jumat Berkah Kopi & Pastry',
+                period: 'Setiap Hari Jumat',
+                description: 'Diskon 20% untuk semua varian Pastry setiap pembelian Kopi Susu Signature.',
+                terms: 'Berlaku khusus pemesanan dine-in pada hari Jumat.',
+                isActive: true
+            }
+        ];
+
+        let reservationsData = [
+            {
+                id: 'SNJ-2026-8801',
+                branchName: 'Senja Table Senopati',
+                date: '2026-10-11',
+                time: '19:00',
+                guests: 4,
+                area: 'Indoor (AC & Nyaman)',
+                name: 'Siti Rahma',
+                whatsapp: '08129876543',
+                email: 'siti@example.com',
+                notes: 'Ulang tahun adik saya',
+                status: 'Confirmed'
+            },
+            {
+                id: 'SNJ-2026-8802',
+                branchName: 'Senja Table Menteng',
+                date: '2026-10-11',
+                time: '18:30',
+                guests: 2,
+                area: 'Outdoor (Pemandangan Senja)',
+                name: 'Dimas Anggara',
+                whatsapp: '08134455667',
+                email: 'dimas@example.com',
+                notes: 'Permintaan area dekat taman',
+                status: 'Pending'
+            },
+            {
+                id: 'SNJ-2026-8803',
+                branchName: 'Senja Table Dago',
+                date: '2026-10-12',
+                time: '13:00',
+                guests: 6,
+                area: 'Indoor (AC & Nyaman)',
+                name: 'Dewi Lestari',
+                whatsapp: '08213322114',
+                email: 'dewi@example.com',
+                notes: 'Pertemuan keluarga besar',
+                status: 'Confirmed'
+            }
+        ];
+
+        // --- INITIALIZATION ON LOAD ---
+        window.onload = function() {
+            renderFeaturedMenu();
+            renderPromotions();
+            renderMenuCategories();
+            renderDigitalMenu();
+            renderBranchSection();
+            renderFooterCategories();
+            
+            // Set date min on reservation form
+            const todayStr = new Date().toISOString().split('T')[0];
+            const dateInput = document.getElementById('res-date');
+            if(dateInput) {
+                dateInput.min = todayStr;
+                dateInput.value = todayStr;
+            }
+
+            // Time slot generator
+            generateTimeSlots();
+        };
+
+        // --- NAVIGATION & UI HELPERS ---
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            const icon = document.getElementById('mobile-menu-icon');
+            menu.classList.toggle('hidden');
+            icon.classList.toggle('fa-bars');
+            icon.classList.toggle('fa-xmark');
+        }
+
+        function showToast(title, message, isError = false) {
+            const toast = document.getElementById('toast-notification');
+            const icon = document.getElementById('toast-icon');
+            document.getElementById('toast-title').innerText = title;
+            document.getElementById('toast-message').innerText = message;
+            
+            if(isError) {
+                icon.className = "fa-solid fa-circle-exclamation text-rose-400 text-lg";
+            } else {
+                icon.className = "fa-solid fa-circle-check text-emerald-400 text-lg";
+            }
+
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3500);
+        }
+
+        // --- PUBLIC WEBSITE RENDERING FUNCTIONS ---
+        function renderFeaturedMenu() {
+            const container = document.getElementById('featured-menu-grid');
+            const featured = menuItemsData.filter(item => item.labels.includes('Best Seller') && item.isAvailable).slice(0, 3);
+            
+            container.innerHTML = featured.map(item => `
+                <div class="bg-ivory border border-borderSubtle rounded-2xl overflow-hidden group hover:border-espresso transition-all flex flex-col justify-between shadow-sm">
+                    <div class="relative overflow-hidden aspect-[4/3]">
+                        <img src="${item.image}" alt="${item.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.src='https://placehold.co/600x400/30231F/F8F5EF?text=Senja+Dish'">
+                        <div class="absolute top-3 left-3 flex flex-wrap gap-1">
+                            ${item.labels.map(l => `<span class="bg-espresso text-ivory text-[10px] font-semibold px-2.5 py-1 rounded-full uppercase tracking-wider">${l}</span>`).join('')}
+                        </div>
+                    </div>
+                    <div class="p-6 flex flex-col justify-between flex-1">
+                        <div>
+                            <span class="text-[10px] uppercase tracking-widest text-terracotta font-bold block mb-1">${item.category}</span>
+                            <h3 class="font-serif font-bold text-xl text-espresso mb-2">${item.name}</h3>
+                            <p class="text-xs text-mutedText line-clamp-2 leading-relaxed">${item.description}</p>
+                        </div>
+                        <div class="flex items-center justify-between pt-6 mt-4 border-t border-borderSubtle">
+                            <span class="font-serif font-bold text-lg text-espresso">Rp ${item.price.toLocaleString('id-ID')}</span>
+                            <button onclick="openReservationModal()" class="text-xs font-semibold text-terracotta hover:text-espresso flex items-center space-x-1">
+                                <span>Pesan Meja</span>
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderPromotions() {
+            const container = document.getElementById('promo-container');
+            const activePromos = promotionsData.filter(p => p.isActive);
+
+            if(activePromos.length === 0) {
+                container.innerHTML = `<div class="col-span-2 text-center py-10 text-mutedText text-sm">Tidak ada promo aktif saat ini.</div>`;
+                return;
+            }
+
+            container.innerHTML = activePromos.map(promo => `
+                <div class="bg-surface border border-borderSubtle rounded-2xl p-6 sm:p-8 shadow-sm flex flex-col justify-between relative overflow-hidden">
+                    <div class="absolute -right-10 -top-10 w-32 h-32 bg-terracotta/5 rounded-full pointer-events-none"></div>
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="bg-terracotta/10 text-terracotta text-xs font-semibold px-3 py-1 rounded-full">Periode: ${promo.period}</span>
+                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                        </div>
+                        <h3 class="font-serif text-2xl font-bold text-espresso mb-2">${promo.title}</h3>
+                        <p class="text-sm text-mutedText mb-4 leading-relaxed">${promo.description}</p>
+                        <p class="text-xs text-mutedText italic border-l-2 border-terracotta pl-3 mb-6">${promo.terms}</p>
+                    </div>
+                    <div class="pt-4 border-t border-borderSubtle flex items-center justify-between">
+                        <span class="text-xs font-semibold text-espresso">Klaim langsung saat kunjungan</span>
+                        <button onclick="openReservationModal()" class="bg-espresso text-ivory px-5 py-2.5 rounded-full text-xs font-semibold hover:bg-terracotta transition-all">
+                            Reservasi Promo Ini
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderMenuCategories() {
+            const container = document.getElementById('menu-category-tabs');
+            container.innerHTML = `
+                <button onclick="setMenuCategory('All')" class="category-btn px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap ${appState.menuCategoryFilter === 'All' ? 'bg-espresso text-ivory' : 'bg-surface border border-borderSubtle text-espresso hover:border-espresso'} transition-all">Semua</button>
+            ` + menuCategoriesData.map(cat => `
+                <button onclick="setMenuCategory('${cat}')" class="category-btn px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap ${appState.menuCategoryFilter === cat ? 'bg-espresso text-ivory' : 'bg-surface border border-borderSubtle text-espresso hover:border-espresso'} transition-all">${cat}</button>
+            `).join('');
+        }
+
+        function renderFooterCategories() {
+            const container = document.getElementById('footer-category-list');
+            container.innerHTML = menuCategoriesData.map(cat => `
+                <li><a href="#menu" onclick="setMenuCategory('${cat}')" class="hover:text-white transition-colors">${cat}</a></li>
+            `).join('');
+        }
+
+        function setMenuCategory(category) {
+            appState.menuCategoryFilter = category;
+            renderMenuCategories();
+            renderDigitalMenu();
+        }
+
+        function toggleLabelFilter(label) {
+            appState.menuLabelFilter = label;
+            ['all', 'best', 'spicy', 'veg', 'new'].forEach(id => {
+                const btn = document.getElementById(`label-${id}`);
+                if(btn) {
+                    btn.className = "px-3 py-1.5 rounded-lg bg-ivory border border-borderSubtle text-espresso hover:border-espresso transition-colors";
+                }
+            });
+            const activeId = label === 'All' ? 'all' : (label === 'Best Seller' ? 'best' : (label === 'Pedas' ? 'spicy' : (label === 'Vegetarian' ? 'veg' : 'new')));
+            const activeBtn = document.getElementById(`label-${activeId}`);
+            if(activeBtn) {
+                activeBtn.className = "px-3 py-1.5 rounded-lg bg-espresso text-white font-medium transition-colors";
+            }
+            renderDigitalMenu();
+        }
+
+        function filterMenuCatalog() {
+            appState.menuSearchQuery = document.getElementById('menu-search-input').value.toLowerCase();
+            renderDigitalMenu();
+        }
+
+        function renderDigitalMenu() {
+            const container = document.getElementById('digital-menu-grid');
+            const emptyState = document.getElementById('menu-empty-state');
+
+            let filtered = menuItemsData.filter(item => {
+                const matchCategory = appState.menuCategoryFilter === 'All' || item.category === appState.menuCategoryFilter;
+                const matchLabel = appState.menuLabelFilter === 'All' || item.labels.includes(appState.menuLabelFilter);
+                const matchSearch = item.name.toLowerCase().includes(appState.menuSearchQuery) || item.description.toLowerCase().includes(appState.menuSearchQuery);
+                return matchCategory && matchLabel && matchSearch;
+            });
+
+            if(filtered.length === 0) {
+                container.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            container.innerHTML = filtered.map(item => `
+                <div class="bg-surface border border-borderSubtle rounded-2xl overflow-hidden shadow-sm flex flex-col justify-between group hover:border-espresso transition-all relative">
+                    ${!item.isAvailable ? '<div class="absolute inset-0 bg-white/70 backdrop-blur-[1px] z-10 flex items-center justify-center"><span class="bg-rose-800 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-md uppercase tracking-wider">Habis / Kosong</span></div>' : ''}
+                    <div class="relative overflow-hidden aspect-[16/10]">
+                        <img src="${item.image}" alt="${item.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.src='https://placehold.co/600x400/30231F/F8F5EF?text=Menu'">
+                        <div class="absolute top-3 left-3 flex flex-wrap gap-1">
+                            ${item.labels.map(l => `<span class="bg-espresso/90 text-ivory text-[10px] font-semibold px-2.5 py-0.5 rounded-full uppercase tracking-wider">${l}</span>`).join('')}
+                        </div>
+                    </div>
+                    <div class="p-6 flex flex-col justify-between flex-1">
+                        <div>
+                            <span class="text-[10px] uppercase tracking-widest text-terracotta font-bold block mb-1">${item.category}</span>
+                            <h3 class="font-serif font-bold text-lg text-espresso mb-2">${item.name}</h3>
+                            <p class="text-xs text-mutedText leading-relaxed mb-4">${item.description}</p>
+                        </div>
+                        <div class="flex items-center justify-between pt-4 border-t border-borderSubtle">
+                            <span class="font-serif font-bold text-lg text-espresso">Rp ${item.price.toLocaleString('id-ID')}</span>
+                            <button ${!item.isAvailable ? 'disabled' : 'onclick="openReservationModal()"'} class="text-xs font-semibold ${item.isAvailable ? 'text-espresso hover:text-terracotta' : 'text-mutedText cursor-not-allowed'} flex items-center space-x-1">
+                                <span>${item.isAvailable ? 'Pesan Meja' : 'Tidak Tersedia'}</span>
+                                ${item.isAvailable ? '<i class="fa-solid fa-arrow-right"></i>' : ''}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // --- BRANCH & LOCATION MANAGEMENT ---
+        function renderBranchSection() {
+            const selectorContainer = document.getElementById('branch-selector-tabs');
+            selectorContainer.innerHTML = branchesData.map(branch => `
+                <button onclick="setActiveBranch('${branch.id}')" class="px-5 py-2.5 rounded-full text-xs font-bold transition-all ${appState.activeBranchId === branch.id ? 'bg-espresso text-ivory shadow-md' : 'bg-surface border border-borderSubtle text-espresso hover:border-espresso'}">
+                    ${branch.city}
+                </button>
+            `).join('');
+
+            const active = branchesData.find(b => b.id === appState.activeBranchId);
+            if(!active) return;
+
+            document.getElementById('active-branch-city').innerText = active.city;
+            document.getElementById('active-branch-name').innerText = active.name;
+            document.getElementById('active-branch-address').innerText = active.address;
+            document.getElementById('active-branch-phone').innerHTML = `${active.phone} (Reservasi & Informasi)`;
+            document.getElementById('active-branch-map-link').href = active.mapUrl;
+            document.getElementById('hero-operating-info').innerText = `${active.city} — Buka Setiap Hari 10:00 - 22:00 WIB`;
+            document.getElementById('header-status-text').innerText = 'Buka Sekarang';
+            document.getElementById('mobile-status-text').innerText = `${active.name}: Buka Sekarang`;
+
+            const hoursContainer = document.getElementById('operating-hours-list');
+            hoursContainer.innerHTML = Object.entries(active.hours).map(([day, time]) => `
+                <div class="flex justify-between items-center py-1 border-b border-borderSubtle/50 text-xs">
+                    <span class="font-medium text-espresso">${day}</span>
+                    <span class="text-mutedText font-mono">${time} WIB</span>
+                </div>
+            `).join('');
+        }
+
+        function setActiveBranch(id) {
+            appState.activeBranchId = id;
+            appState.reservationData.branchId = id;
+            renderBranchSection();
+        }
+
+        // --- RESERVATION FLOW SYSTEM (6 STEPS) ---
+        function openReservationModal() {
+            appState.reservationStep = 1;
+            renderReservationStep();
+            document.getElementById('reservation-modal').classList.remove('hidden');
+        }
+
+        function closeReservationModal() {
+            document.getElementById('reservation-modal').classList.add('hidden');
+        }
+
+        function renderReservationStep() {
+            const step = appState.reservationStep;
+            
+            // Hide all steps
+            for(let i=1; i<=5; i++) {
+                document.getElementById(`res-step-${i}`).classList.add('hidden');
+                document.getElementById(`dot-${i}`).className = "w-2.5 h-2.5 rounded-full bg-borderSubtle";
+            }
+
+            // Show active step
+            document.getElementById(`res-step-${step}`).classList.remove('hidden');
+            document.getElementById(`dot-${step}`).className = "w-2.5 h-2.5 rounded-full bg-terracotta";
+
+            const backBtn = document.getElementById('res-back-btn');
+            const nextBtn = document.getElementById('res-next-btn');
+            const indicator = document.getElementById('step-indicator-text');
+
+            if(step === 1) {
+                backBtn.classList.add('hidden');
+                indicator.innerText = "Langkah 1 dari 5: Pilih Cabang Restoran";
+                nextBtn.innerText = "Lanjutkan";
+                renderBranchOptionsModal();
+            } else if(step === 2) {
+                backBtn.classList.remove('hidden');
+                indicator.innerText = "Langkah 2 dari 5: Pilih Jadwal & Kapasitas";
+                nextBtn.innerText = "Lanjutkan";
+            } else if(step === 3) {
+                backBtn.classList.remove('hidden');
+                indicator.innerText = "Langkah 3 dari 5: Informasi Kontak Pemesan";
+                nextBtn.innerText = "Review Reservasi";
+            } else if(step === 4) {
+                backBtn.classList.remove('hidden');
+                indicator.innerText = "Langkah 4 dari 5: Konfirmasi & Review";
+                nextBtn.innerText = "Kirim Permintaan";
+                populateReviewData();
+            } else if(step === 5) {
+                backBtn.classList.add('hidden');
+                nextBtn.classList.add('hidden');
+                indicator.innerText = "Langkah 5 dari 5: Reservasi Diterima";
+            }
+        }
+
+        function renderBranchOptionsModal() {
+            const container = document.getElementById('branch-options-container');
+            container.innerHTML = branchesData.map(b => `
+                <label class="border ${appState.reservationData.branchId === b.id ? 'border-espresso bg-ivory shadow-sm' : 'border-borderSubtle'} p-4 rounded-2xl cursor-pointer hover:border-espresso transition-all flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-terracotta">${b.city}</span>
+                            <input type="radio" name="modal-branch" value="${b.id}" ${appState.reservationData.branchId === b.id ? 'checked' : ''} onchange="appState.reservationData.branchId='${b.id}'; renderBranchOptionsModal();" class="text-espresso">
+                        </div>
+                        <h5 class="font-serif font-bold text-espresso text-base">${b.name}</h5>
+                        <p class="text-xs text-mutedText mt-1">${b.address}</p>
+                    </div>
+                </label>
+            `).join('');
+        }
+
+        function generateTimeSlots() {
+            const container = document.getElementById('time-slots-container');
+            const slots = ['10:00', '11:30', '13:00', '14:30', '16:00', '17:30', '18:30', '19:45', '21:00'];
+            
+            container.innerHTML = slots.map(time => `
+                <button type="button" onclick="selectTimeSlot('${time}')" id="slot-${time}" class="time-slot-btn py-2.5 px-3 rounded-xl text-xs font-semibold border ${appState.reservationData.time === time ? 'bg-espresso text-ivory border-espresso' : 'bg-ivory border-borderSubtle text-espresso hover:border-espresso'} transition-all">
+                    ${time} WIB
+                </button>
+            `).join('');
+        }
+
+        function selectTimeSlot(time) {
+            appState.reservationData.time = time;
+            generateTimeSlots();
+        }
+
+        function nextReservationStep() {
+            if(appState.reservationStep === 1) {
+                appState.reservationStep = 2;
+                renderReservationStep();
+                generateTimeSlots();
+            } else if(appState.reservationStep === 2) {
+                appState.reservationData.date = document.getElementById('res-date').value;
+                appState.reservationData.guests = document.getElementById('res-guests').value;
+                const areaEl = document.querySelector('input[name="res-area"]:checked');
+                if(areaEl) appState.reservationData.area = areaEl.value;
+
+                if(!appState.reservationData.date) {
+                    showToast('Validasi Gagal', 'Silakan tentukan tanggal kunjungan.', true);
+                    return;
+                }
+                appState.reservationStep = 3;
+                renderReservationStep();
+            } else if(appState.reservationStep === 3) {
+                appState.reservationData.name = document.getElementById('res-name').value.trim();
+                appState.reservationData.whatsapp = document.getElementById('res-whatsapp').value.trim();
+                appState.reservationData.email = document.getElementById('res-email').value.trim();
+                appState.reservationData.notes = document.getElementById('res-notes').value.trim();
+
+                if(!appState.reservationData.name || !appState.reservationData.whatsapp) {
+                    showToast('Validasi Gagal', 'Nama lengkap dan nomor WhatsApp wajib diisi.', true);
+                    return;
+                }
+                appState.reservationStep = 4;
+                renderReservationStep();
+            } else if(appState.reservationStep === 4) {
+                // Submit reservation backend simulation
+                const branchObj = branchesData.find(b => b.id === appState.reservationData.branchId);
+                const uniqueCode = 'SNJ-2026-' + Math.floor(1000 + Math.random() * 9000);
+                
+                const newRes = {
+                    id: uniqueCode,
+                    branchName: branchObj ? branchObj.name : 'Senja Table',
+                    date: appState.reservationData.date,
+                    time: appState.reservationData.time,
+                    guests: parseInt(appState.reservationData.guests),
+                    area: appState.reservationData.area,
+                    name: appState.reservationData.name,
+                    whatsapp: appState.reservationData.whatsapp,
+                    email: appState.reservationData.email,
+                    notes: appState.reservationData.notes || 'Tidak ada catatan',
+                    status: 'Pending'
+                };
+
+                reservationsData.unshift(newRes);
+                document.getElementById('success-res-code').innerText = uniqueCode;
+                
+                appState.reservationStep = 5;
+                renderReservationStep();
+                showToast('Berhasil', 'Permintaan reservasi meja berhasil dikirim.');
+            }
+        }
+
+        function prevReservationStep() {
+            if(appState.reservationStep > 1) {
+                appState.reservationStep--;
+                renderReservationStep();
+            }
+        }
+
+        function populateReviewData() {
+            const branchObj = branchesData.find(b => b.id === appState.reservationData.branchId);
+            document.getElementById('review-branch').innerText = branchObj ? branchObj.name : '-';
+            document.getElementById('review-datetime').innerText = `${appState.reservationData.date} pukul ${appState.reservationData.time} WIB`;
+            document.getElementById('review-guests-area').innerText = `${appState.reservationData.guests} Orang — ${appState.reservationData.area}`;
+            document.getElementById('review-name').innerText = appState.reservationData.name;
+            document.getElementById('review-whatsapp').innerText = appState.reservationData.whatsapp;
+            document.getElementById('review-notes').innerText = appState.reservationData.notes || 'Tidak ada catatan khusus';
+        }
+
+        // --- ADMIN CMS DASHBOARD SYSTEM ---
+        function openAdminModal() {
+            renderAdminContent();
+            document.getElementById('admin-modal').classList.remove('hidden');
+        }
+
+        function closeAdminModal() {
+            document.getElementById('admin-modal').classList.add('hidden');
+        }
+
+        function switchAdminTab(tabKey) {
+            appState.adminActiveTab = tabKey;
+            
+            // Highlight nav button
+            ['overview', 'reservations', 'menu', 'promo', 'branches', 'reports'].forEach(t => {
+                const btn = document.getElementById(`adm-tab-${t}`);
+                if(btn) {
+                    if(t === tabKey) {
+                        btn.className = "admin-nav-btn w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-semibold bg-espresso text-ivory flex items-center space-x-3";
+                    } else {
+                        btn.className = "admin-nav-btn w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-semibold text-darkText hover:bg-borderSubtle/50 flex items-center space-x-3";
+                    }
+                }
+            });
+
+            renderAdminContent();
+        }
+
+        function renderAdminContent() {
+            const area = document.getElementById('admin-content-area');
+            const tab = appState.adminActiveTab;
+
+            if(tab === 'overview') {
+                const pendingCount = reservationsData.filter(r => r.status === 'Pending').length;
+                const confirmedCount = reservationsData.filter(r => r.status === 'Confirmed').length;
+                const todayCount = reservationsData.length;
+
+                area.innerHTML = `
+                    <div class="space-y-6">
+                        <div>
+                            <h3 class="font-serif font-bold text-2xl text-espresso">Dashboard Overview</h3>
+                            <p class="text-xs text-mutedText">Ringkasan operasional harian dan statistik reservasi Senja Table.</p>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <div class="bg-ivory p-5 rounded-2xl border border-borderSubtle">
+                                <span class="text-xs uppercase text-mutedText font-semibold block mb-1">Total Reservasi</span>
+                                <span class="font-serif font-bold text-3xl text-espresso">${todayCount}</span>
+                                <span class="text-[10px] text-emerald-600 block mt-2"><i class="fa-solid fa-arrow-up mr-1"></i> Data aktif sistem</span>
+                            </div>
+                            <div class="bg-ivory p-5 rounded-2xl border border-borderSubtle">
+                                <span class="text-xs uppercase text-mutedText font-semibold block mb-1">Menunggu Konfirmasi</span>
+                                <span class="font-serif font-bold text-3xl text-amber-600">${pendingCount}</span>
+                                <span class="text-[10px] text-amber-700 block mt-2">Memerlukan tindakan admin</span>
+                            </div>
+                            <div class="bg-ivory p-5 rounded-2xl border border-borderSubtle">
+                                <span class="text-xs uppercase text-mutedText font-semibold block mb-1">Reservasi Disetujui</span>
+                                <span class="font-serif font-bold text-3xl text-emerald-600">${confirmedCount}</span>
+                                <span class="text-[10px] text-mutedText block mt-2">Jadwal siap dikunjungi</span>
+                            </div>
+                            <div class="bg-ivory p-5 rounded-2xl border border-borderSubtle">
+                                <span class="text-xs uppercase text-mutedText font-semibold block mb-1">Menu Aktif</span>
+                                <span class="font-serif font-bold text-3xl text-espresso">${menuItemsData.length}</span>
+                                <span class="text-[10px] text-mutedText block mt-2">Katalog digital online</span>
+                            </div>
+                        </div>
+                        <div class="pt-4">
+                            <h4 class="font-serif font-bold text-lg text-espresso mb-4">Aktivitas Reservasi Terbaru</h4>
+                            <div class="border border-borderSubtle rounded-2xl overflow-hidden">
+                                <table class="w-full text-left border-collapse text-xs">
+                                    <thead>
+                                        <tr class="bg-ivory border-b border-borderSubtle text-mutedText font-semibold">
+                                            <th class="p-3.5">Kode</th>
+                                            <th class="p-3.5">Nama Tamu</th>
+                                            <th class="p-3.5">Cabang & Waktu</th>
+                                            <th class="p-3.5">Tamu</th>
+                                            <th class="p-3.5">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-borderSubtle">
+                                        ${reservationsData.slice(0, 5).map(r => `
+                                            <tr class="hover:bg-ivory/50">
+                                                <td class="p-3.5 font-mono font-bold text-espresso">${r.id}</td>
+                                                <td class="p-3.5 font-medium text-espresso">${r.name}<br><span class="text-[10px] text-mutedText">${r.whatsapp}</span></td>
+                                                <td class="p-3.5 text-mutedText">${r.branchName}<br>${r.date} (${r.time})</td>
+                                                <td class="p-3.5">${r.guests} Orang</td>
+                                                <td class="p-3.5"><span class="px-2.5 py-1 rounded-full text-[10px] font-semibold ${r.status === 'Confirmed' ? 'bg-emerald-100 text-emerald-800' : (r.status === 'Pending' ? 'bg-amber-100 text-amber-800' : 'bg-rose-100 text-rose-800')}">${r.status}</span></td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if(tab === 'reservations') {
+                area.innerHTML = `
+                    <div class="space-y-6">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div>
+                                <h3 class="font-serif font-bold text-2xl text-espresso">Manajemen Reservasi</h3>
+                                <p class="text-xs text-mutedText">Kelola persetujuan, penolakan, atau status kehadiran pelanggan.</p>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <select onchange="filterAdminReservations(this.value)" class="p-2.5 bg-ivory border border-borderSubtle rounded-xl text-xs font-semibold focus:outline-none">
+                                    <option value="All">Semua Status</option>
+                                    <option value="Pending">Menunggu (Pending)</option>
+                                    <option value="Confirmed">Disetujui (Confirmed)</option>
+                                    <option value="Rejected">Ditolak (Rejected)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="border border-borderSubtle rounded-2xl overflow-hidden">
+                            <table class="w-full text-left border-collapse text-xs">
+                                <thead>
+                                    <tr class="bg-ivory border-b border-borderSubtle text-mutedText font-semibold">
+                                        <th class="p-3.5">Kode & Tamu</th>
+                                        <th class="p-3.5">Cabang & Area</th>
+                                        <th class="p-3.5">Jadwal</th>
+                                        <th class="p-3.5">Catatan</th>
+                                        <th class="p-3.5">Status</th>
+                                        <th class="p-3.5 text-right">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-borderSubtle" id="admin-res-table-body">
+                                    ${renderAdminReservationsRows()}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+            } else if(tab === 'menu') {
+                area.innerHTML = `
+                    <div class="space-y-6">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div>
+                                <h3 class="font-serif font-bold text-2xl text-espresso">Manajemen Menu & Kategori</h3>
+                                <p class="text-xs text-mutedText">Tambah, edit harga, atau ubah ketersediaan menu secara real-time.</p>
+                            </div>
+                            <button onclick="showAddMenuModal()" class="bg-espresso text-ivory px-4 py-2.5 rounded-xl text-xs font-semibold hover:bg-terracotta transition-all shadow-sm">
+                                <i class="fa-solid fa-plus mr-1"></i> Tambah Menu Baru
+                            </button>
+                        </div>
+                        <div class="border border-borderSubtle rounded-2xl overflow-hidden">
+                            <table class="w-full text-left border-collapse text-xs">
+                                <thead>
+                                    <tr class="bg-ivory border-b border-borderSubtle text-mutedText font-semibold">
+                                        <th class="p-3.5">Menu & Kategori</th>
+                                        <th class="p-3.5">Harga</th>
+                                        <th class="p-3.5">Label</th>
+                                        <th class="p-3.5">Status</th>
+                                        <th class="p-3.5 text-right">Kelola</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-borderSubtle">
+                                    ${menuItemsData.map(item => `
+                                        <tr class="hover:bg-ivory/50">
+                                            <td class="p-3.5 flex items-center space-x-3">
+                                                <img src="${item.image}" class="w-10 h-10 rounded-lg object-cover" onerror="this.src='https://placehold.co/100x100/30231F/F8F5EF?text=Item'">
+                                                <div>
+                                                    <span class="font-bold text-espresso block">${item.name}</span>
+                                                    <span class="text-[10px] text-mutedText">${item.category}</span>
+                                                </div>
+                                            </td>
+                                            <td class="p-3.5 font-semibold text-espresso">Rp ${item.price.toLocaleString('id-ID')}</td>
+                                            <td class="p-3.5">${item.labels.map(l => `<span class="bg-ivory border border-borderSubtle text-[9px] px-2 py-0.5 rounded-md mr-1">${l}</span>`).join('')}</td>
+                                            <td class="p-3.5">
+                                                <span class="px-2 py-1 rounded-full text-[10px] font-semibold ${item.isAvailable ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
+                                                    ${item.isAvailable ? 'Tersedia' : 'Habis'}
+                                                </span>
+                                            </td>
+                                            <td class="p-3.5 text-right space-x-2">
+                                                <button onclick="toggleMenuAvailability(${item.id})" class="p-1.5 bg-ivory border border-borderSubtle rounded-lg text-espresso hover:border-espresso transition-colors" title="Ubah Ketersediaan">
+                                                    <i class="fa-solid fa-power-off text-xs"></i>
+                                                </button>
+                                                <button onclick="deleteMenuItem(${item.id})" class="p-1.5 bg-ivory border border-borderSubtle rounded-lg text-rose-700 hover:border-rose-700 transition-colors" title="Hapus Menu">
+                                                    <i class="fa-solid fa-trash text-xs"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+            } else if(tab === 'promo') {
+                area.innerHTML = `
+                    <div class="space-y-6">
+                        <div>
+                            <h3 class="font-serif font-bold text-2xl text-espresso">Pengelolaan Promo Mingguan</h3>
+                            <p class="text-xs text-mutedText">Atur penawaran diskon atau paket spesial yang tampil di website publik.</p>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            ${promotionsData.map(p => `
+                                <div class="bg-ivory border border-borderSubtle p-5 rounded-2xl space-y-3">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-[10px] font-bold text-terracotta uppercase">${p.period}</span>
+                                        <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold ${p.isActive ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-200 text-gray-700'}">${p.isActive ? 'Aktif' : 'Nonaktif'}</span>
+                                    </div>
+                                    <h4 class="font-serif font-bold text-lg text-espresso">${p.title}</h4>
+                                    <p class="text-xs text-mutedText">${p.description}</p>
+                                    <div class="pt-3 border-t border-borderSubtle flex justify-end">
+                                        <button onclick="togglePromoStatus(${p.id})" class="text-xs font-semibold text-espresso hover:text-terracotta">
+                                            ${p.isActive ? 'Nonaktifkan Promo' : 'Aktifkan Promo'}
+                                        </button>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            } else if(tab === 'branches') {
+                area.innerHTML = `
+                    <div class="space-y-6">
+                        <div>
+                            <h3 class="font-serif font-bold text-2xl text-espresso">Cabang & Konfigurasi Kapasitas</h3>
+                            <p class="text-xs text-mutedText">Pengaturan kapasitas maksimal per slot waktu dan informasi operasional cabang.</p>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            ${branchesData.map(b => `
+                                <div class="bg-ivory border border-borderSubtle p-5 rounded-2xl space-y-3">
+                                    <span class="text-[10px] font-bold text-terracotta uppercase">${b.city}</span>
+                                    <h4 class="font-serif font-bold text-lg text-espresso">${b.name}</h4>
+                                    <p class="text-xs text-mutedText">${b.address}</p>
+                                    <div class="pt-2 text-xs border-t border-borderSubtle">
+                                        <span class="font-semibold text-espresso">Kapasitas Slot: ${b.capacityPerSlot} Tamu</span>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            } else if(tab === 'reports') {
+                area.innerHTML = `
+                    <div class="space-y-6">
+                        <div>
+                            <h3 class="font-serif font-bold text-2xl text-espresso">Laporan Reservasi Bulanan</h3>
+                            <p class="text-xs text-mutedText">Rekapitulasi data kunjungan dan status reservasi aktual berdasarkan database sistem.</p>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div class="bg-ivory p-5 rounded-2xl border border-borderSubtle">
+                                <span class="text-xs text-mutedText uppercase font-semibold">Total Dikonfirmasi</span>
+                                <span class="font-serif font-bold text-3xl text-emerald-600 mt-1 block">${reservationsData.filter(r => r.status === 'Confirmed').length}</span>
+                            </div>
+                            <div class="bg-ivory p-5 rounded-2xl border border-borderSubtle">
+                                <span class="text-xs text-mutedText uppercase font-semibold">Total Pending</span>
+                                <span class="font-serif font-bold text-3xl text-amber-600 mt-1 block">${reservationsData.filter(r => r.status === 'Pending').length}</span>
+                            </div>
+                            <div class="bg-ivory p-5 rounded-2xl border border-borderSubtle">
+                                <span class="text-xs text-mutedText uppercase font-semibold">Total Ditolak/Batal</span>
+                                <span class="font-serif font-bold text-3xl text-rose-600 mt-1 block">${reservationsData.filter(r => r.status === 'Rejected').length}</span>
+                            </div>
+                        </div>
+                        <div class="bg-surface border border-borderSubtle p-6 rounded-2xl text-center">
+                            <button onclick="showToast('Ekspor Data', 'Laporan berhasil diexport ke format CSV sesuai filter aktif.')" class="bg-espresso text-ivory px-6 py-3 rounded-full text-xs font-semibold hover:bg-terracotta transition-all shadow-sm">
+                                <i class="fa-solid fa-download mr-2"></i> Download Laporan CSV (Bulan Ini)
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function renderAdminReservationsRows() {
+            let filtered = reservationsData;
+            if(appState.adminReservationFilterStatus !== 'All') {
+                filtered = reservationsData.filter(r => r.status === appState.adminReservationFilterStatus);
+            }
+
+            if(filtered.length === 0) {
+                return `<tr><td colspan="6" class="p-6 text-center text-mutedText">Tidak ada data reservasi dengan status tersebut.</td></tr>`;
+            }
+
+            return filtered.map(r => `
+                <tr class="hover:bg-ivory/50">
+                    <td class="p-3.5">
+                        <span class="font-mono font-bold text-espresso block">${r.id}</span>
+                        <span class="font-medium text-darkText">${r.name}</span><br>
+                        <span class="text-[10px] text-mutedText">${r.whatsapp}</span>
+                    </td>
+                    <td class="p-3.5 text-mutedText">
+                        <span class="font-medium text-espresso">${r.branchName}</span><br>
+                        <span>${r.area}</span>
+                    </td>
+                    <td class="p-3.5 font-mono text-mutedText">
+                        ${r.date}<br>${r.time} WIB (${r.guests} Tamu)
+                    </td>
+                    <td class="p-3.5 text-mutedText italic">${r.notes}</td>
+                    <td class="p-3.5">
+                        <span class="px-2.5 py-1 rounded-full text-[10px] font-semibold ${r.status === 'Confirmed' ? 'bg-emerald-100 text-emerald-800' : (r.status === 'Pending' ? 'bg-amber-100 text-amber-800' : 'bg-rose-100 text-rose-800')}">${r.status}</span>
+                    </td>
+                    <td class="p-3.5 text-right space-x-1">
+                        ${r.status === 'Pending' ? `
+                            <button onclick="updateReservationStatus('${r.id}', 'Confirmed')" class="px-3 py-1 bg-emerald-600 text-white rounded-lg text-[10px] font-bold hover:bg-emerald-700 transition-colors">Setujui</button>
+                            <button onclick="updateReservationStatus('${r.id}', 'Rejected')" class="px-3 py-1 bg-rose-600 text-white rounded-lg text-[10px] font-bold hover:bg-rose-700 transition-colors">Tolak</button>
+                        ` : '<span class="text-[10px] text-mutedText">Selesai Diverifikasi</span>'}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function filterAdminReservations(status) {
+            appState.adminReservationFilterStatus = status;
+            const tbody = document.getElementById('admin-res-table-body');
+            if(tbody) tbody.innerHTML = renderAdminReservationsRows();
+        }
+
+        function updateReservationStatus(id, newStatus) {
+            const res = reservationsData.find(r => r.id === id);
+            if(res) {
+                res.status = newStatus;
+                renderAdminContent();
+                showToast('Status Diperbarui', `Reservasi ${id} berhasil diubah menjadi ${newStatus}.`);
+            }
+        }
+
+        function toggleMenuAvailability(id) {
+            const item = menuItemsData.find(i => i.id === id);
+            if(item) {
+                item.isAvailable = !item.isAvailable;
+                renderAdminContent();
+                renderDigitalMenu();
+                showToast('Menu Diperbarui', `Status ketersediaan ${item.name} telah diubah.`);
+            }
+        }
+
+        function deleteMenuItem(id) {
+            menuItemsData = menuItemsData.filter(i => i.id !== id);
+            renderAdminContent();
+            renderDigitalMenu();
+            renderFeaturedMenu();
+            showToast('Menu Dihapus', 'Item menu berhasil dihapus dari katalog.');
+        }
+
+        function togglePromoStatus(id) {
+            const promo = promotionsData.papy ? promotionsData.find(p => p.id === id) : promotionsData.find(p => p.id === id);
+            if(promo) {
+                promo.isActive = !promo.isActive;
+                renderAdminContent();
+                renderPromotions();
+                showToast('Promo Diperbarui', `Status promo ${promo.title} berhasil diubah.`);
+            }
+        }
+
+        function showAddMenuModal() {
+            const name = prompt("Masukkan Nama Menu Baru:");
+            if(!name) return;
+            const price = parseInt(prompt("Masukkan Harga Menu (Rp):", "50000")) || 50000;
+            const category = prompt("Masukkan Kategori (Makanan Utama / Kopi & Espresso / dll):", "Makanan Utama");
+            
+            const newItem = {
+                id: Date.now(),
+                name: name,
+                category: menuCategoriesData.includes(category) ? category : 'Makanan Utama',
+                price: price,
+                description: 'Menu spesial racikan Chef Senja Table.',
+                image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80',
+                labels: ['Baru'],
+                isAvailable: true
+            };
+
+            menuItemsData.push(newItem);
+            renderAdminContent();
+            renderDigitalMenu();
+            showToast('Berhasil', 'Menu baru berhasil ditambahkan.');
+        }
+    </script>
+</body>
+</html>

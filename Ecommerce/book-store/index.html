@@ -1,0 +1,1466 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduKriya — Premium Digital Learning & Knowledge Commerce</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Manrope & Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        warm: '#FAF8F5',       /* Warm Cream Background */
+                        ink: '#1E2229',        /* Deep Navy Ink */
+                        terracotta: '#C85A32', /* Primary Accent (Terracotta) */
+                        slateblue: '#3A506B',  /* Secondary Accent (Slate Blue) */
+                        sand: '#E6DFD5',       /* Border & Soft Divider */
+                        clay: '#E07A5F',       /* Highlight / Hover */
+                        cream: '#F4EFEA',      /* Card Background */
+                    },
+                    fontFamily: {
+                        sans: ['Manrope', 'Plus Jakarta Sans', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #FAF8F5;
+            color: #1E2229;
+            font-family: 'Manrope', sans-serif;
+        }
+        .serif-title {
+            font-family: 'Playfair Display', serif;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #F4EFEA;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #3A506B;
+            border-radius: 3px;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-terracotta selection:text-white">
+
+    <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col space-y-3 pointer-events-none"></div>
+
+    <header class="sticky top-0 z-40 bg-warm/90 backdrop-blur-md border-b border-sand transition-all">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <div class="flex items-center space-x-8">
+                <a href="#" onclick="router.navigate('home')" class="flex items-center space-x-3 group">
+                    <div class="w-10 h-10 rounded-xl bg-terracotta flex items-center justify-center text-white font-bold text-xl transition group-hover:scale-105 shadow-md shadow-terracotta/20">
+                        E
+                    </div>
+                    <div>
+                        <span class="text-xl font-bold tracking-tight text-ink font-sans">EduKriya</span>
+                        <span class="block text-[10px] uppercase tracking-widest text-terracotta font-bold">Knowledge Store</span>
+                    </div>
+                </a>
+
+                <nav class="hidden md:flex items-center space-x-6 text-sm font-medium text-ink/80">
+                    <a href="#" onclick="router.navigate('catalog', {type:'all'})" class="hover:text-terracotta transition">Jelajah Semua</a>
+                    <a href="#" onclick="router.navigate('catalog', {type:'course'})" class="hover:text-terracotta transition">Kursus Online</a>
+                    <a href="#" onclick="router.navigate('catalog', {type:'ebook'})" class="hover:text-terracotta transition">E-Book Pilihan</a>
+                    <a href="#" onclick="router.navigate('verify-cert')" class="hover:text-terracotta transition">Cek Sertifikat</a>
+                </nav>
+            </div>
+
+            <div class="flex items-center space-x-4">
+                <button onclick="openSearchModal()" class="hidden sm:flex items-center space-x-2 px-3 py-1.5 rounded-full bg-sand/60 hover:bg-sand text-xs text-ink/70 transition border border-sand">
+                    <i class="fa-solid fa-magnifying-glass text-terracotta"></i>
+                    <span>Cari materi...</span>
+                    <kbd class="bg-white px-1.5 py-0.5 rounded text-[10px] font-mono border border-sand">Ctrl K</kbd>
+                </button>
+
+                <button onclick="toggleCartDrawer()" class="relative p-2.5 rounded-full bg-sand/50 hover:bg-sand text-ink transition">
+                    <i class="fa-solid fa-bag-shopping"></i>
+                    <span id="cart-badge" class="absolute -top-1 -right-1 bg-terracotta text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center shadow-sm hidden">0</span>
+                </button>
+
+                <div id="auth-nav-container" class="flex items-center space-x-3">
+                    <!-- Dynamic Auth -->
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main id="app-main" class="flex-grow">
+        <!-- Render views dynamically -->
+    </main>
+
+    <footer class="bg-ink text-warm py-16 border-t border-slateblue/30 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+                <div class="space-y-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 rounded-lg bg-terracotta flex items-center justify-center text-white font-bold">E</div>
+                        <span class="text-lg font-bold tracking-tight text-white">EduKriya</span>
+                    </div>
+                    <p class="text-xs text-warm/70 leading-relaxed">
+                        Platform kurasi pengetahuan profesional, kursus mandiri terstruktur, dan e-book berkualitas tinggi dengan palet terracota eksklusif untuk kreator masa depan.
+                    </p>
+                    <div class="flex space-x-3 text-warm/60">
+                        <a href="#" class="hover:text-terracotta transition"><i class="fa-brands fa-twitter"></i></a>
+                        <a href="#" class="hover:text-terracotta transition"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="#" class="hover:text-terracotta transition"><i class="fa-brands fa-linkedin"></i></a>
+                        <a href="#" class="hover:text-terracotta transition"><i class="fa-brands fa-youtube"></i></a>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="text-xs font-bold uppercase tracking-widest text-slateblue mb-4">Eksplorasi</h4>
+                    <ul class="space-y-2 text-sm text-warm/80">
+                        <li><a href="#" onclick="router.navigate('catalog', {type:'course'})" class="hover:text-white transition">Katalog Kursus</a></li>
+                        <li><a href="#" onclick="router.navigate('catalog', {type:'ebook'})" class="hover:text-white transition">Koleksi E-Book</a></li>
+                        <li><a href="#" onclick="router.navigate('catalog', {category:'Teknologi'})" class="hover:text-white transition">Topik Teknologi</a></li>
+                        <li><a href="#" onclick="router.navigate('catalog', {category:'Bisnis'})" class="hover:text-white transition">Bisnis & Finansial</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-xs font-bold uppercase tracking-widest text-slateblue mb-4">Pusat Bantuan</h4>
+                    <ul class="space-y-2 text-sm text-warm/80">
+                        <li><a href="#" onclick="showInfoModal('Cara Pembelian & Akses')" class="hover:text-white transition">Cara Pembelian</a></li>
+                        <li><a href="#" onclick="showInfoModal('Kebijakan Akses & Garansi')" class="hover:text-white transition">Kebijakan Akses</a></li>
+                        <li><a href="#" onclick="router.navigate('verify-cert')" class="hover:text-white transition">Verifikasi Sertifikat</a></li>
+                        <li><a href="#" onclick="showInfoModal('Kontak Tim EduKriya')" class="hover:text-white transition">Hubungi Kami</a></li>
+                    </ul>
+                </div>
+                <div class="space-y-4">
+                    <h4 class="text-xs font-bold uppercase tracking-widest text-slateblue mb-4">Akses Admin & Pengajar</h4>
+                    <p class="text-xs text-warm/70">Masuk ke panel manajemen untuk mempublikasikan materi atau mengelola sistem.</p>
+                    <button onclick="auth.loginAsAdmin()" class="px-4 py-2 bg-terracotta text-white text-xs font-semibold rounded-lg hover:bg-terracotta/90 transition shadow-sm">
+                        Masuk sebagai Admin CMS
+                    </button>
+                </div>
+            </div>
+            <div class="pt-8 border-t border-warm/10 flex flex-col sm:flex-row justify-between items-center text-xs text-warm/50">
+                <p>&copy; 2026 EduKriya Commerce & Learning System. Hak Cipta Dilindungi.</p>
+                <div class="flex space-x-6 mt-4 sm:mt-0">
+                    <a href="#" class="hover:text-warm">Privasi</a>
+                    <a href="#" class="hover:text-warm">Syarat & Ketentuan</a>
+                    <a href="#" class="hover:text-warm">Keamanan Data</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <div id="cart-drawer" class="fixed inset-0 z-50 overflow-hidden hidden">
+        <div class="absolute inset-0 bg-ink/50 backdrop-blur-sm transition-opacity" onclick="toggleCartDrawer()"></div>
+        <div class="absolute inset-y-0 right-0 max-w-full flex pl-10">
+            <div class="w-screen max-w-md bg-warm shadow-2xl flex flex-col border-l border-sand">
+                <div class="p-6 border-b border-sand flex items-center justify-between bg-white">
+                    <div class="flex items-center space-x-2">
+                        <i class="fa-solid fa-bag-shopping text-terracotta"></i>
+                        <h3 class="font-bold text-ink">Keranjang Belanja</h3>
+                    </div>
+                    <button onclick="toggleCartDrawer()" class="text-ink/60 hover:text-ink"><i class="fa-solid fa-xmark text-lg"></i></button>
+                </div>
+                <div id="cart-items-container" class="flex-1 overflow-y-auto p-6 space-y-4">
+                    <!-- Dynamic cart items -->
+                </div>
+                <div id="cart-footer" class="p-6 border-t border-sand bg-white">
+                    <!-- Dynamic cart summary -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="search-modal" class="fixed inset-0 z-50 bg-ink/60 backdrop-blur-sm flex items-start justify-center pt-20 px-4 hidden">
+        <div class="bg-warm w-full max-w-2xl rounded-2xl shadow-2xl border border-sand overflow-hidden">
+            <div class="p-4 border-b border-sand flex items-center space-x-3 bg-white">
+                <i class="fa-solid fa-magnifying-glass text-terracotta ml-2"></i>
+                <input type="text" id="global-search-input" oninput="handleGlobalSearch(this.value)" placeholder="Cari kursus, e-book, atau topik pembelajaran..." class="w-full bg-transparent text-ink placeholder-ink/40 text-sm focus:outline-none">
+                <button onclick="closeSearchModal()" class="text-xs px-2.5 py-1 rounded bg-sand text-ink font-medium">ESC</button>
+            </div>
+            <div id="search-results-container" class="max-h-96 overflow-y-auto p-4 space-y-2">
+                <div class="text-center py-8 text-ink/50 text-sm">Ketik untuk mulai mencari produk digital...</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="info-modal" class="fixed inset-0 z-50 bg-ink/50 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+        <div class="bg-warm w-full max-w-md rounded-2xl shadow-2xl border border-sand p-6 space-y-4">
+            <div class="flex justify-between items-center">
+                <h3 id="info-modal-title" class="font-bold text-ink text-lg">Informasi</h3>
+                <button onclick="closeInfoModal()" class="text-ink/60 hover:text-ink"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div id="info-modal-content" class="text-sm text-ink/80 leading-relaxed">
+                <!-- Content -->
+            </div>
+            <div class="flex justify-end pt-2">
+                <button onclick="closeInfoModal()" class="px-4 py-2 bg-terracotta text-white rounded-lg text-xs font-semibold hover:bg-terracotta/90">Mengerti</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const DB = {
+            currentUser: {
+                id: 'USR-001',
+                name: 'Budi Santoso',
+                email: 'budi.santoso@example.com',
+                role: 'customer',
+                avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200'
+            },
+            categories: ['Semua', 'Teknologi', 'Bisnis & Startup', 'Desain & UI/UX', 'Data & AI', 'Penulisan'],
+            products: [
+                {
+                    id: 'PROD-101',
+                    type: 'course',
+                    title: 'Full-Stack Web Architecture & Clean Code Mastery',
+                    slug: 'full-stack-web-architecture',
+                    category: 'Teknologi',
+                    instructor: {
+                        name: 'Rian Prasetya, M.Kom',
+                        role: 'Principal Software Architect',
+                        avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200',
+                        bio: 'Berpengalaman lebih dari 12 tahun merancang sistem berskala enterprise untuk perusahaan teknologi global.'
+                    },
+                    price: 499000,
+                    originalPrice: 750000,
+                    thumbnail: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&q=80&w=800',
+                    level: 'Menengah - Mahir',
+                    totalDuration: '8 Jam 40 Menit',
+                    totalModules: 14,
+                    rating: 4.9,
+                    reviewsCount: 128,
+                    description: 'Pelajari arsitektur perangkat lunak modern, pola perancangan clean code, pengelolaan state terdistribusi, dan praktik terbaik pengembangan web end-to-end.',
+                    outcomes: [
+                        'Memahami prinsip Solid Principles & Clean Architecture secara mendalam',
+                        'Merancang API berkinerja tinggi dengan keamanan ketat',
+                        'Mengelola database relasional & non-relasional skala besar',
+                        'Menerapkan testing otomatis dan CI/CD pipeline profesional'
+                    ],
+                    prerequisites: 'Menguasai dasar JavaScript/TypeScript dan dasar pemrograman web.',
+                    chapters: [
+                        {
+                            id: 'CH-1',
+                            title: 'Modul 1: Fondasi Arsitektur Perangkat Lunak',
+                            lessons: [
+                                { id: 'LES-1', title: '1.1 Pengantar Clean Architecture & Separation of Concerns', duration: '24m', videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4', freePreview: true, completed: true },
+                                { id: 'LES-2', title: '1.2 Domain-Driven Design (DDD) untuk Pemula', duration: '35m', videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4', freePreview: false, completed: false },
+                                { id: 'LES-3', title: '1.3 Studi Kasus: Memetakan Batasan Kontekstual Sistem', duration: '40m', videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4', freePreview: false, completed: false }
+                            ]
+                        },
+                        {
+                            id: 'CH-2',
+                            title: 'Modul 2: Backend Scalability & API Design',
+                            lessons: [
+                                { id: 'LES-4', title: '2.1 RESTful API Best Practices & Versioning', duration: '42m', videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4', freePreview: false, completed: false },
+                                { id: 'LES-5', title: '2.2 Rate Limiting, Security Headers & JWT Authentication', duration: '50m', videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4', freePreview: false, completed: false }
+                            ]
+                        }
+                    ],
+                    hasQuiz: true,
+                    hasCertificate: true
+                },
+                {
+                    id: 'PROD-102',
+                    type: 'ebook',
+                    title: 'Mastering Product Strategy: Panduan Praktis Product Manager Modern',
+                    slug: 'mastering-product-strategy',
+                    category: 'Bisnis & Startup',
+                    instructor: {
+                        name: 'Amanda Kirana',
+                        role: 'Head of Product at Unicorn Tech',
+                        avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=200',
+                        bio: 'Praktisi produk dengan rekam jejak meluncurkan 5 produk digital yang digunakan jutaan pengguna.'
+                    },
+                    price: 189000,
+                    originalPrice: 250000,
+                    thumbnail: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&q=80&w=800',
+                    level: 'Semua Level',
+                    pages: 246,
+                    format: 'PDF (Watermarked)',
+                    rating: 4.8,
+                    reviewsCount: 94,
+                    description: 'E-book komprehensif yang membahas cara merumuskan visi produk, validasi ide dengan data, penyusunan roadmap yang realistis, dan kolaborasi efektif lintas fungsi.',
+                    outcomes: [
+                        'Menyusun product roadmap berbasis objektif strategis',
+                        'Melakukan customer discovery dan user interview yang tajam',
+                        'Mengukur metrik pertumbuhan produk secara akurat'
+                    ],
+                    chapters: [
+                        { title: 'Bab 1: Fundasi Product Thinking & Market Fit' },
+                        { title: 'Bab 2: Framework Prioritisasi Fitur (RICE, MoSCoW)' },
+                        { title: 'Bab 3: Validasi Hipotesis & Prototyping Cepat' }
+                    ],
+                    samplePages: [
+                        'Pengantar: Mengapa Banyak Produk Gagal di Tahun Pertama?\n\nDalam dunia digital saat ini, membangun produk bukan sekadar menulis kode atau merancang antarmuka yang indah. Produk terbaik lahir dari pemahaman mendalam terhadap masalah nyata pengguna (Pain Points).\n\nBuku ini dirancang sebagai panduan operasional bagi product manager, founder startup, dan desainer...'
+                    ]
+                },
+                {
+                    id: 'PROD-103',
+                    type: 'course',
+                    title: 'UI/UX Design Systems: Skala Antarmuka Profesional',
+                    slug: 'ui-ux-design-systems',
+                    category: 'Desain & UI/UX',
+                    instructor: {
+                        name: 'Dimas Anggara',
+                        role: 'Lead Product Designer',
+                        avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=200',
+                        bio: 'Spesialis Design Systems & DesignOps untuk perusahaan SaaS multinasional.'
+                    },
+                    price: 389000,
+                    originalPrice: 500000,
+                    thumbnail: 'https://images.unsplash.com/photo-1581291518633-83b4ebd1d83e?auto=format&fit=crop&q=80&w=800',
+                    level: 'Menengah',
+                    totalDuration: '5 Jam 15 Menit',
+                    totalModules: 8,
+                    rating: 4.9,
+                    reviewsCount: 76,
+                    description: 'Pelajari cara merancang dan mendokumentasikan Design System berskala enterprise yang konsisten, mudah dirawat, dan mempercepat kolaborasi desainer serta developer.',
+                    outcomes: [
+                        'Membuat Token Desain (Typography, Colors, Spacing)',
+                        'Menyusun komponen Atomic Design yang fleksibel',
+                        'Dokumentasi Figma dan sinkronisasi dengan kode frontend'
+                    ],
+                    prerequisites: 'Menguasai dasar Figma dan prinsip dasar UI/UX.',
+                    chapters: [
+                        {
+                            id: 'CH-DS-1',
+                            title: 'Modul 1: Pengantar Design Systems',
+                            lessons: [
+                                { id: 'LES-DS-1', title: '1.1 Apa itu DesignOps & Design System?', duration: '20m', videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4', freePreview: true, completed: false }
+                            ]
+                        }
+                    ],
+                    hasQuiz: true,
+                    hasCertificate: true
+                },
+                {
+                    id: 'PROD-104',
+                    type: 'ebook',
+                    title: 'Data-Driven Decision Making dalam Bisnis Digital',
+                    slug: 'data-driven-decision-making',
+                    category: 'Data & AI',
+                    instructor: {
+                        name: 'Dr. Sarah Wijaya',
+                        role: 'Data Scientist & Consultant',
+                        avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&q=80&w=200',
+                        bio: 'Konsultan analitik data untuk berbagai perusahaan retail dan fintech terkemuka.'
+                    },
+                    price: 149000,
+                    originalPrice: 200000,
+                    thumbnail: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=800',
+                    level: 'Pemula - Menengah',
+                    pages: 198,
+                    format: 'PDF (Watermarked)',
+                    rating: 4.7,
+                    reviewsCount: 52,
+                    description: 'Panduan praktis menterjemahkan data mentah menjadi keputusan strategis bisnis yang menguntungkan tanpa terjebak dalam mitos big data.',
+                    outcomes: [
+                        'Menentukan KPI dan metrik metrik esensial bisnis',
+                        'Membuat visualisasi data yang mudah dipahami stakeholder'
+                    ],
+                    chapters: [
+                        { title: 'Bab 1: Mindset Berbasis Data di Era Modern' },
+                        { title: 'Bab 2: Metrik Utama (North Star Metric)' }
+                    ],
+                    samplePages: [
+                        'Pendahuluan: Data Bukan Hanya Angka\n\nBanyak perusahaan mengumpulkan terabyte data namun kebingungan mengambil keputusan. Masalah utamanya bukan kurangnya data, melainkan ketiadaan kerangka pertanyaan yang tepat...'
+                    ]
+                }
+            ],
+            userPurchases: ['PROD-101'],
+            cart: [],
+            coupons: {
+                'EDUKRIYA20': { discountPercent: 20, minPurchase: 100000 },
+                'KIRYA50': { discountFlat: 50000, minPurchase: 200000 }
+            }
+        };
+
+        // Router & Navigation
+        const router = {
+            currentView: 'home',
+            params: {},
+            navigate(view, params = {}) {
+                this.currentView = view;
+                this.params = params;
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                render();
+            }
+        };
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `pointer-events-auto px-4 py-3 rounded-xl shadow-lg border text-sm flex items-center space-x-3 transition transform translate-y-2 opacity-0 animate-fade-in ${
+                type === 'success' ? 'bg-slate-800 text-white border-slate-700' : 'bg-terracotta text-white border-terracotta/30'
+            }`;
+            toast.innerHTML = `
+                <i class="fa-solid ${type === 'success' ? 'fa-circle-check text-slateblue' : 'fa-circle-exclamation'}"></i>
+                <span class="font-medium">${message}</span>
+            `;
+            container.appendChild(toast);
+            setTimeout(() => toast.classList.remove('translate-y-2', 'opacity-0'), 10);
+            setTimeout(() => {
+                toast.classList.add('translate-y-2', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
+        // Main Render Dispatcher
+        function render() {
+            renderAuthNav();
+            const main = document.getElementById('app-main');
+            
+            switch(router.currentView) {
+                case 'home':
+                    main.innerHTML = renderHomeView();
+                    break;
+                case 'catalog':
+                    main.innerHTML = renderCatalogView(router.params);
+                    break;
+                case 'product-detail':
+                    main.innerHTML = renderProductDetailView(router.params.id);
+                    break;
+                case 'checkout':
+                    main.innerHTML = renderCheckoutView(router.params.productId);
+                    break;
+                case 'my-learning':
+                    main.innerHTML = renderMyLearningView();
+                    break;
+                case 'course-player':
+                    main.innerHTML = renderCoursePlayerView(router.params.productId);
+                    break;
+                case 'ebook-reader':
+                    main.innerHTML = renderEbookReaderView(router.params.productId);
+                    break;
+                case 'quiz':
+                    main.innerHTML = renderQuizView(router.params.productId);
+                    break;
+                case 'certificate':
+                    main.innerHTML = renderCertificateView(router.params.productId);
+                    break;
+                case 'verify-cert':
+                    main.innerHTML = renderVerifyCertView();
+                    break;
+                case 'admin-cms':
+                    main.innerHTML = renderAdminCmsView();
+                    break;
+                default:
+                    main.innerHTML = renderHomeView();
+            }
+        }
+
+        function renderAuthNav() {
+            const container = document.getElementById('auth-nav-container');
+            if (DB.currentUser) {
+                container.innerHTML = `
+                    <button onclick="router.navigate('my-learning')" class="hidden sm:flex items-center space-x-2 px-3 py-1.5 rounded-lg bg-slateblue text-white text-xs font-semibold hover:bg-slateblue/90 transition shadow-sm">
+                        <i class="fa-solid fa-graduation-cap"></i>
+                        <span>Dashboard Belajar</span>
+                    </button>
+                    <div class="relative group">
+                        <button class="flex items-center space-x-2 p-1 rounded-full hover:bg-sand transition">
+                            <img src="${DB.currentUser.avatar}" alt="User" class="w-9 h-9 rounded-full object-cover border border-slateblue/30">
+                        </button>
+                        <div class="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-sand py-2 hidden group-hover:block z-50">
+                            <div class="px-4 py-2 border-b border-sand">
+                                <p class="text-xs font-bold text-ink">${DB.currentUser.name}</p>
+                                <p class="text-[10px] text-ink/65 truncate">${DB.currentUser.email}</p>
+                            </div>
+                            <a href="#" onclick="router.navigate('my-learning')" class="block px-4 py-2 text-xs text-ink hover:bg-sand/50"><i class="fa-solid fa-book-open mr-2 text-slateblue"></i> Produk Saya</a>
+                            ${DB.currentUser.role === 'admin' ? `<a href="#" onclick="router.navigate('admin-cms')" class="block px-4 py-2 text-xs text-terracotta font-bold hover:bg-sand/50"><i class="fa-solid fa-sliders mr-2"></i> Admin CMS</a>` : ''}
+                            <div class="border-t border-sand my-1"></div>
+                            <a href="#" onclick="auth.logout()" class="block px-4 py-2 text-xs text-terracotta hover:bg-sand/50"><i class="fa-solid fa-right-from-bracket mr-2"></i> Keluar</a>
+                        </div>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `
+                    <button onclick="auth.loginAsCustomer()" class="px-4 py-2 rounded-lg bg-terracotta text-white text-xs font-semibold hover:bg-terracotta/90 transition shadow-sm">
+                        Masuk / Daftar
+                    </button>
+                `;
+            }
+        }
+
+        // ================= HOMEPAGE =================
+        function renderHomeView() {
+            return `
+                <section class="relative overflow-hidden py-16 lg:py-24 border-b border-sand bg-gradient-to-b from-warm to-cream/40">
+                    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                            <div class="lg:col-span-7 space-y-6">
+                                <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-terracotta/10 text-terracotta text-xs font-bold tracking-wider uppercase">
+                                    <i class="fa-solid fa-award"></i>
+                                    <span>Kurasi Pengetahuan Profesional</span>
+                                </div>
+                                <h1 class="serif-title text-4xl sm:text-5xl lg:text-6xl font-bold text-ink leading-tight">
+                                    Kuasai Keahlian Nyata Bersama <span class="text-terracotta italic">EduKriya</span>
+                                </h1>
+                                <p class="text-base sm:text-lg text-ink/75 leading-relaxed max-w-2xl">
+                                    Platform pembelajaran digital terpadu untuk kursus mandiri terstruktur dan e-book berkualitas tinggi. Miliki akses instan dengan palet desain hangat yang nyaman dan elegan.
+                                </p>
+                                <div class="flex flex-col sm:flex-row items-stretch sm:items-center space-y-3 sm:space-y-0 sm:space-x-4 pt-2">
+                                    <button onclick="router.navigate('catalog', {type:'all'})" class="px-8 py-3.5 bg-terracotta text-white rounded-xl font-semibold text-sm hover:bg-terracotta/90 transition shadow-lg shadow-terracotta/20 flex items-center justify-center space-x-2">
+                                        <span>Jelajahi Katalog</span>
+                                        <i class="fa-solid fa-arrow-right"></i>
+                                    </button>
+                                    <button onclick="router.navigate('my-learning')" class="px-8 py-3.5 bg-white border border-sand text-ink rounded-xl font-semibold text-sm hover:bg-sand/50 transition flex items-center justify-center space-x-2">
+                                        <i class="fa-solid fa-graduation-cap text-slateblue"></i>
+                                        <span>Dashboard Belajar Saya</span>
+                                    </button>
+                                </div>
+                                <div class="grid grid-cols-3 gap-6 pt-8 border-t border-sand/80">
+                                    <div>
+                                        <p class="text-2xl font-bold text-ink">100%</p>
+                                        <p class="text-xs text-ink/60">Akses Selamanya</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-2xl font-bold text-ink">QRIS & VA</p>
+                                        <p class="text-xs text-ink/60">Otomatis Terverifikasi</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-2xl font-bold text-ink">Sertifikat</p>
+                                        <p class="text-xs text-ink/60">Kelulusan Resmi</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="lg:col-span-5">
+                                <div class="relative">
+                                    <div class="absolute -inset-2 bg-gradient-to-r from-terracotta to-slateblue rounded-2xl blur-lg opacity-15"></div>
+                                    <div class="relative bg-white p-6 rounded-2xl border border-sand shadow-xl space-y-4">
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-xs font-bold uppercase tracking-wider text-terracotta bg-terracotta/10 px-2.5 py-1 rounded">Unggulan Minggu Ini</span>
+                                            <span class="text-xs text-ink/65"><i class="fa-solid fa-star text-amber-600 mr-1"></i> 4.9 (128 ulasan)</span>
+                                        </div>
+                                        <img src="${DB.products[0].thumbnail}" alt="Hero Course" class="w-full h-52 object-cover rounded-xl">
+                                        <div>
+                                            <h3 class="font-bold text-ink text-base line-clamp-1">${DB.products[0].title}</h3>
+                                            <p class="text-xs text-ink/60 mt-1">Oleh ${DB.products[0].instructor.name}</p>
+                                        </div>
+                                        <div class="flex items-center justify-between pt-2 border-t border-sand">
+                                            <div>
+                                                <span class="text-xs text-ink/40 line-through">Rp 750.000</span>
+                                                <p class="text-base font-bold text-terracotta">Rp 499.000</p>
+                                            </div>
+                                            <button onclick="router.navigate('product-detail', {id:'${DB.products[0].id}'})" class="px-4 py-2 bg-slateblue text-white text-xs font-semibold rounded-lg hover:bg-slateblue/90 transition">
+                                                Lihat Detail
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Categories -->
+                <section class="py-12 bg-white border-b border-sand">
+                    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div class="flex justify-between items-end mb-8">
+                            <div>
+                                <h2 class="text-xs font-bold uppercase tracking-widest text-slateblue mb-1">Eksplorasi Topik</h2>
+                                <h3 class="text-2xl font-bold text-ink font-serif">Kategori Pembelajaran Populer</h3>
+                            </div>
+                            <button onclick="router.navigate('catalog')" class="text-xs font-semibold text-terracotta hover:underline">Lihat Semua Kategori <i class="fa-solid fa-arrow-right ml-1"></i></button>
+                        </div>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+                            ${DB.categories.filter(c => c !== 'Semua').map(cat => `
+                                <div onclick="router.navigate('catalog', {category:'${cat}'})" class="p-5 rounded-2xl bg-warm hover:bg-slateblue hover:text-white transition group border border-sand cursor-pointer text-center space-y-3">
+                                    <div class="w-12 h-12 mx-auto rounded-full bg-white group-hover:bg-white/20 flex items-center justify-center text-slateblue group-hover:text-white transition shadow-sm">
+                                        <i class="fa-solid ${cat === 'Teknologi' ? 'fa-code' : cat === 'Bisnis & Startup' ? 'fa-chart-pie' : cat === 'Desain & UI/UX' ? 'fa-pen-nib' : cat === 'Data & AI' ? 'fa-database' : 'fa-book'}"></i>
+                                    </div>
+                                    <h4 class="font-bold text-sm text-ink group-hover:text-white transition">${cat}</h4>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Featured Products -->
+                <section class="py-16 bg-warm">
+                    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div class="flex justify-between items-end mb-10">
+                            <div>
+                                <h2 class="text-xs font-bold uppercase tracking-widest text-slateblue mb-1">Koleksi Kurasi</h2>
+                                <h3 class="text-2xl font-bold text-ink font-serif">Kursus & E-Book Pilihan Terbaik</h3>
+                            </div>
+                            <button onclick="router.navigate('catalog')" class="px-4 py-2 rounded-xl bg-white border border-sand text-xs font-semibold text-ink hover:bg-sand transition">Buka Katalog Lengkap</button>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                            ${DB.products.map(p => renderProductCard(p)).join('')}
+                        </div>
+                    </div>
+                </section>
+            `;
+        }
+
+        function renderProductCard(p) {
+            const isOwned = DB.userPurchases.includes(p.id);
+            return `
+                <div class="bg-white rounded-2xl border border-sand overflow-hidden shadow-sm hover:shadow-md transition flex flex-col group">
+                    <div class="relative overflow-hidden aspect-video bg-sand/40">
+                        <img src="${p.thumbnail}" alt="${p.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                        <div class="absolute top-3 left-3">
+                            <span class="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider ${p.type === 'course' ? 'bg-slateblue text-white' : 'bg-terracotta text-white'}">
+                                ${p.type === 'course' ? 'Kursus Online' : 'E-Book'}
+                            </span>
+                        </div>
+                        ${isOwned ? '<div class="absolute top-3 right-3"><span class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-slateblue/20 text-slateblue"><i class="fa-solid fa-check mr-1"></i> Dimiliki</span></div>' : ''}
+                    </div>
+                    <div class="p-5 flex-1 flex flex-col justify-between space-y-4">
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between text-xs text-ink/65">
+                                <span>${p.category}</span>
+                                <span><i class="fa-solid fa-star text-amber-600 mr-1"></i> ${p.rating}</span>
+                            </div>
+                            <h4 onclick="router.navigate('product-detail', {id:'${p.id}'})" class="font-bold text-ink hover:text-terracotta transition cursor-pointer line-clamp-2 text-sm">${p.title}</h4>
+                            <p class="text-xs text-ink/60">Oleh ${p.instructor.name}</p>
+                        </div>
+                        <div class="pt-4 border-t border-sand flex items-center justify-between">
+                            <div>
+                                <span class="text-[10px] text-ink/40 line-through">Rp ${p.originalPrice.toLocaleString('id-ID')}</span>
+                                <p class="text-sm font-bold text-terracotta">Rp ${p.price.toLocaleString('id-ID')}</p>
+                            </div>
+                            <button onclick="router.navigate('product-detail', {id:'${p.id}'})" class="px-3.5 py-2 rounded-lg bg-sand/60 hover:bg-terracotta hover:text-white text-xs font-semibold text-ink transition">
+                                ${isOwned ? 'Buka' : 'Detail'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ================= CATALOG =================
+        function renderCatalogView(params = {}) {
+            const selectedCat = params.category || 'Semua';
+            const selectedType = params.type || 'all';
+
+            const filtered = DB.products.filter(p => {
+                const matchCat = selectedCat === 'Semua' || p.category === selectedCat;
+                const matchType = selectedType === 'all' || p.type === selectedType;
+                return matchCat && matchType;
+            });
+
+            return `
+                <div class="py-12 bg-warm">
+                    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+                        <div>
+                            <h1 class="serif-title text-3xl font-bold text-ink">Katalog Produk Digital</h1>
+                            <p class="text-sm text-ink/70 mt-1">Temukan kursus interaktif dan e-book berkualitas untuk meningkatkan keahlian Anda.</p>
+                        </div>
+
+                        <div class="bg-white p-4 rounded-2xl border border-sand shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between">
+                            <div class="flex flex-wrap gap-2 items-center">
+                                <span class="text-xs font-bold uppercase tracking-wider text-ink/50 mr-2">Jenis:</span>
+                                <button onclick="router.navigate('catalog', {type:'all', category:'${selectedCat}'})" class="px-3 py-1.5 rounded-lg text-xs font-semibold ${selectedType === 'all' ? 'bg-slateblue text-white' : 'bg-sand/60 text-ink hover:bg-sand'} transition">Semua</button>
+                                <button onclick="router.navigate('catalog', {type:'course', category:'${selectedCat}'})" class="px-3 py-1.5 rounded-lg text-xs font-semibold ${selectedType === 'course' ? 'bg-slateblue text-white' : 'bg-sand/60 text-ink hover:bg-sand'} transition">Kursus Online</button>
+                                <button onclick="router.navigate('catalog', {type:'ebook', category:'${selectedCat}'})" class="px-3 py-1.5 rounded-lg text-xs font-semibold ${selectedType === 'ebook' ? 'bg-slateblue text-white' : 'bg-sand/60 text-ink hover:bg-sand'} transition">E-Book</button>
+                            </div>
+                            <div class="flex flex-wrap gap-2 items-center">
+                                <span class="text-xs font-bold uppercase tracking-wider text-ink/50 mr-2">Kategori:</span>
+                                <select onchange="router.navigate('catalog', {type:'${selectedType}', category:this.value})" class="bg-sand/60 border border-sand rounded-lg px-3 py-1.5 text-xs font-semibold text-ink focus:outline-none">
+                                    ${DB.categories.map(c => `<option value="${c}" ${selectedCat === c ? 'selected' : ''}>${c}</option>`).join('')}
+                                </select>
+                            </div>
+                        </div>
+
+                        ${filtered.length > 0 ? `
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                ${filtered.map(p => renderProductCard(p)).join('')}
+                            </div>
+                        ` : `
+                            <div class="bg-white p-12 rounded-2xl border border-sand text-center space-y-3">
+                                <i class="fa-solid fa-folder-open text-4xl text-ink/30"></i>
+                                <h3 class="font-bold text-ink">Tidak ada produk ditemukan</h3>
+                                <p class="text-xs text-ink/60">Coba ubah filter kategori atau jenis produk yang Anda cari.</p>
+                                <button onclick="router.navigate('catalog', {type:'all', category:'Semua'})" class="px-4 py-2 bg-slateblue text-white rounded-lg text-xs font-semibold">Reset Filter</button>
+                            </div>
+                        `}
+                    </div>
+                </div>
+            `;
+        }
+
+        // ================= PRODUCT DETAIL =================
+        function renderProductDetailView(productId) {
+            const p = DB.products.find(item => item.id === productId);
+            if (!p) return `<div class="p-12 text-center">Produk tidak ditemukan.</div>`;
+
+            const isOwned = DB.userPurchases.includes(p.id);
+
+            return `
+                <div class="py-12 bg-warm">
+                    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+                        <div class="flex items-center space-x-2 text-xs text-ink/60">
+                            <a href="#" onclick="router.navigate('home')" class="hover:text-terracotta">Beranda</a>
+                            <span>/</span>
+                            <a href="#" onclick="router.navigate('catalog')" class="hover:text-terracotta">Katalog</a>
+                            <span>/</span>
+                            <span class="text-ink font-semibold">${p.title}</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+                            <div class="lg:col-span-8 space-y-8">
+                                <div class="space-y-4">
+                                    <div class="flex items-center space-x-3">
+                                        <span class="px-3 py-1 rounded-md text-xs font-bold uppercase tracking-wider ${p.type === 'course' ? 'bg-slateblue text-white' : 'bg-terracotta text-white'}">
+                                            ${p.type === 'course' ? 'Kursus Online' : 'E-Book Digital'}
+                                        </span>
+                                        <span class="text-xs font-semibold text-ink/60">${p.category}</span>
+                                    </div>
+                                    <h1 class="serif-title text-3xl sm:text-4xl font-bold text-ink">${p.title}</h1>
+                                    <p class="text-base text-ink/75 leading-relaxed">${p.description}</p>
+                                </div>
+
+                                <div class="bg-white p-6 rounded-2xl border border-sand flex items-start space-x-4">
+                                    <img src="${p.instructor.avatar}" alt="Instructor" class="w-16 h-16 rounded-full object-cover border border-slateblue/30 flex-shrink-0">
+                                    <div class="space-y-1">
+                                        <span class="text-[10px] font-bold uppercase tracking-wider text-slateblue">Pengajar / Penulis</span>
+                                        <h4 class="font-bold text-ink text-base">${p.instructor.name}</h4>
+                                        <p class="text-xs font-medium text-ink/60">${p.instructor.role}</p>
+                                        <p class="text-xs text-ink/75 pt-1">${p.instructor.bio}</p>
+                                    </div>
+                                </div>
+
+                                <div class="bg-white p-6 rounded-2xl border border-sand space-y-6">
+                                    <div>
+                                        <h3 class="font-bold text-ink text-lg mb-4">Apa yang Akan Anda Pelajari</h3>
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                            ${p.outcomes.map(o => `
+                                                <div class="flex items-start space-x-2 text-xs text-ink/80">
+                                                    <i class="fa-solid fa-check text-terracotta mt-0.5"></i>
+                                                    <span>${o}</span>
+                                                </div>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="bg-white p-6 rounded-2xl border border-sand space-y-4">
+                                    <div class="flex justify-between items-center">
+                                        <h3 class="font-bold text-ink text-lg">Silabus & Materi</h3>
+                                        <span class="text-xs font-semibold text-slateblue">${p.totalModules || p.chapters.length} Modul / Bab</span>
+                                    </div>
+                                    <div class="space-y-3">
+                                        ${p.chapters.map((ch, idx) => `
+                                            <div class="border border-sand rounded-xl p-4 space-y-2">
+                                                <div class="font-bold text-sm text-ink flex justify-between items-center">
+                                                    <span>${ch.title}</span>
+                                                </div>
+                                                ${ch.lessons ? `
+                                                    <div class="space-y-1 pl-4 border-l-2 border-slateblue/20 mt-2">
+                                                        ${ch.lessons.map(les => `
+                                                            <div class="flex justify-between items-center text-xs text-ink/75 py-1">
+                                                                <span class="flex items-center space-x-2">
+                                                                    <i class="fa-solid fa-play text-[10px] text-terracotta"></i>
+                                                                    <span>${les.title}</span>
+                                                                </span>
+                                                                <div class="flex items-center space-x-2">
+                                                                    ${les.freePreview ? `<button onclick="openVideoPreview('${les.videoUrl}', '${les.title}')" class="px-2 py-0.5 bg-slateblue/10 text-slateblue rounded font-semibold text-[10px] hover:bg-slateblue/20">Preview Gratis</button>` : ''}
+                                                                    <span class="text-ink/40">${les.duration}</span>
+                                                                </div>
+                                                            </div>
+                                                        `).join('')}
+                                                    </div>
+                                                ` : ''}
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="lg:col-span-4">
+                                <div class="sticky top-28 bg-white p-6 rounded-2xl border border-sand shadow-xl space-y-6">
+                                    <div class="aspect-video rounded-xl overflow-hidden bg-sand">
+                                        <img src="${p.thumbnail}" alt="Thumbnail" class="w-full h-full object-cover">
+                                    </div>
+                                    <div>
+                                        <span class="text-xs text-ink/40 line-through">Rp ${p.originalPrice.toLocaleString('id-ID')}</span>
+                                        <div class="flex items-baseline space-x-2">
+                                            <span class="text-3xl font-bold text-terracotta">Rp ${p.price.toLocaleString('id-ID')}</span>
+                                            <span class="text-xs text-ink/60">/ akses selamanya</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="space-y-3 pt-2">
+                                        ${isOwned ? `
+                                            <button onclick="router.navigate('${p.type === 'course' ? 'course-player' : 'ebook-reader'}', {productId:'${p.id}'})" class="w-full py-3.5 bg-slateblue text-white font-bold rounded-xl text-sm hover:bg-slateblue/90 transition shadow-lg shadow-slateblue/20 flex items-center justify-center space-x-2">
+                                                <i class="fa-solid fa-play"></i>
+                                                <span>${p.type === 'course' ? 'Mulai Belajar Sekarang' : 'Baca E-Book Sekarang'}</span>
+                                            </button>
+                                        ` : `
+                                            <button onclick="router.navigate('checkout', {productId:'${p.id}'})" class="w-full py-3.5 bg-terracotta text-white font-bold rounded-xl text-sm hover:bg-terracotta/90 transition shadow-lg shadow-terracotta/20 flex items-center justify-center space-x-2">
+                                                <i class="fa-solid fa-bolt"></i>
+                                                <span>Beli Akses Instan</span>
+                                            </button>
+                                            <button onclick="addToCart('${p.id}')" class="w-full py-3 bg-sand/60 hover:bg-sand text-ink font-semibold rounded-xl text-xs transition flex items-center justify-center space-x-2">
+                                                <i class="fa-solid fa-bag-shopping"></i>
+                                                <span>Tambah ke Keranjang</span>
+                                            </button>
+                                        `}
+                                    </div>
+
+                                    <div class="space-y-3 pt-4 border-t border-sand text-xs text-ink/75">
+                                        <div class="flex items-center space-x-3">
+                                            <i class="fa-solid fa-shield-halved text-slateblue text-base"></i>
+                                            <span>Garansi akses materi selamanya & pembaruan</span>
+                                        </div>
+                                        <div class="flex items-center space-x-3">
+                                            <i class="fa-solid fa-bolt text-slateblue text-base"></i>
+                                            <span>Otomatis aktif setelah pembayaran terverifikasi</span>
+                                        </div>
+                                        <div class="flex items-center space-x-3">
+                                            <i class="fa-solid fa-certificate text-slateblue text-base"></i>
+                                            <span>Sertifikat kelulusan resmi ber-ID unik</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function openVideoPreview(url, title) {
+            showInfoModal(`Preview Materi: ${title}`, `<video controls autoplay class="w-full rounded-xl bg-black mt-2"><source src="${url}" type="video/mp4">Browser Anda tidak mendukung tag video.</video>`);
+        }
+
+        // ================= CHECKOUT =================
+        function renderCheckoutView(productId) {
+            const p = DB.products.find(item => item.id === productId);
+            if (!p) return `<div class="p-12 text-center">Produk tidak ditemukan untuk checkout.</div>`;
+
+            return `
+                <div class="py-12 bg-warm">
+                    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+                        <div>
+                            <h1 class="serif-title text-3xl font-bold text-ink">Checkout & Pembayaran Aman</h1>
+                            <p class="text-xs text-ink/60 mt-1">Selesaikan pembayaran untuk langsung mendapatkan akses penuh ke akun Anda.</p>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+                            <div class="md:col-span-7 bg-white p-6 rounded-2xl border border-sand space-y-6">
+                                <h3 class="font-bold text-ink text-base border-b border-sand pb-4">Ringkasan Pesanan</h3>
+                                <div class="flex items-center space-x-4">
+                                    <img src="${p.thumbnail}" alt="Thumb" class="w-20 h-16 object-cover rounded-xl border border-sand">
+                                    <div>
+                                        <span class="text-[10px] uppercase tracking-wider font-bold text-slateblue">${p.type === 'course' ? 'Kursus Online' : 'E-Book'}</span>
+                                        <h4 class="font-bold text-ink text-sm">${p.title}</h4>
+                                        <p class="text-xs text-ink/60">Oleh ${p.instructor.name}</p>
+                                    </div>
+                                </div>
+
+                                <div class="pt-4 border-t border-sand space-y-2">
+                                    <label class="text-xs font-bold text-ink">Kode Kupon / Diskon</label>
+                                    <div class="flex space-x-2">
+                                        <input type="text" id="coupon-code-input" placeholder="Contoh: EDUKRIYA20" class="flex-1 bg-sand/40 border border-sand rounded-lg px-3 py-2 text-xs text-ink uppercase focus:outline-none">
+                                        <button onclick="applyCoupon('${p.price}')" class="px-4 py-2 bg-slateblue text-white rounded-lg text-xs font-semibold hover:bg-slateblue/90">Gunakan</button>
+                                    </div>
+                                    <p id="coupon-feedback" class="text-[10px] text-terracotta font-medium"></p>
+                                </div>
+
+                                <div class="pt-4 border-t border-sand space-y-2">
+                                    <div class="flex justify-between text-xs text-ink/70">
+                                        <span>Harga Normal</span>
+                                        <span>Rp ${p.price.toLocaleString('id-ID')}</span>
+                                    </div>
+                                    <div id="discount-row" class="flex justify-between text-xs text-terracotta font-semibold hidden">
+                                        <span>Diskon Kupon</span>
+                                        <span id="discount-amount">- Rp 0</span>
+                                    </div>
+                                    <div class="flex justify-between text-sm font-bold text-ink pt-2 border-t border-sand">
+                                        <span>Total Pembayaran</span>
+                                        <span id="final-total-price" data-raw="${p.price}" class="text-terracotta">Rp ${p.price.toLocaleString('id-ID')}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="md:col-span-5 bg-white p-6 rounded-2xl border border-sand space-y-6">
+                                <h3 class="font-bold text-ink text-base border-b border-sand pb-4">Metode Pembayaran</h3>
+                                <div class="space-y-3">
+                                    <label class="flex items-center justify-between p-3 rounded-xl border border-terracotta bg-terracotta/5 cursor-pointer">
+                                        <div class="flex items-center space-x-3">
+                                            <i class="fa-solid fa-qrcode text-terracotta text-lg"></i>
+                                            <div>
+                                                <span class="block font-bold text-xs text-ink">QRIS (Instan)</span>
+                                                <span class="block text-[10px] text-ink/60">Scan dengan GoPay, OVO, BCA, Dana</span>
+                                            </div>
+                                        </div>
+                                        <input type="radio" name="payment-method" checked class="text-terracotta">
+                                    </label>
+                                    <label class="flex items-center justify-between p-3 rounded-xl border border-sand hover:bg-sand/50 cursor-pointer">
+                                        <div class="flex items-center space-x-3">
+                                            <i class="fa-solid fa-building-columns text-ink/70 text-lg"></i>
+                                            <div>
+                                                <span class="block font-bold text-xs text-ink">Virtual Account Bank</span>
+                                                <span class="block text-[10px] text-ink/60">BCA, Mandiri, BNI, BRI</span>
+                                            </div>
+                                        </div>
+                                        <input type="radio" name="payment-method" class="text-terracotta">
+                                    </label>
+                                </div>
+
+                                <button onclick="processPayment('${p.id}')" class="w-full py-3.5 bg-terracotta text-white font-bold rounded-xl text-sm hover:bg-terracotta/90 transition shadow-lg shadow-terracotta/20 flex items-center justify-center space-x-2">
+                                    <i class="fa-solid fa-lock"></i>
+                                    <span>Bayar Sekarang & Ambil Akses</span>
+                                </button>
+                                <p class="text-[10px] text-center text-ink/50">Transaksi dienkripsi dengan standar keamanan industri perbankan.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        let appliedDiscount = 0;
+        function applyCoupon(originalPrice) {
+            const code = document.getElementById('coupon-code-input').value.trim().toUpperCase();
+            const feedback = document.getElementById('coupon-feedback');
+            const discountRow = document.getElementById('discount-row');
+            const discountAmountSpan = document.getElementById('discount-amount');
+            const finalPriceSpan = document.getElementById('final-total-price');
+
+            if (DB.coupons[code]) {
+                const coupon = DB.coupons[code];
+                if (originalPrice < coupon.minPurchase) {
+                    feedback.className = 'text-[10px] text-terracotta font-medium';
+                    feedback.innerText = `Minimum transaksi untuk kupon ini adalah Rp ${coupon.minPurchase.toLocaleString('id-ID')}`;
+                    return;
+                }
+                appliedDiscount = coupon.discountPercent ? (originalPrice * coupon.discountPercent / 100) : coupon.discountFlat;
+                const final = originalPrice - appliedDiscount;
+                
+                discountRow.classList.remove('hidden');
+                discountAmountSpan.innerText = `- Rp ${appliedDiscount.toLocaleString('id-ID')}`;
+                finalPriceSpan.innerText = `Rp ${final.toLocaleString('id-ID')}`;
+                finalPriceSpan.setAttribute('data-raw', final);
+
+                feedback.className = 'text-[10px] text-slateblue font-medium';
+                feedback.innerText = `Kupon ${code} berhasil diterapkan!`;
+                showToast('Kupon diskon berhasil digunakan');
+            } else {
+                feedback.className = 'text-[10px] text-terracotta font-medium';
+                feedback.innerText = 'Kode kupon tidak valid atau sudah kedaluwarsa.';
+            }
+        }
+
+        function processPayment(productId) {
+            showToast('Memproses transaksi aman...', 'success');
+            setTimeout(() => {
+                if (!DB.userPurchases.includes(productId)) {
+                    DB.userPurchases.push(productId);
+                }
+                showToast('Pembayaran berhasil diverifikasi! Hak akses diberikan.', 'success');
+                router.navigate('my-learning');
+            }, 1500);
+        }
+
+        // ================= MY LEARNING DASHBOARD =================
+        function renderMyLearningView() {
+            const ownedProducts = DB.products.filter(p => DB.userPurchases.includes(p.id));
+
+            return `
+                <div class="py-12 bg-warm">
+                    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+                        <div>
+                            <h1 class="serif-title text-3xl font-bold text-ink">Dashboard Belajar Saya</h1>
+                            <p class="text-xs text-ink/75 mt-1">Akses seluruh kursus dan e-book yang telah Anda miliki selamanya.</p>
+                        </div>
+
+                        ${ownedProducts.length > 0 ? `
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                ${ownedProducts.map(p => `
+                                    <div class="bg-white rounded-2xl border border-sand overflow-hidden shadow-sm flex flex-col justify-between">
+                                        <div class="aspect-video relative bg-sand">
+                                            <img src="${p.thumbnail}" alt="Thumb" class="w-full h-full object-cover">
+                                            <span class="absolute top-3 left-3 px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider ${p.type === 'course' ? 'bg-slateblue text-white' : 'bg-terracotta text-white'}">
+                                                ${p.type === 'course' ? 'Kursus Aktif' : 'E-Book Koleksi'}
+                                            </span>
+                                        </div>
+                                        <div class="p-6 space-y-4 flex-1 flex flex-col justify-between">
+                                            <div class="space-y-2">
+                                                <h3 class="font-bold text-ink text-base">${p.title}</h3>
+                                                <p class="text-xs text-ink/60">Oleh ${p.instructor.name}</p>
+                                                ${p.type === 'course' ? `
+                                                    <div class="pt-2">
+                                                        <div class="flex justify-between text-xs text-ink/75 mb-1">
+                                                            <span>Progres Belajar</span>
+                                                            <span class="font-bold text-slateblue">35%</span>
+                                                        </div>
+                                                        <div class="w-full bg-sand rounded-full h-2 overflow-hidden">
+                                                            <div class="bg-slateblue h-full w-[35%] rounded-full"></div>
+                                                        </div>
+                                                    </div>
+                                                ` : ''}
+                                            </div>
+                                            <div class="pt-4 border-t border-sand flex items-center justify-between">
+                                                <button onclick="router.navigate('${p.type === 'course' ? 'course-player' : 'ebook-reader'}', {productId:'${p.id}'})" class="w-full py-2.5 bg-slateblue text-white text-xs font-bold rounded-xl hover:bg-slateblue/90 transition shadow-sm flex items-center justify-center space-x-2">
+                                                    <i class="fa-solid fa-play"></i>
+                                                    <span>${p.type === 'course' ? 'Lanjutkan Belajar' : 'Buka E-Book Reader'}</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : `
+                            <div class="bg-white p-16 rounded-2xl border border-sand text-center space-y-4">
+                                <i class="fa-solid fa-graduation-cap text-5xl text-ink/30"></i>
+                                <h3 class="font-bold text-ink text-lg">Belum Ada Produk yang Dimiliki</h3>
+                                <p class="text-xs text-ink/60 max-w-md mx-auto">Jelajahi katalog kursus dan e-book kami untuk mulai meningkatkan keahlian Anda hari ini.</p>
+                                <button onclick="router.navigate('catalog')" class="px-6 py-2.5 bg-terracotta text-white rounded-xl text-xs font-semibold">Jelajahi Katalog</button>
+                            </div>
+                        `}
+                    </div>
+                </div>
+            `;
+        }
+
+        // ================= COURSE PLAYER =================
+        function renderCoursePlayerView(productId) {
+            const p = DB.products.find(item => item.id === productId);
+            if (!p || p.type !== 'course') return `<div class="p-12 text-center">Kursus tidak ditemukan.</div>`;
+            const firstLesson = p.chapters[0].lessons[0];
+
+            return `
+                <div class="min-h-screen bg-ink text-warm flex flex-col">
+                    <div class="bg-ink border-b border-warm/10 px-6 py-4 flex justify-between items-center">
+                        <div class="flex items-center space-x-4">
+                            <button onclick="router.navigate('my-learning')" class="px-3 py-1.5 rounded-lg bg-warm/10 hover:bg-warm/20 text-xs font-semibold transition text-warm">
+                                <i class="fa-solid fa-arrow-left mr-1"></i> Kembali ke Dashboard
+                            </button>
+                            <h2 class="font-bold text-sm text-white truncate max-w-md">${p.title}</h2>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <button onclick="router.navigate('quiz', {productId:'${p.id}'})" class="px-3.5 py-1.5 bg-terracotta text-white text-xs font-bold rounded-lg hover:bg-terracotta/90 transition">
+                                <i class="fa-solid fa-clipboard-question mr-1"></i> Ujian & Kuis
+                            </button>
+                            <button onclick="router.navigate('certificate', {productId:'${p.id}'})" class="px-3.5 py-1.5 bg-slateblue text-white text-xs font-bold rounded-lg hover:bg-slateblue/90 transition">
+                                <i class="fa-solid fa-certificate mr-1"></i> Sertifikat
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="flex-1 grid grid-cols-1 lg:grid-cols-12">
+                        <div class="lg:col-span-8 p-6 space-y-6 overflow-y-auto">
+                            <div class="aspect-video bg-black rounded-2xl overflow-hidden shadow-2xl relative">
+                                <video id="main-course-video" controls class="w-full h-full object-contain">
+                                    <source src="${firstLesson.videoUrl}" type="video/mp4">
+                                </video>
+                            </div>
+                            <div class="space-y-2">
+                                <span class="text-xs font-bold text-terracotta uppercase tracking-wider">Modul Aktif</span>
+                                <h3 class="text-xl font-bold text-white">${firstLesson.title}</h3>
+                                <p class="text-xs text-warm/70">Durasi: ${firstLesson.duration} • Progres tersimpan otomatis.</p>
+                            </div>
+                        </div>
+
+                        <div class="lg:col-span-4 bg-ink/90 border-l border-warm/10 p-6 space-y-6 overflow-y-auto">
+                            <h3 class="font-bold text-sm text-white tracking-wider uppercase">Daftar Bab & Materi</h3>
+                            <div class="space-y-4">
+                                ${p.chapters.map(ch => `
+                                    <div class="space-y-2">
+                                        <h4 class="text-xs font-bold text-slateblue">${ch.title}</h4>
+                                        <div class="space-y-1">
+                                            ${ch.lessons.map(les => `
+                                                <div onclick="showToast('Memuat materi: ${les.title}')" class="p-3 rounded-xl bg-warm/5 hover:bg-warm/10 transition cursor-pointer flex items-center justify-between text-xs">
+                                                    <span class="flex items-center space-x-2 text-warm/90">
+                                                        <i class="fa-solid fa-play text-[10px] text-terracotta"></i>
+                                                        <span>${les.title}</span>
+                                                    </span>
+                                                    <span class="text-[10px] text-warm/40">${les.duration}</span>
+                                                </div>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ================= E-BOOK READER =================
+        function renderEbookReaderView(productId) {
+            const p = DB.products.find(item => item.id === productId);
+            if (!p || p.type !== 'ebook') return `<div class="p-12 text-center">E-book tidak ditemukan.</div>`;
+
+            return `
+                <div class="py-12 bg-warm min-h-screen">
+                    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+                        <div class="flex justify-between items-center">
+                            <button onclick="router.navigate('my-learning')" class="px-3 py-1.5 rounded-lg bg-sand text-xs font-semibold text-ink">
+                                <i class="fa-solid fa-arrow-left mr-1"></i> Kembali
+                            </button>
+                            <button onclick="downloadWatermarkedPdf('${p.title}')" class="px-4 py-2 bg-terracotta text-white rounded-xl text-xs font-bold hover:bg-terracotta/90 shadow-sm flex items-center space-x-2">
+                                <i class="fa-solid fa-download"></i>
+                               <span>Unduh PDF Ber-Watermark Personal</span>
+                            </button>
+                        </div>
+
+                        <div class="bg-white p-8 sm:p-12 rounded-2xl border border-sand shadow-xl space-y-8 relative overflow-hidden">
+                            <div class="absolute inset-0 pointer-events-none flex items-center justify-center opacity-5 rotate-[-30deg]">
+                                <span class="text-4xl font-bold text-ink uppercase tracking-widest">${DB.currentUser.email} • EDUKRIYA SECURE</span>
+                            </div>
+
+                            <div class="border-b border-sand pb-6">
+                                <span class="text-xs font-bold uppercase tracking-wider text-terracotta">E-Book Resmi Pembeli</span>
+                                <h1 class="serif-title text-3xl font-bold text-ink mt-1">${p.title}</h1>
+                                <p class="text-xs text-ink/60 mt-2">Lisensi Resmi atas Nama: <strong class="text-ink">${DB.currentUser.name}</strong> (${DB.currentUser.email})</p>
+                            </div>
+
+                            <div class="space-y-6 text-sm text-ink/80 leading-relaxed font-serif">
+                                ${p.samplePages.map(page => `<div class="p-6 rounded-xl bg-warm/50 border border-sand/60 whitespace-pre-line">${page}</div>`).join('')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function downloadWatermarkedPdf(title) {
+            showToast('Menyiapkan PDF dengan watermark personal...', 'success');
+            setTimeout(() => {
+                showToast(`File PDF "${title}" berhasil diunduh dengan aman.`, 'success');
+            }, 2000);
+        }
+
+        // ================= QUIZ & CERTIFICATE =================
+        function renderQuizView(productId) {
+            const p = DB.products.find(item => item.id === productId);
+            return `
+                <div class="py-12 bg-warm min-h-screen">
+                    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+                        <div class="flex justify-between items-center">
+                            <button onclick="router.navigate('course-player', {productId:'${p.id}'})" class="px-3 py-1.5 rounded-lg bg-sand text-xs font-semibold text-ink">
+                                <i class="fa-solid fa-arrow-left mr-1"></i> Kembali ke Course Player
+                            </button>
+                            <span class="text-xs font-bold text-terracotta bg-terracotta/10 px-3 py-1 rounded">Ujian Kompetensi</span>
+                        </div>
+
+                        <div class="bg-white p-8 rounded-2xl border border-sand shadow-xl space-y-6">
+                            <h1 class="text-2xl font-bold text-ink font-serif">Ujian Akhir: ${p.title}</h1>
+                            <p class="text-xs text-ink/60">Jawab pertanyaan berikut dengan benar. Ambang kelulusan minimum adalah 80% untuk menerbitkan sertifikat.</p>
+                            
+                            <div class="space-y-6 pt-4 border-t border-sand">
+                                <div class="space-y-3">
+                                    <p class="font-bold text-sm text-ink">1. Manakah prinsip utama dalam Clean Architecture yang memisahkan urusan bisnis inti dengan framework?</p>
+                                    <div class="space-y-2 text-xs">
+                                        <label class="block p-3 rounded-xl border border-sand hover:bg-sand/40 cursor-pointer"><input type="radio" name="q1" class="mr-2"> Dependency Inversion & Separation of Concerns</label>
+                                        <label class="block p-3 rounded-xl border border-sand hover:bg-sand/40 cursor-pointer"><input type="radio" name="q1" class="mr-2"> Menggabungkan database query ke dalam UI controller</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="pt-6 border-t border-sand flex justify-end">
+                                <button onclick="submitQuiz('${p.id}')" class="px-6 py-3 bg-slateblue text-white rounded-xl text-xs font-bold hover:bg-slateblue/90 shadow-sm">
+                                    Kirim Jawaban & Evaluasi
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function submitQuiz(productId) {
+            showToast('Menilai jawaban di backend...', 'success');
+            setTimeout(() => {
+                showToast('Selamat! Anda lulus ujian dengan nilai 100%. Sertifikat terbuka.', 'success');
+                router.navigate('certificate', {productId});
+            }, 1500);
+        }
+
+        function renderCertificateView(productId) {
+            const p = DB.products.find(item => item.id === productId);
+            return `
+                <div class="py-12 bg-warm min-h-screen">
+                    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+                        <div class="flex justify-between items-center">
+                            <button onclick="router.navigate('course-player', {productId:'${p.id}'})" class="px-3 py-1.5 rounded-lg bg-sand text-xs font-semibold text-ink">
+                                <i class="fa-solid fa-arrow-left mr-1"></i> Kembali
+                            </button>
+                            <button onclick="showToast('Sertifikat PDF berhasil diunduh.')" class="px-4 py-2 bg-slateblue text-white rounded-xl text-xs font-bold hover:bg-slateblue/90">
+                                <i class="fa-solid fa-download mr-1"></i> Unduh Sertifikat PDF
+                            </button>
+                        </div>
+
+                        <div class="bg-white p-12 rounded-2xl border-8 border-terracotta/20 shadow-2xl text-center space-y-8 relative">
+                            <div class="w-16 h-16 bg-terracotta text-white rounded-full flex items-center justify-center mx-auto text-2xl font-bold">E</div>
+                            <div class="space-y-2">
+                                <span class="text-xs font-bold uppercase tracking-widest text-terracotta">Sertifikat Kelulusan Resmi</span>
+                                <h2 class="serif-title text-4xl font-bold text-ink">EduKriya Academy</h2>
+                                <p class="text-xs text-ink/60">Nomor Sertifikat Unik: <strong class="text-ink">CERT-2026-994821</strong></p>
+                            </div>
+                            <div class="space-y-4 py-4">
+                                <p class="text-xs text-ink/70">Diberikan dengan bangga kepada:</p>
+                                <p class="serif-title text-3xl font-bold text-terracotta">${DB.currentUser.name}</p>
+                                <p class="text-xs text-ink/70 max-w-lg mx-auto leading-relaxed">Telah berhasil menyelesaikan seluruh materi kurikulum dan ujian kompetensi untuk kursus profesional:</p>
+                                <p class="font-bold text-lg text-ink">${p.title}</p>
+                            </div>
+                            <div class="pt-8 border-t border-sand flex justify-between items-center text-xs text-ink/60 px-8">
+                                <div>
+                                    <p class="font-bold text-ink">${p.instructor.name}</p>
+                                    <p>Instruktur Utama</p>
+                                </div>
+                                <div>
+                                    <p class="font-bold text-ink">11 Oktober 2026</p>
+                                    <p>Tanggal Kelulusan</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderVerifyCertView() {
+            return `
+                <div class="py-16 bg-warm min-h-screen">
+                    <div class="max-w-xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+                        <div class="text-center space-y-2">
+                            <h1 class="serif-title text-3xl font-bold text-ink">Verifikasi Keaslian Sertifikat</h1>
+                            <p class="text-xs text-ink/70">Masukkan nomor unik sertifikat untuk memeriksa validitas kelulusan peserta.</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-2xl border border-sand shadow-xl space-y-4">
+                            <label class="text-xs font-bold text-ink">Nomor Sertifikat</label>
+                            <input type="text" placeholder="Contoh: CERT-2026-994821" class="w-full bg-sand/50 border border-sand rounded-xl px-4 py-3 text-xs text-ink font-mono focus:outline-none">
+                            <button onclick="showToast('Sertifikat Valid! Diterbitkan atas nama Budi Santoso.', 'success')" class="w-full py-3 bg-terracotta text-white rounded-xl text-xs font-bold hover:bg-terracotta/90">
+                                Verifikasi Sekarang
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ================= ADMIN CMS =================
+        function renderAdminCmsView() {
+            return `
+                <div class="min-h-screen bg-warm flex flex-col">
+                    <div class="bg-ink text-white px-8 py-4 flex justify-between items-center border-b border-warm/10">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 rounded bg-terracotta flex items-center justify-center font-bold text-sm">CMS</div>
+                            <h1 class="font-bold text-sm">EduKriya Admin Dashboard</h1>
+                        </div>
+                        <button onclick="router.navigate('home')" class="px-3 py-1 rounded bg-warm/10 hover:bg-warm/20 text-xs">Keluar ke Store</button>
+                    </div>
+
+                    <div class="flex-1 grid grid-cols-1 lg:grid-cols-12">
+                        <div class="lg:col-span-3 bg-white border-r border-sand p-6 space-y-2">
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-ink/40">Manajemen</span>
+                            <a href="#" onclick="showToast('Modul Produk Aktif')" class="block px-3 py-2 rounded-lg bg-slateblue text-white text-xs font-semibold">Kelola Produk & Kursus</a>
+                            <a href="#" onclick="showToast('Modul Transaksi Aktif')" class="block px-3 py-2 rounded-lg hover:bg-sand text-xs text-ink">Transaksi & Pembayaran</a>
+                            <a href="#" onclick="showToast('Modul Akses Peserta')" class="block px-3 py-2 rounded-lg hover:bg-sand text-xs text-ink">Akses Peserta & Audit Log</a>
+                        </div>
+                        <div class="lg:col-span-9 p-8 space-y-8">
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                                <div class="bg-white p-6 rounded-2xl border border-sand shadow-sm space-y-1">
+                                    <span class="text-xs text-ink/60">Total Pendapatan Bulan Ini</span>
+                                    <p class="text-2xl font-bold text-terracotta">Rp 48.950.000</p>
+                                </div>
+                                <div class="bg-white p-6 rounded-2xl border border-sand shadow-sm space-y-1">
+                                    <span class="text-xs text-ink/60">Peserta Aktif Terdaftar</span>
+                                    <p class="text-2xl font-bold text-ink">1,420</p>
+                                </div>
+                                <div class="bg-white p-6 rounded-2xl border border-sand shadow-sm space-y-1">
+                                    <span class="text-xs text-ink/60">Transaksi Berhasil</span>
+                                    <p class="text-2xl font-bold text-ink">384</p>
+                                </div>
+                            </div>
+
+                            <div class="bg-white p-6 rounded-2xl border border-sand shadow-sm space-y-4">
+                                <div class="flex justify-between items-center">
+                                    <h3 class="font-bold text-ink text-base">Daftar Produk Digital</h3>
+                                    <button onclick="showToast('Fitur tambah produk baru')" class="px-4 py-2 bg-terracotta text-white rounded-xl text-xs font-semibold">+ Tambah Produk Baru</button>
+                                </div>
+                                <div class="overflow-x-auto">
+                                    <table class="w-full text-left text-xs">
+                                        <thead class="bg-sand/50 text-ink/70">
+                                            <tr>
+                                                <th class="p-3">Judul Produk</th>
+                                                <th class="p-3">Jenis</th>
+                                                <th class="p-3">Harga</th>
+                                                <th class="p-3">Kategori</th>
+                                                <th class="p-3">Aksi</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y divide-sand">
+                                            ${DB.products.map(p => `
+                                                <tr>
+                                                    <td class="p-3 font-bold text-ink">${p.title}</td>
+                                                    <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${p.type === 'course' ? 'bg-slateblue/10 text-slateblue' : 'bg-terracotta/10 text-terracotta'}">${p.type}</span></td>
+                                                    <td class="p-3 font-semibold text-terracotta">Rp ${p.price.toLocaleString('id-ID')}</td>
+                                                    <td class="p-3 text-ink/70">${p.category}</td>
+                                                    <td class="p-3">
+                                                        <button onclick="showToast('Edit produk ${p.id}')" class="text-slateblue hover:underline font-semibold mr-2">Edit</button>
+                                                        <button onclick="showToast('Hapus produk ${p.id}')" class="text-terracotta hover:underline font-semibold">Hapus</button>
+                                                    </td>
+                                                </tr>
+                                            `).join('')}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ================= UTILITIES & CART =================
+        function toggleCartDrawer() {
+            const drawer = document.getElementById('cart-drawer');
+            drawer.classList.toggle('hidden');
+            renderCartItems();
+        }
+
+        function addToCart(productId) {
+            if (!DB.cart.includes(productId)) {
+                DB.cart.push(productId);
+                showToast('Produk ditambahkan ke keranjang');
+                updateCartBadge();
+            } else {
+                showToast('Produk sudah ada di keranjang', 'warning');
+            }
+        }
+
+        function removeFromCart(productId) {
+            DB.cart = DB.cart.filter(id => id !== productId);
+            renderCartItems();
+            updateCartBadge();
+            showToast('Produk dihapus dari keranjang');
+        }
+
+        function updateCartBadge() {
+            const badge = document.getElementById('cart-badge');
+            if (DB.cart.length > 0) {
+                badge.innerText = DB.cart.length;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+
+        function renderCartItems() {
+            const container = document.getElementById('cart-items-container');
+            const footer = document.getElementById('cart-footer');
+
+            if (DB.cart.length === 0) {
+                container.innerHTML = `<div class="text-center py-12 text-ink/50 text-sm">Keranjang belanja Anda masih kosong.</div>`;
+                footer.innerHTML = '';
+                return;
+            }
+
+            const cartProds = DB.products.filter(p => DB.cart.includes(p.id));
+            const total = cartProds.reduce((sum, p) => sum + p.price, 0);
+
+            container.innerHTML = cartProds.map(p => `
+                <div class="flex items-center space-x-4 p-3 rounded-xl bg-white border border-sand">
+                    <img src="${p.thumbnail}" class="w-16 h-12 object-cover rounded-lg">
+                    <div class="flex-1">
+                        <h4 class="font-bold text-xs text-ink line-clamp-1">${p.title}</h4>
+                        <p class="text-xs font-semibold text-terracotta">Rp ${p.price.toLocaleString('id-ID')}</p>
+                    </div>
+                    <button onclick="removeFromCart('${p.id}')" class="text-ink/40 hover:text-terracotta"><i class="fa-solid fa-trash"></i></button>
+                </div>
+            `).join('');
+
+            footer.innerHTML = `
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center font-bold text-sm text-ink">
+                        <span>Total Keseluruhan</span>
+                        <span class="text-terracotta">Rp ${total.toLocaleString('id-ID')}</span>
+                    </div>
+                    <button onclick="toggleCartDrawer(); router.navigate('checkout', {productId:'${cartProds[0].id}'})" class="w-full py-3 bg-terracotta text-white rounded-xl text-xs font-bold hover:bg-terracotta/90 shadow-sm text-center">
+                        Lanjut ke Checkout Pembayaran
+                    </button>
+                </div>
+            `;
+        }
+
+        function openSearchModal() {
+            document.getElementById('search-modal').classList.remove('hidden');
+            document.getElementById('global-search-input').focus();
+        }
+
+        function closeSearchModal() {
+            document.getElementById('search-modal').classList.add('hidden');
+        }
+
+        function handleGlobalSearch(query) {
+            const container = document.getElementById('search-results-container');
+            if (!query.trim()) {
+                container.innerHTML = `<div class="text-center py-8 text-ink/50 text-sm">Ketik untuk mulai mencari produk digital...</div>`;
+                return;
+            }
+            const results = DB.products.filter(p => p.title.toLowerCase().includes(query.toLowerCase()) || p.category.toLowerCase().includes(query.toLowerCase()));
+            if (results.length === 0) {
+                container.innerHTML = `<div class="text-center py-8 text-ink/50 text-sm">Tidak ditemukan produk untuk "${query}"</div>`;
+                return;
+            }
+            container.innerHTML = results.map(p => `
+                <div onclick="closeSearchModal(); router.navigate('product-detail', {id:'${p.id}'})" class="p-3 rounded-xl hover:bg-sand cursor-pointer flex items-center space-x-3 transition">
+                    <img src="${p.thumbnail}" class="w-12 h-10 object-cover rounded-lg">
+                    <div>
+                        <h4 class="font-bold text-xs text-ink">${p.title}</h4>
+                        <span class="text-[10px] text-terracotta font-semibold">Rp ${p.price.toLocaleString('id-ID')} • ${p.category}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function showInfoModal(title, htmlContent = '') {
+            document.getElementById('info-modal-title').innerText = title;
+            document.getElementById('info-modal-content').innerHTML = htmlContent || 'EduKriya memastikan seluruh transaksi dan akses materi dilindungi enkripsi backend.';
+            document.getElementById('info-modal').classList.remove('hidden');
+        }
+
+        function closeInfoModal() {
+            document.getElementById('info-modal').classList.add('hidden');
+        }
+
+        const auth = {
+            loginAsAdmin() {
+                DB.currentUser.role = 'admin';
+                showToast('Berhasil masuk sebagai Admin CMS', 'success');
+                router.navigate('admin-cms');
+            },
+            loginAsCustomer() {
+                DB.currentUser.role = 'customer';
+                showToast('Berhasil masuk sebagai Budi Santoso', 'success');
+                router.navigate('my-learning');
+            },
+            logout() {
+                showToast('Anda telah keluar dari akun', 'warning');
+                router.navigate('home');
+            }
+        };
+
+        window.addEventListener('DOMContentLoaded', () => {
+            router.navigate('home');
+        });
+    </script>
+</body>
+</html>

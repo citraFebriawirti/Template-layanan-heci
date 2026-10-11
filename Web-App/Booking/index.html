@@ -1,0 +1,1404 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aura & Co. — Professional Booking & Operations Platform</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        ivory: '#F8F7F3',
+                        charcoal: '#252823',
+                        forest: '#365B49',
+                        sage: '#A8B5A0',
+                        stoneborder: '#E6E5DE',
+                        surface: '#FFFFFF',
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #F8F7F3;
+            color: #252823;
+        }
+        /* Custom scrollbar for clean SaaS UI */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #F8F7F3;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #D1D0C5;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #A8B5A0;
+        }
+    </style>
+</head>
+<body class="h-full flex flex-col antialiased selection:bg-forest selection:text-white">
+
+    <!-- Top Announcement Bar -->
+    <div class="bg-forest text-white text-xs py-2 px-4 text-center font-medium tracking-wide flex items-center justify-center gap-2">
+        <i class="fa-solid fa-shield-halved text-sage"></i>
+        <span>Sistem Ketersediaan Otomatis & Temporary Hold 10 Menit Aktif</span>
+        <span class="hidden md:inline bg-forest/80 px-2 py-0.5 rounded text-[10px] uppercase tracking-widest border border-sage/30">Multi-Branch v2.5 Unsplash Edition</span>
+    </div>
+
+    <!-- Main Navigation Header -->
+    <header class="bg-surface border-b border-stoneborder sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between">
+            <div class="flex items-center gap-6">
+                <a href="#" onclick="switchView('public')" class="flex items-center gap-3 group">
+                    <div class="w-10 h-10 rounded-xl bg-forest text-white flex items-center justify-center font-bold text-lg shadow-sm group-hover:bg-forest/90 transition-colors">
+                        A
+                    </div>
+                    <div>
+                        <span class="font-bold text-lg tracking-tight block text-charcoal">Aura & Co.</span>
+                        <span class="text-xs text-forest font-medium block">Salon & Wellness Studio</span>
+                    </div>
+                </a>
+                
+                <!-- Branch Selector Dropdown in Header -->
+                <div class="hidden md:flex items-center gap-2 pl-6 border-l border-stoneborder text-xs text-charcoal">
+                    <i class="fa-solid fa-location-dot text-forest"></i>
+                    <div>
+                        <span class="text-gray-400 block text-[10px] uppercase font-semibold">Cabang Aktif</span>
+                        <select id="headerBranchSelect" onchange="changeActiveBranch(this.value)" class="bg-transparent font-semibold text-charcoal focus:outline-none cursor-pointer">
+                            <option value="br-1">Senopati Flagship (GMT+7)</option>
+                            <option value="br-2">PIK Avenue Hub (GMT+7)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <!-- Toggle Mode: Public vs Admin -->
+                <div class="bg-ivory p-1 rounded-xl border border-stoneborder flex items-center gap-1">
+                    <button onclick="switchView('public')" id="btnNavPublic" class="px-3 py-1.5 text-xs font-semibold rounded-lg transition-all bg-surface text-forest shadow-sm">
+                        <i class="fa-solid fa-calendar-check mr-1.5"></i> Pelanggan
+                    </button>
+                    <button onclick="switchView('admin')" id="btnNavAdmin" class="px-3 py-1.5 text-xs font-semibold rounded-lg transition-all text-charcoal hover:text-forest">
+                        <i class="fa-solid fa-gauge-high mr-1.5"></i> Admin Dashboard
+                    </button>
+                </div>
+
+                <button onclick="openManageModal()" class="hidden sm:inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-xl border border-stoneborder bg-surface text-charcoal hover:bg-ivory transition-all">
+                    <i class="fa-solid fa-magnifying-glass text-forest"></i> Cek Booking Saya
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN VIEW CONTAINER -->
+    <main class="flex-1 flex flex-col relative overflow-y-auto">
+
+        <!-- ==================== PUBLIC BOOKING EXPERIENCE ==================== -->
+        <div id="viewPublic" class="flex-1 flex flex-col">
+            <!-- Hero Section with Unsplash Photography -->
+            <section class="bg-ivory border-b border-stoneborder py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+                <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+                    <div class="md:col-span-7 space-y-5 z-10">
+                        <div class="inline-flex items-center gap-2 bg-sage/20 text-forest px-3 py-1 rounded-full text-xs font-semibold">
+                            <i class="fa-solid fa-sparkles"></i> Perawatan Premium & Terkurasi Unsplash
+                        </div>
+                        <h1 class="text-3xl sm:text-5xl font-bold tracking-tight text-charcoal leading-tight">
+                            Reservasi Jadwal Perawatan Anda Tanpa Repot.
+                        </h1>
+                        <p class="text-sm sm:text-base text-charcoal/80 leading-relaxed">
+                            Pilih layanan unggulan, tentukan terapis profesional pilihan Anda, dan nikmati konfirmasi jadwal instan dengan sistem ketersediaan waktu real-time yang akurat.
+                        </p>
+                        <div class="pt-2 flex flex-wrap items-center gap-4">
+                            <button onclick="scrollToWizard()" class="bg-forest hover:bg-forest/90 text-white font-semibold text-sm px-6 py-3.5 rounded-xl shadow-md transition-all flex items-center gap-2">
+                                <i class="fa-solid fa-calendar-plus"></i> Mulai Booking Sekarang
+                            </button>
+                            <div class="flex items-center gap-2 text-xs text-charcoal/70">
+                                <i class="fa-solid fa-clock-rotate-left text-forest text-base"></i>
+                                <span>Konfirmasi instan &amp; Pembayaran Fleksibel</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="md:col-span-5 relative">
+                        <!-- Unsplash Hero Image Collage -->
+                        <div class="relative mx-auto max-w-md md:max-w-none">
+                            <div class="absolute -inset-1 bg-gradient-to-r from-forest to-sage rounded-3xl blur-lg opacity-25"></div>
+                            <div class="relative rounded-2xl overflow-hidden border-2 border-stoneborder shadow-xl bg-surface aspect-[4/3]">
+                                <img src="https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=800&q=80" alt="Salon Interior" class="w-full h-full object-cover hover:scale-105 transition-transform duration-700" onerror="this.src='https://placehold.co/600x400/365B49/FFFFFF?text=Aura+Co+Salon'">
+                            </div>
+                            <!-- Floating Badge Card -->
+                            <div class="absolute -bottom-6 -left-6 bg-surface p-4 rounded-2xl border border-stoneborder shadow-lg flex items-center gap-3 hidden sm:flex">
+                                <div class="w-10 h-10 rounded-xl bg-forest/10 text-forest flex items-center justify-center font-bold">
+                                    <i class="fa-solid fa-star"></i>
+                                </div>
+                                <div>
+                                    <span class="text-xs font-bold text-charcoal block">4.9 / 5.0 Rating</span>
+                                    <span class="text-[10px] text-gray-500">Dari 1,420+ Ulasan Pelanggan</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- BOOKING WIZARD CONTAINER -->
+            <section id="wizardSection" class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
+                
+                <!-- Progress Indicator -->
+                <div class="mb-8">
+                    <div class="flex items-center justify-between text-xs font-semibold mb-2">
+                        <span id="wizardStepTitle" class="text-forest uppercase tracking-wider">Langkah 1 dari 7: Pilih Cabang</span>
+                        <span id="wizardStepPercent" class="text-gray-400">14% Selesai</span>
+                    </div>
+                    <div class="h-2 w-full bg-stoneborder rounded-full overflow-hidden">
+                        <div id="wizardProgressBar" class="h-full bg-forest transition-all duration-300 rounded-full" style="width: 14%;"></div>
+                    </div>
+                </div>
+
+                <!-- Wizard Card Wrapper -->
+                <div class="bg-surface rounded-2xl border border-stoneborder shadow-sm p-6 sm:p-8">
+                    
+                    <!-- STEP 1: SELECT BRANCH -->
+                    <div id="step1" class="wizard-step space-y-6">
+                        <div>
+                            <h2 class="text-xl font-bold text-charcoal">Pilih Cabang Lokasi</h2>
+                            <p class="text-xs text-charcoal/70 mt-1">Pilih studio atau cabang Aura & Co. terdekat dari lokasi Anda.</p>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="branchCardsContainer">
+                            <!-- Populated via JS -->
+                        </div>
+                        <div class="flex justify-end pt-4 border-t border-stoneborder">
+                            <button onclick="nextStep(2)" class="bg-forest hover:bg-forest/90 text-white font-semibold text-xs px-6 py-3 rounded-xl transition-all flex items-center gap-2">
+                                Lanjutkan ke Layanan <i class="fa-solid fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- STEP 2: SELECT SERVICE -->
+                    <div id="step2" class="wizard-step hidden space-y-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h2 class="text-xl font-bold text-charcoal">Pilih Perawatan &amp; Layanan</h2>
+                                <p class="text-xs text-charcoal/70 mt-1">Harga dan durasi transparan sesuai standar cabang aktif.</p>
+                            </div>
+                            <button onclick="prevStep(1)" class="text-xs font-semibold text-forest hover:underline flex items-center gap-1">
+                                <i class="fa-solid fa-arrow-left"></i> Kembali
+                            </button>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="servicesListContainer">
+                            <!-- Populated via JS with Unsplash Service Photos -->
+                        </div>
+                        <div class="flex justify-between pt-4 border-t border-stoneborder">
+                            <button onclick="prevStep(1)" class="px-5 py-2.5 text-xs font-semibold text-charcoal border border-stoneborder rounded-xl hover:bg-ivory">Kembali</button>
+                            <button onclick="nextStep(3)" id="btnStep2Next" disabled class="bg-forest/50 cursor-not-allowed text-white font-semibold text-xs px-6 py-3 rounded-xl transition-all flex items-center gap-2">
+                                Lanjutkan ke Staf <i class="fa-solid fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- STEP 3: SELECT STAFF -->
+                    <div id="step3" class="wizard-step hidden space-y-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h2 class="text-xl font-bold text-charcoal">Pilih Tenaga Profesional (Staf)</h2>
+                                <p class="text-xs text-charcoal/70 mt-1">Pilih spesialis favorit Anda atau serahkan pada sistem.</p>
+                            </div>
+                            <button onclick="prevStep(2)" class="text-xs font-semibold text-forest hover:underline flex items-center gap-1">
+                                <i class="fa-solid fa-arrow-left"></i> Kembali
+                            </button>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4" id="staffListContainer">
+                            <!-- Populated via JS with Unsplash Staff Headshots -->
+                        </div>
+                        <div class="flex justify-between pt-4 border-t border-stoneborder">
+                            <button onclick="prevStep(2)" class="px-5 py-2.5 text-xs font-semibold text-charcoal border border-stoneborder rounded-xl hover:bg-ivory">Kembali</button>
+                            <button onclick="nextStep(4)" id="btnStep3Next" disabled class="bg-forest/50 cursor-not-allowed text-white font-semibold text-xs px-6 py-3 rounded-xl transition-all flex items-center gap-2">
+                                Lanjutkan ke Jadwal <i class="fa-solid fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- STEP 4: SELECT DATE & TIME -->
+                    <div id="step4" class="wizard-step hidden space-y-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h2 class="text-xl font-bold text-charcoal">Pilih Tanggal &amp; Slot Waktu</h2>
+                                <p class="text-xs text-charcoal/70 mt-1">Sistem menghitung ketersediaan akurat berdasarkan jam kerja, istirahat, dan benturan jadwal.</p>
+                            </div>
+                            <button onclick="prevStep(3)" class="text-xs font-semibold text-forest hover:underline flex items-center gap-1">
+                                <i class="fa-solid fa-arrow-left"></i> Kembali
+                            </button>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
+                            <!-- Date Picker Control -->
+                            <div class="md:col-span-5 bg-ivory p-4 rounded-xl border border-stoneborder space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs font-bold text-charcoal uppercase tracking-wider" id="currentMonthYearLabel">Oktober 2026</span>
+                                    <div class="flex gap-1">
+                                        <button onclick="adjustCalendarMonth(-1)" class="p-1.5 rounded-lg bg-surface border border-stoneborder text-xs hover:bg-stoneborder"><i class="fa-solid fa-chevron-left"></i></button>
+                                        <button onclick="adjustCalendarMonth(1)" class="p-1.5 rounded-lg bg-surface border border-stoneborder text-xs hover:bg-stoneborder"><i class="fa-solid fa-chevron-right"></i></button>
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-7 gap-1 text-center text-[11px] font-bold text-charcoal/60">
+                                    <span>Min</span><span>Sen</span><span>Sel</span><span>Rab</span><span>Kam</span><span>Jum</span><span>Sab</span>
+                                </div>
+                                <div class="grid grid-cols-7 gap-1" id="calendarDaysGrid">
+                                    <!-- Populated via JS -->
+                                </div>
+                            </div>
+
+                            <!-- Time Slots Grid -->
+                            <div class="md:col-span-7 space-y-3">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs font-bold text-charcoal uppercase tracking-wider" id="selectedDateDisplay">Pilih Tanggal di Kalender</span>
+                                    <span class="text-[11px] text-forest font-semibold" id="slotCountIndicator">0 slot tersedia</span>
+                                </div>
+                                <div class="grid grid-cols-3 gap-2.5 max-h-[260px] overflow-y-auto p-1" id="timeSlotsContainer">
+                                    <div class="col-span-3 text-center py-12 text-xs text-gray-400">Silakan pilih tanggal terlebih dahulu untuk melihat ketersediaan real-time.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between pt-4 border-t border-stoneborder">
+                            <button onclick="prevStep(3)" class="px-5 py-2.5 text-xs font-semibold text-charcoal border border-stoneborder rounded-xl hover:bg-ivory">Kembali</button>
+                            <button onclick="nextStep(5)" id="btnStep4Next" disabled class="bg-forest/50 cursor-not-allowed text-white font-semibold text-xs px-6 py-3 rounded-xl transition-all flex items-center gap-2">
+                                Lanjutkan ke Data Diri <i class="fa-solid fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- STEP 5: CUSTOMER INFORMATION & HOLD -->
+                    <div id="step5" class="wizard-step hidden space-y-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h2 class="text-xl font-bold text-charcoal">Informasi Kontak &amp; Ringkasan</h2>
+                                <p class="text-xs text-charcoal/70 mt-1">Temporary slot hold 10 menit aktif. Masukkan nomor WhatsApp yang aktif.</p>
+                            </div>
+                            <button onclick="prevStep(4)" class="text-xs font-semibold text-forest hover:underline flex items-center gap-1">
+                                <i class="fa-solid fa-arrow-left"></i> Kembali
+                            </button>
+                        </div>
+
+                        <!-- Temporary Hold Banner Timer -->
+                        <div id="tempHoldBanner" class="bg-amber-50 border border-amber-200 p-4 rounded-xl flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-xs">
+                                    <i class="fa-solid fa-hourglass-half animate-spin"></i>
+                                </div>
+                                <div>
+                                    <span class="text-xs font-bold text-amber-900 block">Slot Sementara Dikunci (Temporary Hold)</span>
+                                    <span class="text-[11px] text-amber-700">Selesaikan form di bawah sebelum waktu penahanan habis.</span>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-sm font-mono font-bold text-amber-800" id="holdTimerDisplay">09:59</span>
+                                <span class="text-[10px] text-amber-600 block">Sisa Waktu Hold</span>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+                            <!-- Form Inputs -->
+                            <div class="md:col-span-7 space-y-4">
+                                <div class="space-y-1">
+                                    <label class="text-xs font-bold text-charcoal">Nama Lengkap <span class="text-red-500">*</span></label>
+                                    <input type="text" id="custName" placeholder="cth. Salsabila Putri" class="w-full px-4 py-2.5 rounded-xl border border-stoneborder text-xs focus:outline-none focus:border-forest bg-ivory">
+                                </div>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div class="space-y-1">
+                                        <label class="text-xs font-bold text-charcoal">Nomor WhatsApp <span class="text-red-500">*</span></label>
+                                        <input type="tel" id="custPhone" placeholder="cth. 081234567890" class="w-full px-4 py-2.5 rounded-xl border border-stoneborder text-xs focus:outline-none focus:border-forest bg-ivory">
+                                    </div>
+                                    <div class="space-y-1">
+                                        <label class="text-xs font-bold text-charcoal">Email (Opsional)</label>
+                                        <input type="email" id="custEmail" placeholder="cth. salsabila@gmail.com" class="w-full px-4 py-2.5 rounded-xl border border-stoneborder text-xs focus:outline-none focus:border-forest bg-ivory">
+                                    </div>
+                                </div>
+                                <div class="space-y-1">
+                                    <label class="text-xs font-bold text-charcoal">Catatan Khusus untuk Terapis (Opsional)</label>
+                                    <textarea id="custNotes" rows="2" placeholder="cth. Alergi produk tertentu atau preferensi tekanan pijatan." class="w-full px-4 py-2.5 rounded-xl border border-stoneborder text-xs focus:outline-none focus:border-forest bg-ivory"></textarea>
+                                </div>
+                            </div>
+
+                            <!-- Booking Snapshot Summary Card -->
+                            <div class="md:col-span-5 bg-ivory p-5 rounded-xl border border-stoneborder space-y-3">
+                                <span class="text-xs font-bold text-charcoal uppercase tracking-wider block border-b border-stoneborder pb-2">Ringkasan Pemesanan</span>
+                                <div class="space-y-2 text-xs text-charcoal/80">
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-500">Cabang:</span>
+                                        <span class="font-semibold" id="sumBranch">-</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-500">Layanan:</span>
+                                        <span class="font-semibold" id="sumService">-</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-500">Durasi:</span>
+                                        <span class="font-semibold" id="sumDuration">-</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-500">Staf:</span>
+                                        <span class="font-semibold" id="sumStaff">-</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-500">Jadwal:</span>
+                                        <span class="font-semibold text-forest" id="sumDateTime">-</span>
+                                    </div>
+                                </div>
+                                <div class="pt-3 border-t border-stoneborder flex justify-between items-center">
+                                    <span class="text-xs font-bold text-charcoal">Total Biaya:</span>
+                                    <span class="text-sm font-bold text-forest" id="sumPrice">-</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between pt-4 border-t border-stoneborder">
+                            <button onclick="prevStep(4)" class="px-5 py-2.5 text-xs font-semibold text-charcoal border border-stoneborder rounded-xl hover:bg-ivory">Kembali</button>
+                            <button onclick="nextStep(6)" class="bg-forest hover:bg-forest/90 text-white font-semibold text-xs px-6 py-3 rounded-xl transition-all flex items-center gap-2">
+                                Lanjutkan ke Pembayaran <i class="fa-solid fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- STEP 6: PAYMENT & CONFIRMATION -->
+                    <div id="step6" class="wizard-step hidden space-y-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h2 class="text-xl font-bold text-charcoal">Pilih Metode Pembayaran</h2>
+                                <p class="text-xs text-charcoal/70 mt-1">Pembayaran aman terverifikasi via QRIS atau Virtual Account.</p>
+                            </div>
+                            <button onclick="prevStep(5)" class="text-xs font-semibold text-forest hover:underline flex items-center gap-1">
+                                <i class="fa-solid fa-arrow-left"></i> Kembali
+                            </button>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <label class="border-2 border-forest bg-forest/5 p-4 rounded-xl cursor-pointer flex flex-col justify-between space-y-2">
+                                <div class="flex items-center justify-between">
+                                    <span class="font-bold text-xs text-charcoal">Uang Muka (DP 30%)</span>
+                                    <input type="radio" name="payType" value="dp" checked class="accent-forest">
+                                </div>
+                                <span class="text-[11px] text-gray-600">Bayar DP sekarang, sisa dibayar di lokasi.</span>
+                                <span class="text-xs font-bold text-forest" id="payAmountDP">Rp 0</span>
+                            </label>
+                            <label class="border border-stoneborder hover:border-forest p-4 rounded-xl cursor-pointer flex flex-col justify-between space-y-2 bg-ivory">
+                                <div class="flex items-center justify-between">
+                                    <span class="font-bold text-xs text-charcoal">Bayar Penuh</span>
+                                    <input type="radio" name="payType" value="full" class="accent-forest">
+                                </div>
+                                <span class="text-[11px] text-gray-600">Lunasi seluruh biaya layanan saat ini.</span>
+                                <span class="text-xs font-bold text-forest" id="payAmountFull">Rp 0</span>
+                            </label>
+                            <label class="border border-stoneborder hover:border-forest p-4 rounded-xl cursor-pointer flex flex-col justify-between space-y-2 bg-ivory">
+                                <div class="flex items-center justify-between">
+                                    <span class="font-bold text-xs text-charcoal">Bayar di Tempat (COD)</span>
+                                    <input type="radio" name="payType" value="cod" class="accent-forest">
+                                </div>
+                                <span class="text-[11px] text-gray-600">Sesuai kebijakan khusus cabang.</span>
+                                <span class="text-xs font-bold text-forest">0% DP</span>
+                            </label>
+                        </div>
+
+                        <!-- Simulated Payment Gateway Box -->
+                        <div class="bg-ivory p-5 rounded-xl border border-stoneborder space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-charcoal uppercase tracking-wider">Simulasi Gateway Pembayaran</span>
+                                <span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 text-[10px] font-bold rounded">Live Sandbox Active</span>
+                            </div>
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                                <button type="button" onclick="selectPayMethod('QRIS')" class="pay-method-btn border-2 border-forest bg-surface p-3 rounded-xl text-center text-xs font-semibold text-charcoal flex flex-col items-center gap-1">
+                                    <i class="fa-solid fa-qrcode text-forest text-lg"></i> QRIS
+                                </button>
+                                <button type="button" onclick="selectPayMethod('BCA VA')" class="pay-method-btn border border-stoneborder bg-surface p-3 rounded-xl text-center text-xs font-semibold text-charcoal flex flex-col items-center gap-1">
+                                    <i class="fa-solid fa-building-columns text-forest text-lg"></i> BCA VA
+                                </button>
+                                <button type="button" onclick="selectPayMethod('Mandiri VA')" class="pay-method-btn border border-stoneborder bg-surface p-3 rounded-xl text-center text-xs font-semibold text-charcoal flex flex-col items-center gap-1">
+                                    <i class="fa-solid fa-building-columns text-forest text-lg"></i> Mandiri VA
+                                </button>
+                                <button type="button" onclick="selectPayMethod('E-Wallet')" class="pay-method-btn border border-stoneborder bg-surface p-3 rounded-xl text-center text-xs font-semibold text-charcoal flex flex-col items-center gap-1">
+                                    <i class="fa-solid fa-wallet text-forest text-lg"></i> E-Wallet
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between pt-4 border-t border-stoneborder">
+                            <button onclick="prevStep(5)" class="px-5 py-2.5 text-xs font-semibold text-charcoal border border-stoneborder rounded-xl hover:bg-ivory">Kembali</button>
+                            <button onclick="finalizeBooking()" class="bg-forest hover:bg-forest/90 text-white font-semibold text-xs px-6 py-3 rounded-xl transition-all flex items-center gap-2">
+                                <i class="fa-solid fa-check-circle"></i> Konfirmasi &amp; Bayar Sekarang
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- STEP 7: SUCCESS CONFIRMATION -->
+                    <div id="step7" class="wizard-step hidden space-y-6 text-center py-6">
+                        <div class="w-16 h-16 bg-emerald-100 text-forest rounded-full flex items-center justify-center mx-auto text-2xl shadow-sm">
+                            <i class="fa-solid fa-circle-check"></i>
+                        </div>
+                        <div class="space-y-2">
+                            <span class="inline-block px-3 py-1 bg-emerald-50 text-emerald-800 text-xs font-bold rounded-full">Booking Berhasil Dikonfirmasi</span>
+                            <h2 class="text-2xl font-bold text-charcoal">Terima Kasih, <span id="successCustName">Pelanggan</span>!</h2>
+                            <p class="text-xs text-charcoal/70 max-w-md mx-auto">Kode booking unik Anda telah diterbitkan. Detail reservasi telah dicatat ke dalam database operasional dan dikirimkan via WhatsApp.</p>
+                        </div>
+
+                        <!-- Booking Pass Ticket -->
+                        <div class="max-w-md mx-auto bg-ivory p-6 rounded-2xl border border-stoneborder text-left space-y-4 shadow-sm">
+                            <div class="flex justify-between items-center pb-3 border-b border-stoneborder">
+                                <div>
+                                    <span class="text-[10px] text-gray-500 uppercase font-bold">Kode Booking</span>
+                                    <span class="text-base font-mono font-bold text-forest tracking-wider" id="successBookingCode">AC-8842</span>
+                                </div>
+                                <span class="px-2.5 py-1 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-lg" id="successPayStatus">Confirmed &amp; DP Paid</span>
+                            </div>
+                            <div class="space-y-2 text-xs text-charcoal/80">
+                                <div class="flex justify-between"><span class="text-gray-500">Cabang:</span><span class="font-semibold" id="succBranch">-</span></div>
+                                <div class="flex justify-between"><span class="text-gray-500">Layanan:</span><span class="font-semibold" id="succService">-</span></div>
+                                <div class="flex justify-between"><span class="text-gray-500">Terapis:</span><span class="font-semibold" id="succStaff">-</span></div>
+                                <div class="flex justify-between"><span class="text-gray-500">Jadwal:</span><span class="font-semibold text-forest" id="succDateTime">-</span></div>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="flex flex-wrap justify-center gap-3 pt-2">
+                            <button onclick="addToGoogleCalendar()" class="px-4 py-2.5 bg-surface border border-stoneborder rounded-xl text-xs font-semibold text-charcoal hover:bg-ivory flex items-center gap-2">
+                                <i class="fa-brands fa-google text-forest"></i> Tambah ke Google Calendar
+                            </button>
+                            <button onclick="openManageModal()" class="px-4 py-2.5 bg-surface border border-stoneborder rounded-xl text-xs font-semibold text-charcoal hover:bg-ivory flex items-center gap-2">
+                                <i class="fa-solid fa-shield-halved text-forest"></i> Kelola Booking Saya
+                            </button>
+                            <button onclick="resetWizard()" class="px-4 py-2.5 bg-forest text-white rounded-xl text-xs font-semibold hover:bg-forest/90 flex items-center gap-2">
+                                <i class="fa-solid fa-plus"></i> Buat Booking Baru
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+        </div>
+
+        <!-- ==================== ADMINISTRATIVE DASHBOARD ==================== -->
+        <div id="viewAdmin" class="flex-1 flex flex-col hidden bg-ivory">
+            <!-- Admin Subheader -->
+            <div class="bg-surface border-b border-stoneborder px-4 sm:px-6 lg:px-8 py-4 flex flex-wrap items-center justify-between gap-4">
+                <div class="flex items-center gap-4">
+                    <div>
+                        <h1 class="text-lg font-bold text-charcoal flex items-center gap-2">
+                            <span>Dashboard Operasional Harian</span>
+                            <span class="px-2 py-0.5 bg-forest text-white text-[10px] font-bold rounded">Live System</span>
+                        </h1>
+                        <p class="text-xs text-charcoal/70">Kelola jadwal staf, konfirmasi pembayaran, dan validasi ketersediaan lintas cabang.</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <button onclick="openManualBookingModal()" class="px-3.5 py-2 bg-forest text-white text-xs font-semibold rounded-xl hover:bg-forest/90 shadow-sm flex items-center gap-2">
+                        <i class="fa-solid fa-plus-circle"></i> Buat Booking Manual
+                    </button>
+                    <div class="flex items-center gap-2 bg-ivory px-3 py-1.5 rounded-xl border border-stoneborder text-xs">
+                        <i class="fa-solid fa-calendar-day text-forest"></i>
+                        <span class="font-semibold text-charcoal" id="adminCurrentDateLabel">11 Oktober 2026</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Content Container -->
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full space-y-6">
+                
+                <!-- Quick KPI Overview Cards -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="bg-surface p-5 rounded-xl border border-stoneborder shadow-sm space-y-1">
+                        <div class="flex items-center justify-between text-gray-500">
+                            <span class="text-xs font-bold uppercase tracking-wider">Booking Hari Ini</span>
+                            <i class="fa-solid fa-calendar-check text-forest"></i>
+                        </div>
+                        <div class="text-2xl font-bold text-charcoal" id="kpiTodayBookings">12</div>
+                        <span class="text-[11px] text-emerald-600 font-semibold"><i class="fa-solid fa-arrow-up"></i> 8 Terkonfirmasi</span>
+                    </div>
+                    <div class="bg-surface p-5 rounded-xl border border-stoneborder shadow-sm space-y-1">
+                        <div class="flex items-center justify-between text-gray-500">
+                            <span class="text-xs font-bold uppercase tracking-wider">Okupansi Staf</span>
+                            <i class="fa-solid fa-user-clock text-forest"></i>
+                        </div>
+                        <div class="text-2xl font-bold text-charcoal">78.5%</div>
+                        <span class="text-[11px] text-gray-500 font-semibold">Efektif jam produktif</span>
+                    </div>
+                    <div class="bg-surface p-5 rounded-xl border border-stoneborder shadow-sm space-y-1">
+                        <div class="flex items-center justify-between text-gray-500">
+                            <span class="text-xs font-bold uppercase tracking-wider">Pendapatan Diterima</span>
+                            <i class="fa-solid fa-wallet text-forest"></i>
+                        </div>
+                        <div class="text-2xl font-bold text-charcoal" id="kpiRevenue">Rp 4.250.000</div>
+                        <span class="text-[11px] text-emerald-600 font-semibold">DP &amp; Pelunasan</span>
+                    </div>
+                    <div class="bg-surface p-5 rounded-xl border border-stoneborder shadow-sm space-y-1">
+                        <div class="flex items-center justify-between text-gray-500">
+                            <span class="text-xs font-bold uppercase tracking-wider">Pending Payment</span>
+                            <i class="fa-solid fa-hourglass-half text-amber-600"></i>
+                        </div>
+                        <div class="text-2xl font-bold text-charcoal" id="kpiPending">2</div>
+                        <span class="text-[11px] text-amber-600 font-semibold">Menunggu callback</span>
+                    </div>
+                </div>
+
+                <!-- Main Admin Schedule Calendar & Operational Table -->
+                <div class="bg-surface rounded-2xl border border-stoneborder shadow-sm overflow-hidden">
+                    <div class="p-5 border-b border-stoneborder flex flex-wrap items-center justify-between gap-4">
+                        <div class="flex items-center gap-3">
+                            <h2 class="text-base font-bold text-charcoal">Jadwal &amp; Daftar Booking Aktif</h2>
+                            <span class="px-2.5 py-0.5 bg-ivory border border-stoneborder text-xs font-semibold text-charcoal rounded-full" id="adminBookingCountBadge">12 Total</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <input type="text" id="adminSearchInput" onkeyup="filterAdminTable()" placeholder="Cari nama / kode booking..." class="px-3 py-1.5 rounded-xl border border-stoneborder text-xs focus:outline-none focus:border-forest bg-ivory w-60">
+                            <select id="adminStatusFilter" onchange="filterAdminTable()" class="px-3 py-1.5 rounded-xl border border-stoneborder text-xs focus:outline-none focus:border-forest bg-ivory">
+                                <option value="all">Semua Status</option>
+                                <option value="Confirmed">Confirmed</option>
+                                <option value="Pending Payment">Pending Payment</option>
+                                <option value="Completed">Completed</option>
+                                <option value="Cancelled">Cancelled</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead>
+                                <tr class="bg-ivory text-charcoal/70 border-b border-stoneborder font-bold">
+                                    <th class="py-3 px-4">Kode / Waktu</th>
+                                    <th class="py-3 px-4">Pelanggan &amp; Kontak</th>
+                                    <th class="py-3 px-4">Cabang &amp; Layanan</th>
+                                    <th class="py-3 px-4">Terapis</th>
+                                    <th class="py-3 px-4">Status Pembayaran</th>
+                                    <th class="py-3 px-4">Status Booking</th>
+                                    <th class="py-3 px-4 text-right">Aksi Operasional</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminBookingsTableBody" class="divide-y divide-stoneborder text-charcoal">
+                                <!-- Populated via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Management Tabs for Staff, Services, Branch -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Staff Overview -->
+                    <div class="bg-surface p-5 rounded-2xl border border-stoneborder shadow-sm space-y-4">
+                        <div class="flex items-center justify-between pb-3 border-b border-stoneborder">
+                            <h3 class="text-sm font-bold text-charcoal flex items-center gap-2">
+                                <i class="fa-solid fa-user-tie text-forest"></i> Manajemen Staf &amp; Jadwal
+                            </h3>
+                            <button onclick="alert('Fitur tambah staf baru dibuka.')" class="text-xs font-bold text-forest hover:underline">+ Staf</button>
+                        </div>
+                        <div class="space-y-3" id="adminStaffList">
+                            <!-- Populated via JS -->
+                        </div>
+                    </div>
+
+                    <!-- Services Overview -->
+                    <div class="bg-surface p-5 rounded-2xl border border-stoneborder shadow-sm space-y-4">
+                        <div class="flex items-center justify-between pb-3 border-b border-stoneborder">
+                            <h3 class="text-sm font-bold text-charcoal flex items-center gap-2">
+                                <i class="fa-solid fa-scissors text-forest"></i> Katalog Layanan &amp; Durasi
+                            </h3>
+                            <button onclick="alert('Fitur tambah layanan baru dibuka.')" class="text-xs font-bold text-forest hover:underline">+ Layanan</button>
+                        </div>
+                        <div class="space-y-3" id="adminServicesList">
+                            <!-- Populated via JS -->
+                        </div>
+                    </div>
+
+                    <!-- System Audit & Rules -->
+                    <div class="bg-surface p-5 rounded-2xl border border-stoneborder shadow-sm space-y-4">
+                        <div class="flex items-center justify-between pb-3 border-b border-stoneborder">
+                            <h3 class="text-sm font-bold text-charcoal flex items-center gap-2">
+                                <i class="fa-solid fa-shield-halved text-forest"></i> Konfigurasi Sistem &amp; Rules
+                            </h3>
+                            <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded">Secure Engine</span>
+                        </div>
+                        <div class="space-y-3 text-xs text-charcoal/80">
+                            <div class="flex justify-between items-center p-2.5 bg-ivory rounded-xl border border-stoneborder">
+                                <span>Temporary Hold Timeout</span>
+                                <span class="font-bold text-forest">10 Menit</span>
+                            </div>
+                            <div class="flex justify-between items-center p-2.5 bg-ivory rounded-xl border border-stoneborder">
+                                <span>Double-Booking Prevention</span>
+                                <span class="font-bold text-emerald-700">Atomic Lock Active</span>
+                            </div>
+                            <div class="flex justify-between items-center p-2.5 bg-ivory rounded-xl border border-stoneborder">
+                                <span>Timezone Enforcement</span>
+                                <span class="font-bold text-charcoal">WIB (GMT+7)</span>
+                            </div>
+                            <div class="flex justify-between items-center p-2.5 bg-ivory rounded-xl border border-stoneborder">
+                                <span>WhatsApp Notification Gateway</span>
+                                <span class="font-bold text-emerald-700">Connected API</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <!-- ==================== MODALS (MANAGE BOOKING & MANUAL BOOKING) ==================== -->
+    
+    <!-- Manage Booking Modal -->
+    <div id="manageBookingModal" class="fixed inset-0 z-50 bg-charcoal/50 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-surface rounded-2xl border border-stoneborder max-w-lg w-full p-6 space-y-6 shadow-xl relative animate-in fade-in zoom-in duration-200">
+            <div class="flex items-center justify-between pb-3 border-b border-stoneborder">
+                <h3 class="text-base font-bold text-charcoal flex items-center gap-2">
+                    <i class="fa-solid fa-magnifying-glass text-forest"></i> Kelola atau Batalkan Booking
+                </h3>
+                <button onclick="closeManageModal()" class="text-gray-400 hover:text-charcoal"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div class="space-y-4">
+                <div class="space-y-1">
+                    <label class="text-xs font-bold text-charcoal">Masukkan Kode Booking / No. WhatsApp</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="searchBookingInput" placeholder="cth. AC-8842 atau 081234567890" class="flex-1 px-4 py-2.5 rounded-xl border border-stoneborder text-xs focus:outline-none focus:border-forest bg-ivory">
+                        <button onclick="executeSearchBooking()" class="bg-forest text-white px-4 py-2.5 rounded-xl text-xs font-semibold hover:bg-forest/90">Cari</button>
+                    </div>
+                </div>
+                <div id="searchBookingResultContainer" class="space-y-3 pt-2">
+                    <!-- Search results appear here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Manual Booking Admin Modal -->
+    <div id="manualBookingModal" class="fixed inset-0 z-50 bg-charcoal/50 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-surface rounded-2xl border border-stoneborder max-w-xl w-full p-6 space-y-6 shadow-xl relative max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between pb-3 border-b border-stoneborder">
+                <h3 class="text-base font-bold text-charcoal flex items-center gap-2">
+                    <i class="fa-solid fa-plus-circle text-forest"></i> Buat Booking Manual (Admin)
+                </h3>
+                <button onclick="closeManualBookingModal()" class="text-gray-400 hover:text-charcoal"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div class="space-y-4 text-xs">
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-1">
+                        <label class="font-bold text-charcoal">Nama Pelanggan</label>
+                        <input type="text" id="manualName" placeholder="Nama lengkap" class="w-full px-3 py-2 rounded-xl border border-stoneborder bg-ivory focus:outline-none focus:border-forest">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="font-bold text-charcoal">No. WhatsApp</label>
+                        <input type="tel" id="manualPhone" placeholder="08..." class="w-full px-3 py-2 rounded-xl border border-stoneborder bg-ivory focus:outline-none focus:border-forest">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-1">
+                        <label class="font-bold text-charcoal">Pilih Layanan</label>
+                        <select id="manualServiceSelect" class="w-full px-3 py-2 rounded-xl border border-stoneborder bg-ivory focus:outline-none focus:border-forest">
+                            <!-- Populated via JS -->
+                        </select>
+                    </div>
+                    <div class="space-y-1">
+                        <label class="font-bold text-charcoal">Pilih Staf</label>
+                        <select id="manualStaffSelect" class="w-full px-3 py-2 rounded-xl border border-stoneborder bg-ivory focus:outline-none focus:border-forest">
+                            <!-- Populated via JS -->
+                        </select>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-1">
+                        <label class="font-bold text-charcoal">Tanggal</label>
+                        <input type="date" id="manualDate" value="2026-10-11" class="w-full px-3 py-2 rounded-xl border border-stoneborder bg-ivory focus:outline-none focus:border-forest">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="font-bold text-charcoal">Jam Mulai</label>
+                        <select id="manualTime" class="w-full px-3 py-2 rounded-xl border border-stoneborder bg-ivory focus:outline-none focus:border-forest">
+                            <option value="10:00">10:00 WIB</option>
+                            <option value="13:30">13:30 WIB</option>
+                            <option value="15:00">15:00 WIB</option>
+                            <option value="17:00">17:00 WIB</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="space-y-1">
+                    <label class="font-bold text-charcoal">Status Pembayaran Awal</label>
+                    <select id="manualPayStatus" class="w-full px-3 py-2 rounded-xl border border-stoneborder bg-ivory focus:outline-none focus:border-forest">
+                        <option value="Confirmed & DP Paid">Confirmed & DP Paid (Lunas Sebagian)</option>
+                        <option value="Confirmed">Confirmed & Full Paid</option>
+                        <option value="Pending Payment">Pending Payment</option>
+                    </select>
+                </div>
+                <div class="pt-4 border-t border-stoneborder flex justify-end gap-2">
+                    <button onclick="closeManualBookingModal()" class="px-4 py-2 border border-stoneborder rounded-xl font-semibold text-charcoal hover:bg-ivory">Batal</button>
+                    <button onclick="saveManualBooking()" class="px-4 py-2 bg-forest text-white rounded-xl font-semibold hover:bg-forest/90">Simpan Booking</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT APPLICATION CORE -->
+    <script>
+        // --- DATABASE & APPLICATION STATE ---
+        const appState = {
+            activeBranch: 'br-1',
+            currentStep: 1,
+            selectedService: null,
+            selectedStaff: null,
+            selectedDate: '2026-10-11',
+            selectedTime: null,
+            selectedPayMethod: 'QRIS',
+            calendarMonth: 9, // October (0-indexed)
+            calendarYear: 2026,
+            holdTimerInterval: null,
+            holdSecondsLeft: 600,
+        };
+
+        const branchesData = [
+            { id: 'br-1', name: 'Senopati Flagship Studio', address: 'Jl. Senopati Raya No. 42, Jakarta Selatan', hours: '09:00 - 20:00' },
+            { id: 'br-2', name: 'PIK Avenue Hub', address: 'PIK Avenue Mall Lt. 2, Jakarta Utara', hours: '10:00 - 21:00' }
+        ];
+
+        const servicesData = [
+            { 
+                id: 'srv-1', 
+                name: 'Signature Haircut & Styling', 
+                desc: 'Potong rambut presisi dengan konsultasi gaya, cuci, dan styling.', 
+                duration: '60 mnt', 
+                price: 250000, 
+                category: 'Hair',
+                image: 'https://images.unsplash.com/photo-1562002715-9988bf279e8a?auto=format&fit=crop&w=600&q=80' 
+            },
+            { 
+                id: 'srv-2', 
+                name: 'Aromatherapy Relaxing Massage', 
+                desc: 'Pijat relaksasi tubuh menyeluruh menggunakan essential oil pilihan.', 
+                duration: '90 mnt', 
+                price: 450000, 
+                category: 'Spa',
+                image: 'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=600&q=80' 
+            },
+            { 
+                id: 'srv-3', 
+                name: 'Deep Cleansing Facial Treatment', 
+                desc: 'Perawatan wajah mendalam untuk mengangkat komedo dan meremajakan kulit.', 
+                duration: '75 mnt', 
+                price: 375000, 
+                category: 'Clinic',
+                image: 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=600&q=80' 
+            },
+            { 
+                id: 'srv-4', 
+                name: 'Beard Trim & Hot Towel Shave', 
+                desc: 'Perawatan khusus janggut dan cukur rapi dengan handuk hangat.', 
+                duration: '45 mnt', 
+                price: 175000, 
+                category: 'Barber',
+                image: 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=600&q=80' 
+            }
+        ];
+
+        const staffData = [
+            { 
+                id: 'stf-0', 
+                name: 'Siapa Saja (Tersedia)', 
+                role: 'Auto-Assign', 
+                avatar: 'fa-user-check',
+                image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80' 
+            },
+            { 
+                id: 'stf-1', 
+                name: 'Rian Pratama', 
+                role: 'Senior Stylist', 
+                avatar: 'fa-user-tie',
+                image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80' 
+            },
+            { 
+                id: 'stf-2', 
+                name: 'Dewi Lestari', 
+                role: 'Master Therapist', 
+                avatar: 'fa-user',
+                image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80' 
+            },
+            { 
+                id: 'stf-3', 
+                name: 'Marcus Vance', 
+                role: 'Creative Director', 
+                avatar: 'fa-user-nurse',
+                image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80' 
+            }
+        ];
+
+        let bookingsDatabase = [
+            { id: 'AC-8841', name: 'Budi Santoso', phone: '081122334455', service: 'Signature Haircut & Styling', staff: 'Rian Pratama', date: '2026-10-11', time: '10:00', price: 250000, payStatus: 'Confirmed', bookingStatus: 'Confirmed', branch: 'Senopati Flagship Studio' },
+            { id: 'AC-8842', name: 'Salsabila Putri', phone: '081234567890', service: 'Aromatherapy Relaxing Massage', staff: 'Dewi Lestari', date: '2026-10-11', time: '13:30', price: 450000, payStatus: 'Confirmed & DP Paid', bookingStatus: 'Confirmed', branch: 'Senopati Flagship Studio' },
+            { id: 'AC-8843', name: 'Reza Rahadian', phone: '081987654321', service: 'Deep Cleansing Facial Treatment', staff: 'Marcus Vance', date: '2026-10-12', time: '15:00', price: 375000, payStatus: 'Pending Payment', bookingStatus: 'Pending Payment', branch: 'Senopati Flagship Studio' }
+        ];
+
+        // --- INITIALIZATION ---
+        window.addEventListener('DOMContentLoaded', () => {
+            renderBranches();
+            renderServices();
+            renderStaff();
+            renderCalendarDays();
+            renderAdminTable();
+            renderAdminLists();
+        });
+
+        // --- NAVIGATION & VIEW SWITCHING ---
+        function switchView(viewName) {
+            const btnPublic = document.getElementById('btnNavPublic');
+            const btnAdmin = document.getElementById('btnNavAdmin');
+            const viewPublic = document.getElementById('viewPublic');
+            const viewAdmin = document.getElementById('viewAdmin');
+
+            if (viewName === 'public') {
+                btnPublic.className = 'px-3 py-1.5 text-xs font-semibold rounded-lg transition-all bg-surface text-forest shadow-sm';
+                btnAdmin.className = 'px-3 py-1.5 text-xs font-semibold rounded-lg transition-all text-charcoal hover:text-forest';
+                viewPublic.classList.remove('hidden');
+                viewAdmin.classList.add('hidden');
+            } else {
+                btnAdmin.className = 'px-3 py-1.5 text-xs font-semibold rounded-lg transition-all bg-surface text-forest shadow-sm';
+                btnPublic.className = 'px-3 py-1.5 text-xs font-semibold rounded-lg transition-all text-charcoal hover:text-forest';
+                viewAdmin.classList.remove('hidden');
+                viewPublic.classList.add('hidden');
+                renderAdminTable();
+            }
+        }
+
+        function changeActiveBranch(branchId) {
+            appState.activeBranch = branchId;
+            const b = branchesData.find(x => x.id === branchId);
+            alert(`Cabang aktif diubah ke: ${b.name}`);
+        }
+
+        function scrollToWizard() {
+            document.getElementById('wizardSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // --- WIZARD STEP CONTROLLER ---
+        function nextStep(step) {
+            if (step === 2 && !appState.selectedBranch) {
+                appState.selectedBranch = branchesData[0]; // default auto select
+            }
+            if (step === 3 && !appState.selectedService) {
+                alert('Silakan pilih salah satu layanan terlebih dahulu.');
+                return;
+            }
+            if (step === 4 && !appState.selectedStaff) {
+                alert('Silakan pilih staf atau terapis.');
+                return;
+            }
+            if (step === 5) {
+                if (!appState.selectedDate || !appState.selectedTime) {
+                    alert('Silakan pilih tanggal dan slot waktu.');
+                    return;
+                }
+                startTemporaryHoldTimer();
+                populateSummary();
+            }
+            if (step === 6) {
+                const name = document.getElementById('custName').value.trim();
+                const phone = document.getElementById('custPhone').value.trim();
+                if (!name || !phone) {
+                    alert('Nama lengkap dan nomor WhatsApp wajib diisi.');
+                    return;
+                }
+                populatePaymentAmounts();
+            }
+
+            appState.currentStep = step;
+            updateWizardUI();
+        }
+
+        function prevStep(step) {
+            appState.currentStep = step;
+            if (step < 5 && appState.holdTimerInterval) {
+                clearInterval(appState.holdTimerInterval);
+            }
+            updateWizardUI();
+        }
+
+        function updateWizardUI() {
+            for (let i = 1; i <= 7; i++) {
+                const el = document.getElementById(`step${i}`);
+                if (el) {
+                    if (i === appState.currentStep) el.classList.remove('hidden');
+                    else el.classList.add('hidden');
+                }
+            }
+
+            const titles = [
+                "Pilih Cabang Lokasi",
+                "Pilih Perawatan & Layanan",
+                "Pilih Tenaga Profesional",
+                "Pilih Tanggal & Waktu",
+                "Informasi Kontak & Hold",
+                "Pembayaran & Konfirmasi",
+                "Selesai"
+            ];
+
+            const percents = [14, 28, 42, 57, 71, 85, 100];
+            document.getElementById('wizardStepTitle').innerText = `Langkah ${appState.currentStep} dari 7: ${titles[appState.currentStep - 1]}`;
+            document.getElementById('wizardStepPercent').innerText = `${percents[appState.currentStep - 1]}% Selesai`;
+            document.getElementById('wizardProgressBar').style.width = `${percents[appState.currentStep - 1]}%`;
+        }
+
+        // --- STEP 1 RENDER ---
+        function renderBranches() {
+            const container = document.getElementById('branchCardsContainer');
+            container.innerHTML = branchesData.map((b, idx) => `
+                <div onclick="selectBranch('${b.id}')" id="branch-card-${b.id}" class="branch-card p-5 rounded-xl border-2 ${idx === 0 ? 'border-forest bg-forest/5' : 'border-stoneborder bg-surface'} cursor-pointer hover:border-forest transition-all space-y-2">
+                    <div class="flex justify-between items-center">
+                        <span class="font-bold text-sm text-charcoal">${b.name}</span>
+                        <i class="fa-solid fa-circle-check ${idx === 0 ? 'text-forest' : 'text-gray-300'}"></i>
+                    </div>
+                    <p class="text-xs text-charcoal/70"><i class="fa-solid fa-location-dot mr-1 text-forest"></i> ${b.address}</p>
+                    <p class="text-xs text-charcoal/70"><i class="fa-solid fa-clock mr-1 text-forest"></i> ${b.hours}</p>
+                </div>
+            `).join('');
+            appState.selectedBranch = branchesData[0];
+        }
+
+        function selectBranch(id) {
+            document.querySelectorAll('.branch-card').forEach(c => {
+                c.className = 'branch-card p-5 rounded-xl border-2 border-stoneborder bg-surface cursor-pointer hover:border-forest transition-all space-y-2';
+                c.querySelector('i.fa-circle-check').className = 'fa-solid fa-circle-check text-gray-300';
+            });
+            const sel = document.getElementById(`branch-card-${id}`);
+            sel.className = 'branch-card p-5 rounded-xl border-2 border-forest bg-forest/5 cursor-pointer transition-all space-y-2';
+            sel.querySelector('i.fa-circle-check').className = 'fa-solid fa-circle-check text-forest';
+            appState.selectedBranch = branchesData.find(x => x.id === id);
+        }
+
+        // --- STEP 2 RENDER WITH UNSPLASH IMAGES ---
+        function renderServices() {
+            const container = document.getElementById('servicesListContainer');
+            container.innerHTML = servicesData.map(s => `
+                <div onclick="selectService('${s.id}')" id="service-card-${s.id}" class="service-card overflow-hidden rounded-xl border-2 border-stoneborder bg-surface cursor-pointer hover:border-forest transition-all flex flex-col justify-between">
+                    <div class="h-36 w-full overflow-hidden relative">
+                        <img src="${s.image}" alt="${s.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.src='https://placehold.co/600x400/365B49/FFFFFF?text=Service'">
+                        <span class="absolute top-2 right-2 px-2.5 py-1 bg-surface/90 backdrop-blur-sm text-forest text-[10px] font-bold rounded-lg shadow">${s.category}</span>
+                    </div>
+                    <div class="p-4 space-y-2 flex-1 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between">
+                                <span class="font-bold text-sm text-charcoal">${s.name}</span>
+                                <i class="fa-solid fa-circle-check text-gray-300 service-check-icon"></i>
+                            </div>
+                            <p class="text-xs text-charcoal/70 mt-1">${s.desc}</p>
+                        </div>
+                        <div class="pt-3 border-t border-stoneborder flex items-center justify-between text-xs">
+                            <span class="text-gray-500 font-semibold"><i class="fa-solid fa-stopwatch mr-1 text-forest"></i> ${s.duration}</span>
+                            <span class="font-bold text-forest text-sm">Rp ${s.price.toLocaleString('id-ID')}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function selectService(id) {
+            document.querySelectorAll('.service-card').forEach(c => {
+                c.className = 'service-card overflow-hidden rounded-xl border-2 border-stoneborder bg-surface cursor-pointer hover:border-forest transition-all flex flex-col justify-between';
+                const icon = c.querySelector('.service-check-icon');
+                if(icon) icon.className = 'fa-solid fa-circle-check text-gray-300 service-check-icon';
+            });
+            const sel = document.getElementById(`service-card-${id}`);
+            sel.className = 'service-card overflow-hidden rounded-xl border-2 border-forest bg-forest/5 cursor-pointer transition-all flex flex-col justify-between shadow-sm';
+            const selIcon = sel.querySelector('.service-check-icon');
+            if(selIcon) selIcon.className = 'fa-solid fa-circle-check text-forest service-check-icon';
+
+            appState.selectedService = servicesData.find(x => x.id === id);
+
+            const btnNext = document.getElementById('btnStep2Next');
+            btnNext.disabled = false;
+            btnNext.className = 'bg-forest hover:bg-forest/90 text-white font-semibold text-xs px-6 py-3 rounded-xl transition-all flex items-center gap-2 cursor-pointer';
+        }
+
+        // --- STEP 3 RENDER WITH UNSPLASH AVATARS ---
+        function renderStaff() {
+            const container = document.getElementById('staffListContainer');
+            container.innerHTML = staffData.map(st => `
+                <div onclick="selectStaff('${st.id}')" id="staff-card-${st.id}" class="staff-card p-5 rounded-xl border-2 border-stoneborder bg-surface cursor-pointer hover:border-forest transition-all text-center space-y-3">
+                    <div class="w-16 h-16 rounded-full overflow-hidden mx-auto border-2 border-stoneborder shadow-sm">
+                        <img src="${st.image}" alt="${st.name}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/200x200/365B49/FFFFFF?text=Staff'">
+                    </div>
+                    <div>
+                        <span class="font-bold text-sm text-charcoal block">${st.name}</span>
+                        <span class="text-xs text-forest font-semibold">${st.role}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function selectStaff(id) {
+            document.querySelectorAll('.staff-card').forEach(c => {
+                c.className = 'staff-card p-5 rounded-xl border-2 border-stoneborder bg-surface cursor-pointer hover:border-forest transition-all text-center space-y-3';
+            });
+            const sel = document.getElementById(`staff-card-${id}`);
+            sel.className = 'staff-card p-5 rounded-xl border-2 border-forest bg-forest/5 cursor-pointer transition-all text-center space-y-3 shadow-sm';
+            appState.selectedStaff = staffData.find(x => x.id === id);
+
+            const btnNext = document.getElementById('btnStep3Next');
+            btnNext.disabled = false;
+            btnNext.className = 'bg-forest hover:bg-forest/90 text-white font-semibold text-xs px-6 py-3 rounded-xl transition-all flex items-center gap-2 cursor-pointer';
+        }
+
+        // --- STEP 4 RENDER: CALENDAR & AVAILABILITY ENGINE ---
+        function renderCalendarDays() {
+            const grid = document.getElementById('calendarDaysGrid');
+            const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+            document.getElementById('currentMonthYearLabel').innerText = `${monthNames[appState.calendarMonth]} ${appState.calendarYear}`;
+
+            let html = '';
+            // Sample days for Oct 2026 (starting Thu = index 4)
+            for (let i = 0; i < 3; i++) {
+                html += `<div class="p-2 text-center text-gray-300 text-xs">-</div>`;
+            }
+            for (let d = 1; d <= 31; d++) {
+                const dateStr = `2026-10-${d < 10 ? '0'+d : d}`;
+                const isSelected = appState.selectedDate === dateStr;
+                html += `<div onclick="selectDate('${dateStr}')" class="p-2 text-center text-xs font-semibold rounded-lg cursor-pointer transition-all ${isSelected ? 'bg-forest text-white shadow-sm' : 'hover:bg-stoneborder text-charcoal'}">${d}</div>`;
+            }
+            grid.innerHTML = html;
+            renderTimeSlots();
+        }
+
+        function adjustCalendarMonth(dir) {
+            appState.calendarMonth += dir;
+            if (appState.calendarMonth > 11) appState.calendarMonth = 0;
+            renderCalendarDays();
+        }
+
+        function selectDate(dateStr) {
+            appState.selectedDate = dateStr;
+            renderCalendarDays();
+            renderTimeSlots();
+        }
+
+        function renderTimeSlots() {
+            document.getElementById('selectedDateDisplay').innerText = `Slot Tersedia Tanggal ${appState.selectedDate}`;
+            const container = document.getElementById('timeSlotsContainer');
+            
+            // Availability Engine Simulation based on business rules
+            const slots = [
+                { time: '10:00', status: 'available' },
+                { time: '11:15', status: 'available' },
+                { time: '12:00', status: 'break', note: 'Jam Istirahat Staf' },
+                { time: '13:30', status: 'booked', note: 'Terisi Booking' },
+                { time: '15:00', status: 'available' },
+                { time: '16:30', status: 'available' },
+                { time: '18:00', status: 'available' }
+            ];
+
+            document.getElementById('slotCountIndicator').innerText = `${slots.filter(s => s.status === 'available').length} slot tersedia`;
+
+            container.innerHTML = slots.map(s => {
+                if (s.status === 'break') {
+                    return `<div class="p-3 bg-ivory border border-stoneborder rounded-xl text-center text-gray-400 text-xs col-span-3 flex justify-between items-center"><span class="font-bold">${s.time} WIB</span><span class="text-[10px] text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">${s.note}</span></div>`;
+                }
+                if (s.status === 'booked') {
+                    return `<div class="p-3 bg-gray-100 border border-stoneborder rounded-xl text-center text-gray-400 text-xs col-span-3 flex justify-between items-center line-through"><span class="font-bold">${s.time} WIB</span><span class="text-[10px] text-gray-500 bg-gray-200 px-2 py-0.5 rounded">${s.note}</span></div>`;
+                }
+                const isSelected = appState.selectedTime === s.time;
+                return `<button onclick="selectTimeSlot('${s.time}')" id="slot-btn-${s.time}" class="p-3 rounded-xl border text-xs font-semibold transition-all ${isSelected ? 'bg-forest text-white border-forest shadow-sm' : 'bg-surface border-stoneborder text-charcoal hover:border-forest'}">${s.time} WIB</button>`;
+            }).join('');
+        }
+
+        function selectTimeSlot(time) {
+            appState.selectedTime = time;
+            renderTimeSlots();
+            const btnNext = document.getElementById('btnStep4Next');
+            btnNext.disabled = false;
+            btnNext.className = 'bg-forest hover:bg-forest/90 text-white font-semibold text-xs px-6 py-3 rounded-xl transition-all flex items-center gap-2 cursor-pointer';
+        }
+
+        // --- TEMPORARY HOLD TIMER ---
+        function startTemporaryHoldTimer() {
+            appState.holdSecondsLeft = 600; // 10 minutes
+            if (appState.holdTimerInterval) clearInterval(appState.holdTimerInterval);
+
+            appState.holdTimerInterval = setInterval(() => {
+                appState.holdSecondsLeft--;
+                const m = Math.floor(appState.holdSecondsLeft / 60);
+                const s = appState.holdSecondsLeft % 60;
+                const display = `${m < 10 ? '0'+m : m}:${s < 10 ? '0'+s : s}`;
+                const timerEl = document.getElementById('holdTimerDisplay');
+                if (timerEl) timerEl.innerText = display;
+
+                if (appState.holdSecondsLeft <= 0) {
+                    clearInterval(appState.holdTimerInterval);
+                    alert('Waktu temporary hold 10 menit telah habis. Slot dikembalikan ke sistem.');
+                    prevStep(4);
+                }
+            }, 1000);
+        }
+
+        // --- SUMMARY & PAYMENT ---
+        function populateSummary() {
+            document.getElementById('sumBranch').innerText = appState.selectedBranch ? appState.selectedBranch.name : '-';
+            document.getElementById('sumService').innerText = appState.selectedService ? appState.selectedService.name : '-';
+            document.getElementById('sumDuration').innerText = appState.selectedService ? appState.selectedService.duration : '-';
+            document.getElementById('sumStaff').innerText = appState.selectedStaff ? appState.selectedStaff.name : '-';
+            document.getElementById('sumDateTime').innerText = `${appState.selectedDate}, ${appState.selectedTime} WIB`;
+            document.getElementById('sumPrice').innerText = appState.selectedService ? `Rp ${appState.selectedService.price.toLocaleString('id-ID')}` : '-';
+        }
+
+        function populatePaymentAmounts() {
+            if (!appState.selectedService) return;
+            const price = appState.selectedService.price;
+            const dp = Math.round(price * 0.3);
+            document.getElementById('payAmountDP').innerText = `Rp ${dp.toLocaleString('id-ID')}`;
+            document.getElementById('payAmountFull').innerText = `Rp ${price.toLocaleString('id-ID')}`;
+        }
+
+        function selectPayMethod(method) {
+            appState.selectedPayMethod = method;
+            document.querySelectorAll('.pay-method-btn').forEach(btn => {
+                btn.className = 'pay-method-btn border border-stoneborder bg-surface p-3 rounded-xl text-center text-xs font-semibold text-charcoal flex flex-col items-center gap-1';
+            });
+            event.currentTarget.className = 'pay-method-btn border-2 border-forest bg-forest/5 p-3 rounded-xl text-center text-xs font-semibold text-charcoal flex flex-col items-center gap-1';
+        }
+
+        function finalizeBooking() {
+            if (appState.holdTimerInterval) clearInterval(appState.holdTimerInterval);
+
+            const custName = document.getElementById('custName').value.trim();
+            const custPhone = document.getElementById('custPhone').value.trim();
+            const bookingCode = 'AC-' + Math.floor(1000 + Math.random() * 9000);
+
+            const newBooking = {
+                id: bookingCode,
+                name: custName,
+                phone: custPhone,
+                service: appState.selectedService.name,
+                staff: appState.selectedStaff.name,
+                date: appState.selectedDate,
+                time: appState.selectedTime,
+                price: appState.selectedService.price,
+                payStatus: 'Confirmed & DP Paid',
+                bookingStatus: 'Confirmed',
+                branch: appState.selectedBranch.name
+            };
+
+            bookingsDatabase.unshift(newBooking);
+
+            // Populate Success Ticket
+            document.getElementById('successCustName').innerText = custName;
+            document.getElementById('successBookingCode').innerText = bookingCode;
+            document.getElementById('succBranch').innerText = appState.selectedBranch.name;
+            document.getElementById('succService').innerText = appState.selectedService.name;
+            document.getElementById('succStaff').innerText = appState.selectedStaff.name;
+            document.getElementById('succDateTime').innerText = `${appState.selectedDate}, ${appState.selectedTime} WIB`;
+
+            appState.currentStep = 7;
+            updateWizardUI();
+            renderAdminTable();
+        }
+
+        function resetWizard() {
+            appState.currentStep = 1;
+            appState.selectedService = null;
+            appState.selectedStaff = null;
+            appState.selectedTime = null;
+            updateWizardUI();
+            renderServices();
+            renderStaff();
+        }
+
+        // --- ADMIN DASHBOARD FUNCTIONS ---
+        function renderAdminTable() {
+            const tbody = document.getElementById('adminBookingsTableBody');
+            const search = document.getElementById('adminSearchInput').value.toLowerCase();
+            const statusFilter = document.getElementById('adminStatusFilter').value;
+
+            const filtered = bookingsDatabase.filter(b => {
+                const matchSearch = b.name.toLowerCase().includes(search) || b.id.toLowerCase().includes(search) || b.phone.includes(search);
+                const matchStatus = statusFilter === 'all' || b.bookingStatus === statusFilter;
+                return matchSearch && matchStatus;
+            });
+
+            document.getElementById('adminBookingCountBadge').innerText = `${filtered.length} Total`;
+            document.getElementById('kpiTodayBookings').innerText = bookingsDatabase.length;
+
+            tbody.innerHTML = filtered.map(b => `
+                <tr class="hover:bg-ivory/50 transition-colors">
+                    <td class="py-3 px-4">
+                        <span class="font-mono font-bold text-forest block">${b.id}</span>
+                        <span class="text-[10px] text-gray-500">${b.date} • ${b.time}</span>
+                    </td>
+                    <td class="py-3 px-4">
+                        <span class="font-semibold text-charcoal block">${b.name}</span>
+                        <span class="text-[10px] text-gray-500"><i class="fa-brands fa-whatsapp text-emerald-600"></i> ${b.phone}</span>
+                    </td>
+                    <td class="py-3 px-4">
+                        <span class="font-semibold text-charcoal block">${b.service}</span>
+                        <span class="text-[10px] text-gray-500">${b.branch}</span>
+                    </td>
+                    <td class="py-3 px-4 font-medium">${b.staff}</td>
+                    <td class="py-3 px-4">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold ${b.payStatus.includes('Confirmed') ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${b.payStatus}</span>
+                    </td>
+                    <td class="py-3 px-4">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold ${b.bookingStatus === 'Confirmed' ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'}">${b.bookingStatus}</span>
+                    </td>
+                    <td class="py-3 px-4 text-right space-x-2">
+                        <button onclick="adminCheckIn('${b.id}')" title="Check-in" class="p-1.5 bg-surface border border-stoneborder rounded-lg hover:bg-forest hover:text-white transition-colors"><i class="fa-solid fa-user-check"></i></button>
+                        <button onclick="adminCancelBooking('${b.id}')" title="Batalkan" class="p-1.5 bg-surface border border-stoneborder rounded-lg hover:bg-red-600 hover:text-white transition-colors"><i class="fa-solid fa-ban"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function filterAdminTable() {
+            renderAdminTable();
+        }
+
+        function adminCheckIn(id) {
+            const b = bookingsDatabase.find(x => x.id === id);
+            if (b) {
+                b.bookingStatus = 'Completed';
+                b.payStatus = 'Paid in Full';
+                renderAdminTable();
+                alert(`Booking ${id} berhasil di-check-in dan diselesaikan.`);
+            }
+        }
+
+        function adminCancelBooking(id) {
+            const b = bookingsDatabase.find(x => x.id === id);
+            if (b && confirm(`Batalkan booking ${id} atas nama ${b.name}? Slot waktu akan dilepaskan kembali ke sistem.`)) {
+                b.bookingStatus = 'Cancelled';
+                b.payStatus = 'Refund Processed';
+                renderAdminTable();
+            }
+        }
+
+        function renderAdminLists() {
+            // Staff List with Unsplash Avatars
+            document.getElementById('adminStaffList').innerHTML = staffData.filter(s => s.id !== 'stf-0').map(s => `
+                <div class="flex items-center justify-between p-3 bg-ivory rounded-xl border border-stoneborder">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-full overflow-hidden border border-stoneborder">
+                            <img src="${s.image}" alt="${s.name}" class="w-full h-full object-cover">
+                        </div>
+                        <div>
+                            <span class="font-bold text-xs text-charcoal block">${s.name}</span>
+                            <span class="text-[10px] text-gray-500">${s.role}</span>
+                        </div>
+                    </div>
+                    <span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 text-[10px] font-bold rounded">Aktif</span>
+                </div>
+            `).join('');
+
+            // Services List
+            document.getElementById('adminServicesList').innerHTML = servicesData.map(s => `
+                <div class="flex items-center justify-between p-3 bg-ivory rounded-xl border border-stoneborder">
+                    <div>
+                        <span class="font-bold text-xs text-charcoal block">${s.name}</span>
+                        <span class="text-[10px] text-gray-500">${s.duration} • Rp ${s.price.toLocaleString('id-ID')}</span>
+                    </div>
+                    <span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 text-[10px] font-bold rounded">Tersedia</span>
+                </div>
+            `).join('');
+
+            // Populate manual service/staff dropdowns
+            document.getElementById('manualServiceSelect').innerHTML = servicesData.map(s => `<option value="${s.name}">${s.name} (Rp ${s.price.toLocaleString('id-ID')})</option>`).join('');
+            document.getElementById('manualStaffSelect').innerHTML = staffData.filter(s => s.id !== 'stf-0').map(st => `<option value="${st.name}">${st.name} (${st.role})</option>`).join('');
+        }
+
+        // --- MODAL CONTROLS ---
+        function openManageModal() {
+            document.getElementById('manageBookingModal').classList.remove('hidden');
+        }
+        function closeManageModal() {
+            document.getElementById('manageBookingModal').classList.add('hidden');
+        }
+        function openManualBookingModal() {
+            document.getElementById('manualBookingModal').classList.remove('hidden');
+        }
+        function closeManualBookingModal() {
+            document.getElementById('manualBookingModal').classList.add('hidden');
+        }
+
+        function executeSearchBooking() {
+            const query = document.getElementById('searchBookingInput').value.trim().toLowerCase();
+            const container = document.getElementById('searchBookingResultContainer');
+            const found = bookingsDatabase.filter(b => b.id.toLowerCase().includes(query) || b.phone.includes(query));
+
+            if (found.length === 0) {
+                container.innerHTML = `<div class="p-4 bg-ivory rounded-xl text-center text-xs text-gray-500">Booking tidak ditemukan dengan kata kunci tersebut.</div>`;
+                return;
+            }
+
+            container.innerHTML = found.map(b => `
+                <div class="p-4 bg-ivory rounded-xl border border-stoneborder space-y-2">
+                    <div class="flex justify-between items-center">
+                        <span class="font-mono font-bold text-forest">${b.id}</span>
+                        <span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 text-[10px] font-bold rounded">${b.bookingStatus}</span>
+                    </div>
+                    <div class="text-xs text-charcoal/80 space-y-1">
+                        <div><b>Pelanggan:</b> ${b.name} (${b.phone})</div>
+                        <div><b>Layanan:</b> ${b.service} dengan ${b.staff}</div>
+                        <div><b>Jadwal:</b> ${b.date}, ${b.time} WIB</div>
+                    </div>
+                    <div class="pt-2 flex justify-end gap-2">
+                        <button onclick="alert('Link reschedule dikirim via WhatsApp.')" class="px-3 py-1.5 bg-surface border border-stoneborder rounded-lg text-xs font-semibold hover:bg-forest hover:text-white transition-colors">Reschedule</button>
+                        <button onclick="adminCancelBooking('${b.id}'); closeManageModal();" class="px-3.5 py-1.5 bg-red-50 text-red-700 border border-red-200 rounded-lg text-xs font-semibold hover:bg-red-600 hover:text-white transition-colors">Batalkan</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function saveManualBooking() {
+            const name = document.getElementById('manualName').value.trim();
+            const phone = document.getElementById('manualPhone').value.trim();
+            const service = document.getElementById('manualServiceSelect').value;
+            const staff = document.getElementById('manualStaffSelect').value;
+            const date = document.getElementById('manualDate').value;
+            const time = document.getElementById('manualTime').value;
+            const payStatus = document.getElementById('manualPayStatus').value;
+
+            if (!name || !phone) {
+                alert('Nama dan nomor telepon wajib diisi untuk booking manual.');
+                return;
+            }
+
+            const code = 'AC-' + Math.floor(1000 + Math.random() * 9000);
+            const newB = {
+                id: code,
+                name: name,
+                phone: phone,
+                service: service,
+                staff: staff,
+                date: date,
+                time: time,
+                price: 350000,
+                payStatus: payStatus,
+                bookingStatus: 'Confirmed',
+                branch: 'Senopati Flagship Studio'
+            };
+
+            bookingsDatabase.unshift(newB);
+            renderAdminTable();
+            closeManualBookingModal();
+            alert(`Booking manual ${code} berhasil dibuat dan dikunci di kalender operasional.`);
+        }
+
+        function addToGoogleCalendar() {
+            alert('Membuka tautan Google Calendar dengan detail waktu dan durasi yang akurat...');
+        }
+    </script>
+</body>
+</html>

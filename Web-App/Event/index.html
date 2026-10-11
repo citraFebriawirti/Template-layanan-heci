@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sakinah Academy | Platform Edukasi & Registrasi Pranikah Islami</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: DM Serif Display & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        terracotta: {
+                            DEFAULT: '#9B4D31',
+                            hover: '#823D24',
+                            light: '#F4EBE6',
+                            dark: '#6D281A',
+                        },
+                        burgundy: {
+                            DEFAULT: '#6D281A',
+                            dark: '#48180E'
+                        },
+                        sand: {
+                            DEFAULT: '#FAF7F2',
+                            dark: '#E8E2D5',
+                            muted: '#F2ECE1'
+                        },
+                        charcoal: {
+                            DEFAULT: '#2C221E',
+                            muted: '#7A6B63'
+                        },
+                        gold: '#C59B27'
+                    },
+                    fontFamily: {
+                        serif: ['"DM Serif Display"', 'serif'],
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FAF7F2;
+            color: #2C221E;
+        }
+        .font-serif {
+            font-family: 'DM Serif Display', serif;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-[#F4EBE6] selection:text-[#6D281A]" x-data="appState()">
+
+    <div x-show="toastMessage" 
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0 translate-y-2"
+         x-transition:enter-end="opacity-100 translate-y-0"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100 translate-y-0"
+         x-transition:leave-end="opacity-0 translate-y-2"
+         class="fixed top-5 right-5 z-50 bg-[#6D281A] text-white px-5 py-3 rounded-lg shadow-xl flex items-center gap-3 border border-[#C59B27]/40"
+         style="display: none;">
+        <i data-lucide="check-circle-2" class="w-5 h-5 text-[#C59B27]"></i>
+        <span class="text-sm font-medium" x-text="toastMessage"></span>
+    </div>
+
+    <header class="sticky top-0 z-40 bg-[#FAF7F2]/90 backdrop-blur-md border-b border-[#E8E2D5]">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-3 cursor-pointer" @click="currentTab = 'public'">
+                <div class="w-10 h-10 rounded-lg bg-[#6D281A] flex items-center justify-center text-white shadow-sm">
+                    <i data-lucide="book-open" class="w-5 h-5 text-[#C59B27]"></i>
+                </div>
+                <div>
+                    <h1 class="font-serif text-lg font-bold tracking-tight text-[#6D281A]">Sakinah Academy</h1>
+                    <p class="text-xs text-[#7A6B63] tracking-wide">Pusat Edukasi Pranikah & Keluarga Islami</p>
+                </div>
+            </div>
+
+            <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-[#2C221E]">
+                <button @click="currentTab = 'public'" :class="currentTab === 'public' ? 'text-[#6D281A] font-semibold border-b-2 border-[#6D281A] pb-1' : 'hover:text-[#6D281A]'">Beranda</button>
+                <a href="#events-catalog" @click="currentTab = 'public'" class="hover:text-[#6D281A] transition-colors">Daftar Acara</a>
+                <a href="#about" class="hover:text-[#6D281A] transition-colors">Tentang Kami</a>
+                <a href="#faq" class="hover:text-[#6D281A] transition-colors">FAQ</a>
+            </nav>
+
+            <div class="flex items-center gap-3">
+                <button @click="currentTab = 'scanner'" class="hidden sm:flex items-center gap-2 text-xs font-medium px-3 py-2 rounded-md bg-[#F4EBE6] text-[#6D281A] hover:bg-[#EEDFD7] transition-colors border border-[#E8E2D5]">
+                    <i data-lucide="qr-code" class="w-4 h-4"></i>
+                    <span>Check-in Panitia</span>
+                </button>
+                <button @click="currentTab = currentTab === 'admin' ? 'public' : 'admin'" 
+                        :class="currentTab === 'admin' ? 'bg-[#6D281A] text-white shadow-md' : 'bg-[#2C221E] text-white hover:bg-[#40332D]'"
+                        class="flex items-center gap-2 text-xs font-semibold px-4 py-2.5 rounded-md transition-all shadow-sm">
+                    <i data-lucide="settings" class="w-4 h-4 text-[#C59B27]"></i>
+                    <span x-text="currentTab === 'admin' ? 'Keluar Admin' : 'Admin Dashboard'"></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow">
+        
+        <!-- ==================== PUBLIC EVENT DISCOVERY / LANDING PAGE ==================== -->
+        <div x-show="currentTab === 'public'" class="space-y-20 pb-20">
+            
+            <!-- Hero Section -->
+            <section class="relative overflow-hidden pt-12 pb-16 lg:pt-20 lg:pb-24 border-b border-[#E8E2D5] bg-gradient-to-b from-[#F2ECE1] to-[#FAF7F2]">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                        <div class="lg:col-span-7 space-y-6">
+                            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#F4EBE6] text-[#6D281A] text-xs font-semibold tracking-wider uppercase border border-[#E8E2D5]">
+                                <i data-lucide="shield" class="w-3.5 h-3.5 text-[#C59B27]"></i>
+                                <span>PROGRAM EDUKASI KELUARGA ISLAMI BERSTANDAR</span>
+                            </div>
+                            <h1 class="font-serif text-4xl sm:text-5xl lg:text-6xl text-[#6D281A] leading-tight font-normal">
+                                “Menyiapkan Pernikahan, Membangun Keluarga dengan Ilmu.”
+                            </h1>
+                            <p class="text-lg text-[#7A6B63] font-normal leading-relaxed max-w-2xl">
+                                Temukan kelas, seminar, dan kegiatan edukatif terpilih untuk mempersiapkan kehidupan pernikahan dengan pemahaman, komunikasi yang matang, dan nilai-nilai Islam yang luhur.
+                            </p>
+                            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-2">
+                                <a href="#events-catalog" class="inline-flex items-center justify-center gap-3 px-6 py-3.5 rounded-lg bg-[#6D281A] text-white font-medium hover:bg-[#521E13] transition-all shadow-md group">
+                                    <span>Jelajahi Jadwal Acara</span>
+                                    <i data-lucide="arrow-right" class="w-4 h-4 transition-transform group-hover:translate-x-1 text-[#C59B27]"></i>
+                                </a>
+                                <a href="#about" class="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-lg bg-white border border-[#E8E2D5] text-[#2C221E] font-medium hover:bg-[#F4EBE6] transition-all">
+                                    <span>Pelajari Metode Kami</span>
+                                </a>
+                            </div>
+                            <div class="grid grid-cols-3 gap-6 pt-8 border-t border-[#E8E2D5]">
+                                <div>
+                                    <div class="font-serif text-2xl font-bold text-[#6D281A]">1,200+</div>
+                                    <div class="text-xs text-[#7A6B63]">Alumni Pranikah</div>
+                                </div>
+                                <div>
+                                    <div class="font-serif text-2xl font-bold text-[#6D281A]">100%</div>
+                                    <div class="text-xs text-[#7A6B63]">Bersanad & Kredibel</div>
+                                </div>
+                                <div>
+                                    <div class="font-serif text-2xl font-bold text-[#6D281A]">15+</div>
+                                    <div class="text-xs text-[#7A6B63]">Ahli Konseling</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="lg:col-span-5">
+                            <div class="relative">
+                                <div class="absolute -inset-1 rounded-2xl bg-gradient-to-r from-[#C59B27]/30 to-[#6D281A]/20 blur-lg opacity-70"></div>
+                                <div class="relative rounded-2xl overflow-hidden border border-[#E8E2D5] shadow-xl bg-white">
+                                    <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&q=80&w=800" alt="Suasana Kajian" class="w-full h-80 object-cover">
+                                    <div class="p-6 space-y-3 bg-white">
+                                        <div class="flex items-center justify-between text-xs font-semibold text-[#6D281A]">
+                                            <span class="px-2.5 py-1 rounded bg-[#F4EBE6]">Unggulan Pekan Ini</span>
+                                            <span class="flex items-center gap-1 text-[#7A6B63]"><i data-lucide="clock" class="w-3.5 h-3.5"></i> 28 Okt 2026</span>
+                                        </div>
+                                        <h3 class="font-serif text-xl font-bold text-[#6D281A] leading-snug">
+                                            Bekal Menuju Pernikahan: Komunikasi, Komitmen, & Kesiapan Diri
+                                        </h3>
+                                        <p class="text-sm text-[#7A6B63] line-clamp-2">
+                                            Seminar komprehensif bagi calon pengantin bersama psikolog keluarga dan pakar fiqh muamalah.
+                                        </p>
+                                        <button @click="openEventDetail(events[0])" class="w-full mt-2 py-2.5 px-4 rounded-lg bg-[#6D281A] text-white text-sm font-medium hover:bg-[#521E13] transition-colors flex items-center justify-center gap-2">
+                                            <span>Lihat Detail & Daftar</span>
+                                            <i data-lucide="chevron-right" class="w-4 h-4 text-[#C59B27]"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Event Catalog & Filters -->
+            <section id="events-catalog" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 pt-6">
+                <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-4 border-b border-[#E8E2D5]">
+                    <div>
+                        <div class="text-xs font-semibold uppercase tracking-wider text-[#C59B27]">JADWAL PROGRAM</div>
+                        <h2 class="font-serif text-3xl font-bold text-[#6D281A] mt-1">Pilihan Kelas & Seminar</h2>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="relative">
+                            <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#7A6B63]"></i>
+                            <input type="text" x-model="searchQuery" placeholder="Cari judul acara..." class="pl-9 pr-4 py-2 text-sm rounded-lg bg-white border border-[#E8E2D5] focus:outline-none focus:border-[#6D281A] w-full sm:w-64">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Category Filters -->
+                <div class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+                    <template x-for="cat in ['Semua', 'Pranikah', 'Keluarga Sakinah', 'Parenting', 'Offline', 'Online']">
+                        <button @click="activeCategoryFilter = cat" 
+                                :class="activeCategoryFilter === cat ? 'bg-[#6D281A] text-white shadow-sm' : 'bg-white border border-[#E8E2D5] text-[#2C221E] hover:bg-[#F4EBE6]'"
+                                class="px-4 py-2 rounded-lg text-xs font-medium whitespace-nowrap transition-all"
+                                x-text="cat"></button>
+                    </template>
+                </div>
+
+                <!-- Event Cards Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <template x-for="evt in filteredEvents" :key="evt.id">
+                        <div @click="openEventDetail(evt)" class="bg-white rounded-xl overflow-hidden border border-[#E8E2D5] shadow-sm hover:shadow-md transition-all flex flex-col group cursor-pointer">
+                            <div class="relative h-48 overflow-hidden bg-[#F4EBE6]">
+                                <img :src="evt.image" :alt="evt.title" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                <div class="absolute top-3 left-3 bg-[#6D281A] text-white text-xs font-semibold px-2.5 py-1 rounded shadow-sm" x-text="evt.format"></div>
+                                <div class="absolute top-3 right-3 bg-white/95 backdrop-blur-sm text-[#6D281A] text-xs font-bold px-2.5 py-1 rounded shadow-sm" x-text="'Rp ' + Number(evt.priceStarting).toLocaleString('id-ID')"></div>
+                            </div>
+                            <div class="p-6 flex-grow flex flex-col justify-between space-y-4">
+                                <div class="space-y-2">
+                                    <div class="text-xs font-semibold text-[#C59B27] uppercase tracking-wide" x-text="evt.eyebrow"></div>
+                                    <h3 class="font-serif text-lg font-bold text-[#6D281A] group-hover:text-[#521E13] leading-snug" x-text="evt.title"></h3>
+                                    <p class="text-xs text-[#7A6B63] line-clamp-2 leading-relaxed" x-text="evt.description"></p>
+                                </div>
+                                <div class="space-y-3 pt-4 border-t border-[#E8E2D5]">
+                                    <div class="flex items-center gap-2 text-xs text-[#7A6B63]">
+                                        <i data-lucide="calendar" class="w-4 h-4 text-[#6D281A]"></i>
+                                        <span x-text="evt.date + ' • ' + evt.time"></span>
+                                    </div>
+                                    <div class="flex items-center gap-2 text-xs text-[#7A6B63]">
+                                        <i data-lucide="map-pin" class="w-4 h-4 text-[#6D281A] flex-shrink-0"></i>
+                                        <span class="truncate" x-text="evt.location"></span>
+                                    </div>
+                                    <div class="flex items-center justify-between pt-2">
+                                        <div class="text-xs text-[#7A6B63]">
+                                            Sisa kuota: <strong class="text-[#6D281A]" x-text="(evt.quota - evt.registeredCount) + ' kursi'"></strong>
+                                        </div>
+                                        <span class="text-xs font-semibold text-[#6D281A] group-hover:translate-x-1 transition-transform flex items-center gap-1">
+                                            Detail <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </section>
+
+            <!-- Trust & About Section -->
+            <section id="about" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 border-t border-[#E8E2D5]">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                    <div class="space-y-6">
+                        <div class="text-xs font-semibold uppercase tracking-wider text-[#C59B27]">KREDIBILITAS & KOMITMEN</div>
+                        <h2 class="font-serif text-3xl font-bold text-[#6D281A]">
+                            Membangun Fondasi Keluarga Berdasarkan Al-Quran & As-Sunnah
+                        </h2>
+                        <p class="text-[#7A6B63] leading-relaxed">
+                            Sakinah Academy dikelola oleh lembaga konseling dan pendidikan keluarga muslim independen. Kami menghadirkan para pemateri yang kompeten di bidang psikologi keluarga, bimbingan syar'i, dan hukum perkawinan Islam untuk membekali calon pengantin secara holistik.
+                        </p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                            <div class="p-4 rounded-xl bg-white border border-[#E8E2D5] space-y-2">
+                                <div class="w-8 h-8 rounded-lg bg-[#F4EBE6] flex items-center justify-center text-[#6D281A]">
+                                    <i data-lucide="shield" class="w-4 h-4"></i>
+                                </div>
+                                <h4 class="font-semibold text-sm text-[#6D281A]">Kurikulum Terstandar</h4>
+                                <p class="text-xs text-[#7A6B63]">Materi disusun berdasarkan fiqh muamalah kontemporer dan ilmu psikologi keluarga modern.</p>
+                            </div>
+                            <div class="p-4 rounded-xl bg-white border border-[#E8E2D5] space-y-2">
+                                <div class="w-8 h-8 rounded-lg bg-[#F4EBE6] flex items-center justify-center text-[#6D281A]">
+                                    <i data-lucide="user-check" class="w-4 h-4"></i>
+                                </div>
+                                <h4 class="font-semibold text-sm text-[#6D281A]">Pemateri Berpengalaman</h4>
+                                <p class="text-xs text-[#7A6B63]">Praktisi, psikolog klinis, dan ustaz/ustazah yang aktif mendampingi problem rumah tangga.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="rounded-2xl overflow-hidden border border-[#E8E2D5] shadow-lg bg-white p-2">
+                        <img src="https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?auto=format&fit=crop&q=80&w=800" alt="Kelas Diskusi" class="w-full h-80 object-cover rounded-xl">
+                    </div>
+                </div>
+            </section>
+
+            <!-- FAQ Section -->
+            <section id="faq" class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+                <div class="text-center space-y-2">
+                    <div class="text-xs font-semibold uppercase tracking-wider text-[#C59B27]">PERTANYAAN UMUM</div>
+                    <h2 class="font-serif text-3xl font-bold text-[#6D281A]">Informasi Pendaftaran & Acara</h2>
+                </div>
+                <div class="space-y-4">
+                    <div class="p-6 rounded-xl bg-white border border-[#E8E2D5] space-y-2 shadow-sm">
+                        <h3 class="font-semibold text-[#6D281A] text-base flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-full bg-[#F4EBE6] text-[#6D281A] text-xs flex items-center justify-center font-bold">?</span>
+                            Bagaimana cara mendaftar kelas pranikah di Sakinah Academy?
+                        </h3>
+                        <p class="text-sm text-[#7A6B63] pl-8 leading-relaxed">
+                            Pilih acara yang diinginkan pada katalog, klik "Lihat Detail & Daftar", pilih jenis tiket, isi formulir data diri peserta, lalu selesaikan pembayaran atau konfirmasi untuk tiket gratis.
+                        </p>
+                    </div>
+                    <div class="p-6 rounded-xl bg-white border border-[#E8E2D5] space-y-2 shadow-sm">
+                        <h3 class="font-semibold text-[#6D281A] text-base flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-full bg-[#F4EBE6] text-[#6D281A] text-xs flex items-center justify-center font-bold">?</span>
+                            Metode pembayaran apa saja yang didukung?
+                        </h3>
+                        <p class="text-sm text-[#7A6B63] pl-8 leading-relaxed">
+                            Kami mendukung pembayaran instan via QRIS (GoPay, OVO, DANA, BCA Mobile, dll), Virtual Account (BCA, Mandiri, BNI, BRI), serta e-wallet utama.
+                        </p>
+                    </div>
+                    <div class="p-6 rounded-xl bg-white border border-[#E8E2D5] space-y-2 shadow-sm">
+                        <h3 class="font-semibold text-[#6D281A] text-base flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-full bg-[#F4EBE6] text-[#6D281A] text-xs flex items-center justify-center font-bold">?</span>
+                            Kapan e-ticket dan tautan akses dikirimkan?
+                        </h3>
+                        <p class="text-sm text-[#7A6B63] pl-8 leading-relaxed">
+                            E-ticket dengan QR code unik akan dikirimkan seketika setelah pembayaran terverifikasi di sistem, dan dapat diakses kapan saja melalui menu verifikasi tiket.
+                        </p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- ==================== EVENT DETAIL PAGE ==================== -->
+        <div x-show="currentTab === 'detail'" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10" style="display: none;">
+            <button @click="currentTab = 'public'" class="inline-flex items-center gap-2 text-xs font-semibold text-[#7A6B63] hover:text-[#6D281A] transition-colors">
+                <i data-lucide="arrow-right" class="w-4 h-4 rotate-180"></i>
+                <span>Kembali ke Daftar Acara</span>
+            </button>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+                <div class="lg:col-span-8 space-y-8" x-show="selectedEvent">
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-3">
+                            <span class="px-3 py-1 rounded bg-[#F4EBE6] text-[#6D281A] text-xs font-semibold" x-text="selectedEvent?.format"></span>
+                            <span class="text-xs font-medium text-[#7A6B63] uppercase tracking-wide" x-text="selectedEvent?.category"></span>
+                        </div>
+                        <h1 class="font-serif text-3xl sm:text-4xl font-bold text-[#6D281A] leading-tight" x-text="selectedEvent?.title"></h1>
+                        <p class="text-[#7A6B63] text-base leading-relaxed" x-text="selectedEvent?.description"></p>
+                    </div>
+
+                    <div class="rounded-2xl overflow-hidden border border-[#E8E2D5] shadow-sm bg-white">
+                        <img :src="selectedEvent?.image" :alt="selectedEvent?.title" class="w-full h-96 object-cover">
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="p-4 rounded-xl bg-white border border-[#E8E2D5] flex items-start gap-3">
+                            <i data-lucide="calendar" class="w-5 h-5 text-[#6D281A] mt-0.5"></i>
+                            <div>
+                                <div class="text-xs text-[#7A6B63] font-medium">Tanggal & Waktu</div>
+                                <div class="text-sm font-semibold text-[#2C221E] mt-0.5" x-text="selectedEvent?.date"></div>
+                                <div class="text-xs text-[#6D281A] mt-0.5" x-text="selectedEvent?.time"></div>
+                            </div>
+                        </div>
+                        <div class="p-4 rounded-xl bg-white border border-[#E8E2D5] flex items-start gap-3">
+                            <i data-lucide="map-pin" class="w-5 h-5 text-[#6D281A] mt-0.5 flex-shrink-0"></i>
+                            <div>
+                                <div class="text-xs text-[#7A6B63] font-medium">Lokasi / Akses</div>
+                                <div class="text-sm font-semibold text-[#2C221E] mt-0.5" x-text="selectedEvent?.location"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Speakers -->
+                    <div class="space-y-4">
+                        <h3 class="font-serif text-2xl font-bold text-[#6D281A]">Pembicara & Narasumber</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <template x-for="spk in selectedEvent?.speakers">
+                                <div class="p-5 rounded-xl bg-white border border-[#E8E2D5] space-y-2 shadow-sm">
+                                    <div class="font-serif font-bold text-[#6D281A] text-lg" x-text="spk.name"></div>
+                                    <div class="text-xs font-semibold text-[#C59B27]" x-text="spk.role"></div>
+                                    <p class="text-xs text-[#7A6B63] leading-relaxed" x-text="spk.bio"></p>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+
+                    <!-- Agenda -->
+                    <div class="space-y-4">
+                        <h3 class="font-serif text-2xl font-bold text-[#6D281A]">Susunan Acara (Agenda)</h3>
+                        <div class="bg-white rounded-xl border border-[#E8E2D5] divide-y divide-[#E8E2D5]">
+                            <template x-for="ag in selectedEvent?.agenda">
+                                <div class="p-4 flex items-start gap-4">
+                                    <div class="text-xs font-mono font-semibold text-[#6D281A] bg-[#F4EBE6] px-2.5 py-1 rounded whitespace-nowrap" x-text="ag.time"></div>
+                                    <div class="text-sm font-medium text-[#2C221E]" x-text="ag.title"></div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Registration Sidebar Panel -->
+                <div class="lg:col-span-4" x-show="selectedEvent">
+                    <div class="sticky top-28 bg-white rounded-2xl border border-[#E8E2D5] shadow-lg p-6 space-y-6">
+                        <div>
+                            <div class="text-xs font-semibold text-[#7A6B63] uppercase">INVESTASI ACARA</div>
+                            <div class="font-serif text-3xl font-bold text-[#6D281A] mt-1" x-text="'Mulai Rp ' + Number(selectedEvent?.priceStarting).toLocaleString('id-ID')"></div>
+                        </div>
+
+                        <div class="space-y-3 pt-2 border-t border-[#E8E2D5]">
+                            <div class="text-xs font-semibold text-[#2C221E]">Pilih Jenis Tiket:</div>
+                            <template x-for="tkt in selectedEvent?.ticketTypes">
+                                <div @click="selectedTicket = tkt" 
+                                     :class="selectedTicket?.id === tkt.id ? 'border-[#6D281A] bg-[#F4EBE6]/40 shadow-sm' : 'border-[#E8E2D5] hover:border-[#7A6B63]'"
+                                     class="p-4 rounded-xl border transition-all cursor-pointer space-y-1">
+                                    <div class="flex items-center justify-between">
+                                        <span class="font-semibold text-sm text-[#6D281A]" x-text="tkt.name"></span>
+                                        <span class="font-bold text-sm text-[#2C221E]" x-text="'Rp ' + tkt.price.toLocaleString('id-ID')"></span>
+                                    </div>
+                                    <p class="text-xs text-[#7A6B63]" x-text="tkt.desc"></p>
+                                    <div class="text-[11px] text-[#C59B27] font-medium pt-1" x-text="'Sisa kuota: ' + tkt.remaining + ' tiket'"></div>
+                                </div>
+                            </template>
+                        </div>
+
+                        <button @click="startRegistration()" class="w-full py-4 rounded-xl bg-[#6D281A] text-white font-medium hover:bg-[#521E13] transition-all shadow-md flex items-center justify-center gap-2 text-base">
+                            <span>Lanjut Pendaftaran</span>
+                            <i data-lucide="arrow-right" class="w-5 h-5 text-[#C59B27]"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== REGISTRATION FLOW ==================== -->
+        <div x-show="currentTab === 'register'" class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8" style="display: none;">
+            <div class="flex items-center justify-between">
+                <div>
+                    <button @click="currentTab = 'detail'" class="text-xs font-semibold text-[#7A6B63] hover:text-[#6D281A] mb-2 inline-flex items-center gap-1">
+                        <i data-lucide="arrow-right" class="w-3.5 h-3.5 rotate-180"></i> Kembali ke Detail
+                    </button>
+                    <h2 class="font-serif text-2xl sm:text-3xl font-bold text-[#6D281A]">Formulir Pendaftaran Peserta</h2>
+                </div>
+                <div class="text-right">
+                    <span class="text-xs font-semibold uppercase tracking-wider text-[#C59B27]">LANGKAH 1 DARI 2</span>
+                    <div class="text-sm font-bold text-[#6D281A]" x-text="selectedEvent?.title"></div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-[#E8E2D5] shadow-sm p-6 sm:p-8 space-y-6">
+                <div class="p-4 rounded-xl bg-[#FAF7F2] border border-[#E8E2D5] flex items-center justify-between" x-show="selectedTicket">
+                    <div>
+                        <div class="text-xs font-semibold text-[#7A6B63]">TIKET DIPILIH</div>
+                        <div class="font-serif font-bold text-[#6D281A] text-base" x-text="selectedTicket?.name"></div>
+                        <div class="text-xs text-[#7A6B63] mt-0.5" x-text="selectedTicket?.desc"></div>
+                    </div>
+                    <div class="text-right">
+                        <div class="font-bold text-lg text-[#6D281A]" x-text="'Rp ' + (selectedTicket?.price || 0).toLocaleString('id-ID')"></div>
+                        <div class="text-xs text-[#7A6B63]">per tiket</div>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-[#2C221E] mb-1.5">Nama Lengkap & Gelar *</label>
+                        <input type="text" x-model="formData.fullName" placeholder="Contoh: Muhammad Farhan, S.Kom." class="w-full px-4 py-3 text-sm rounded-lg border border-[#E8E2D5] focus:outline-none focus:border-[#6D281A]">
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-[#2C221E] mb-1.5">Email Aktif *</label>
+                            <input type="email" x-model="formData.email" placeholder="nama@email.com" class="w-full px-4 py-3 text-sm rounded-lg border border-[#E8E2D5] focus:outline-none focus:border-[#6D281A]">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-[#2C221E] mb-1.5">Nomor WhatsApp *</label>
+                            <input type="tel" x-model="formData.whatsapp" placeholder="081234567890" class="w-full px-4 py-3 text-sm rounded-lg border border-[#E8E2D5] focus:outline-none focus:border-[#6D281A]">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-[#2C221E] mb-1.5">Instansi / Komunitas (Opsional)</label>
+                        <input type="text" x-model="formData.institution" placeholder="Universitas Indonesia / Umum" class="w-full px-4 py-3 text-sm rounded-lg border border-[#E8E2D5] focus:outline-none focus:border-[#6D281A]">
+                    </div>
+
+                    <div class="pt-4 flex items-start gap-3">
+                        <input type="checkbox" x-model="formData.agreeTerms" id="terms" class="mt-1 w-4 h-4 text-[#6D281A] rounded border-[#E8E2D5]">
+                        <label for="terms" class="text-xs text-[#7A6B63] leading-relaxed">
+                            Saya menyetujui syarat dan ketentuan pendaftaran serta kebijakan privasi data peserta.
+                        </label>
+                    </div>
+                </div>
+
+                <button @click="processToPayment()" 
+                        :class="formData.fullName && formData.email && formData.whatsapp && formData.agreeTerms ? 'bg-[#6D281A] text-white hover:bg-[#521E13]' : 'bg-[#E8E2D5] text-[#7A6B63] cursor-not-allowed'"
+                        class="w-full py-4 rounded-xl font-medium transition-all shadow-md flex items-center justify-center gap-2">
+                    <span>Lanjut ke Pembayaran</span>
+                    <i data-lucide="arrow-right" class="w-5 h-5 text-[#C59B27]"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- ==================== PAYMENT FLOW ==================== -->
+        <div x-show="currentTab === 'payment'" class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8" style="display: none;">
+            <div class="text-center space-y-2">
+                <span class="text-xs font-semibold uppercase tracking-wider text-[#C59B27]">KONFIRMASI & PEMBAYARAN</span>
+                <h2 class="font-serif text-3xl font-bold text-[#6D281A]">Selesaikan Pembayaran Anda</h2>
+                <p class="text-xs text-[#7A6B63]">Mode Demo Simulasi Payment Gateway</p>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-[#E8E2D5] shadow-sm p-6 sm:p-8 space-y-6">
+                <div class="space-y-3 pb-6 border-b border-[#E8E2D5]">
+                    <div class="text-xs font-semibold text-[#7A6B63]">RINGKASAN PESANAN</div>
+                    <div class="flex justify-between text-sm font-semibold text-[#6D281A]">
+                        <span x-text="selectedTicket?.name"></span>
+                        <span x-text="'Rp ' + (selectedTicket?.price || 0).toLocaleString('id-ID')"></span>
+                    </div>
+                    <div class="flex justify-between text-base font-bold text-[#6D281A] pt-2 border-t border-dashed border-[#E8E2D5]">
+                        <span>Total Tagihan</span>
+                        <span x-text="'Rp ' + (selectedTicket?.price || 0).toLocaleString('id-ID')"></span>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <div class="text-xs font-semibold text-[#2C221E]">Pilih Metode Pembayaran:</div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <template x-for="method in ['QRIS', 'Virtual Account BCA', 'Virtual Account Mandiri', 'GoPay / OVO']">
+                            <div @click="paymentMethod = method" 
+                                 :class="paymentMethod === method ? 'border-[#6D281A] bg-[#F4EBE6]/50 text-[#6D281A]' : 'border-[#E8E2D5] text-[#7A6B63]'"
+                                 class="p-4 rounded-xl border text-xs font-semibold transition-all cursor-pointer flex items-center justify-between">
+                                <span x-text="method"></span>
+                                <i data-lucide="check-circle-2" class="w-4 h-4 text-[#6D281A]" x-show="paymentMethod === method"></i>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
+                <div x-show="paymentMethod === 'QRIS'" class="p-6 rounded-xl bg-[#FAF7F2] border border-[#E8E2D5] text-center space-y-4">
+                    <div class="text-xs font-semibold text-[#6D281A]">Pindai QRIS untuk Pembayaran Instan</div>
+                    <div class="w-48 h-48 mx-auto bg-white p-3 rounded-lg border border-[#E8E2D5] flex items-center justify-center shadow-sm">
+                        <i data-lucide="qr-code" class="w-full h-full text-[#6D281A]"></i>
+                    </div>
+                </div>
+
+                <div x-show="paymentState === 'waiting'">
+                    <button @click="executePayment()" class="w-full py-4 rounded-xl bg-[#6D281A] text-white font-medium hover:bg-[#521E13] transition-all shadow-md flex items-center justify-center gap-2">
+                        <span>Simulasikan Pembayaran Berhasil</span>
+                        <i data-lucide="arrow-right" class="w-5 h-5 text-[#C59B27]"></i>
+                    </button>
+                </div>
+
+                <div x-show="paymentState === 'processing'" class="text-center py-6 space-y-3">
+                    <i data-lucide="refresh-cw" class="w-8 h-8 text-[#6D281A] animate-spin mx-auto"></i>
+                    <div class="text-sm font-semibold text-[#6D281A]">Memverifikasi pembayaran dengan sistem...</div>
+                </div>
+
+                <div x-show="paymentState === 'success'" class="space-y-4">
+                    <div class="p-4 rounded-xl bg-[#F4EBE6] text-[#6D281A] text-center space-y-1 border border-[#E8E2D5]">
+                        <i data-lucide="check-circle-2" class="w-8 h-8 mx-auto text-[#6D281A]"></i>
+                        <div class="font-serif font-bold text-lg">Pembayaran Telah Dikonfirmasi!</div>
+                        <p class="text-xs">Nomor Registrasi: <strong x-text="latestRegistration?.id"></strong></p>
+                    </div>
+                    <button @click="viewTicket(latestRegistration)" class="w-full py-4 rounded-xl bg-[#6D281A] text-white font-medium hover:bg-[#521E13] transition-all shadow-md flex items-center justify-center gap-2">
+                        <i data-lucide="qr-code" class="w-5 h-5 text-[#C59B27]"></i>
+                        <span>Lihat E-Ticket & QR Code</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== E-TICKET VIEW ==================== -->
+        <div x-show="currentTab === 'ticket'" class="max-w-xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8" style="display: none;">
+            <div class="text-center space-y-2">
+                <span class="text-xs font-semibold uppercase tracking-wider text-[#C59B27]">E-TICKET RESMI</span>
+                <h2 class="font-serif text-3xl font-bold text-[#6D281A]">Tiket Masuk Acara</h2>
+            </div>
+            <div class="bg-white rounded-2xl border border-[#E8E2D5] shadow-xl overflow-hidden space-y-6" x-show="viewingTicket">
+                <div class="bg-[#6D281A] p-6 text-white space-y-2">
+                    <div class="flex items-center justify-between text-xs font-semibold text-[#C59B27]">
+                        <span>SAKINAH ACADEMY E-PASS</span>
+                        <span>LUNAS / BERHASIL</span>
+                    </div>
+                    <h3 class="font-serif text-xl font-bold" x-text="viewingTicket?.eventTitle"></h3>
+                </div>
+                <div class="p-6 space-y-6">
+                    <div class="flex justify-between items-center pb-4 border-b border-dashed border-[#E8E2D5]">
+                        <div>
+                            <div class="text-xs text-[#7A6B63]">Nama Peserta</div>
+                            <div class="font-serif font-bold text-lg text-[#6D281A]" x-text="viewingTicket?.fullName"></div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-xs text-[#7A6B63]">Nomor Registrasi</div>
+                            <div class="font-mono font-bold text-sm text-[#6D281A]" x-text="viewingTicket?.id"></div>
+                        </div>
+                    </div>
+                    <div class="p-6 rounded-xl bg-[#FAF7F2] border border-[#E8E2D5] text-center space-y-3">
+                        <div class="w-48 h-48 mx-auto bg-white p-3 rounded-lg border border-[#E8E2D5] flex items-center justify-center shadow-sm">
+                            <i data-lucide="qr-code" class="w-full h-full text-[#6D281A]"></i>
+                        </div>
+                        <p class="text-xs text-[#7A6B63]">Tunjukkan QR code ini kepada panitia saat check-in.</p>
+                    </div>
+                    <button @click="currentTab = 'public'" class="w-full py-3 rounded-xl bg-[#F4EBE6] text-[#6D281A] text-xs font-medium hover:bg-[#EEDFD7]">
+                        Kembali ke Beranda
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SCANNER PANITIA ==================== -->
+        <div x-show="currentTab === 'scanner'" class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8" style="display: none;">
+            <div class="text-center space-y-2">
+                <span class="text-xs font-semibold uppercase tracking-wider text-[#C59B27]">PANITIA OPERASIONAL</span>
+                <h2 class="font-serif text-3xl font-bold text-[#6D281A]">Check-in & Validasi Tiket</h2>
+                <p class="text-xs text-[#7A6B63]">Masukkan nomor registrasi peserta</p>
+            </div>
+            <div class="bg-white rounded-2xl border border-[#E8E2D5] shadow-sm p-6 sm:p-8 space-y-6">
+                <div class="space-y-3">
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-[#2C221E]">No. Registrasi / Nama</label>
+                    <div class="flex gap-2">
+                        <input type="text" x-model="scannerCodeInput" placeholder="REG-882149" class="flex-grow px-4 py-3 text-sm rounded-lg border border-[#E8E2D5] focus:outline-none focus:border-[#6D281A]">
+                        <button @click="verifyScannerCode(scannerCodeInput)" class="px-6 py-3 rounded-lg bg-[#6D281A] text-white text-sm font-medium hover:bg-[#521E13]">Validasi</button>
+                    </div>
+                </div>
+                <div class="space-y-2 pt-2">
+                    <div class="text-xs text-[#7A6B63] font-medium">Uji Cepat Data Dummy:</div>
+                    <div class="flex flex-wrap gap-2">
+                        <template x-for="r in registrations">
+                            <button @click="scannerCodeInput = r.id; verifyScannerCode(r.id)" class="text-xs px-3 py-1.5 rounded bg-[#F4EBE6] text-[#6D281A] font-mono hover:bg-[#EEDFD7]" x-text="r.id + ' (' + r.fullName.split(' ')[0] + ')'"></button>
+                        </template>
+                    </div>
+                </div>
+
+                <div x-show="scannerResult" class="p-6 rounded-xl border space-y-3" :class="scannerResult?.status === 'success' ? 'bg-[#F4EBE6]/60 border-[#6D281A]' : 'bg-red-50 border-red-300'">
+                    <div class="flex items-center gap-3">
+                        <i data-lucide="check-circle-2" class="w-6 h-6 text-[#6D281A]" x-show="scannerResult?.status === 'success'"></i>
+                        <h4 class="font-serif font-bold text-base text-[#6D281A]" x-text="scannerResult?.message"></h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== ADMIN DASHBOARD ==================== -->
+        <div x-show="currentTab === 'admin'" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8" style="display: none;">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-[#E8E2D5]">
+                <div>
+                    <span class="text-xs font-semibold uppercase tracking-wider text-[#C59B27]">PANEL ADMINISTRASI UTAMA</span>
+                    <h2 class="font-serif text-3xl font-bold text-[#6D281A]">Manajemen Operasional & Keuangan</h2>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-emerald-600 animate-pulse"></span>
+                    <span class="text-xs font-medium text-[#7A6B63]">Sistem Terhubung</span>
+                </div>
+            </div>
+
+            <!-- Admin Subtabs -->
+            <div class="flex items-center gap-2 overflow-x-auto pb-2 border-b border-[#E8E2D5]">
+                <template x-for="tab in [{id: 'overview', label: 'Overview'}, {id: 'registrations', label: 'Daftar Peserta'}, {id: 'reports', label: 'Laporan & Statistik'}]">
+                    <button @click="adminSubTab = tab.id" 
+                            :class="adminSubTab === tab.id ? 'bg-[#6D281A] text-white shadow-sm' : 'bg-white border border-[#E8E2D5] text-[#2C221E] hover:bg-[#F4EBE6]'"
+                            class="px-4 py-2.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap"
+                            x-text="tab.label"></button>
+                </template>
+            </div>
+
+            <!-- Overview Subtab -->
+            <div x-show="adminSubTab === 'overview'" class="space-y-8">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="p-6 rounded-xl bg-white border border-[#E8E2D5] shadow-sm space-y-2">
+                        <div class="text-xs text-[#7A6B63] font-medium">Total Pendaftar</div>
+                        <div class="font-serif text-3xl font-bold text-[#6D281A]" x-text="registrations.length + ' Orang'"></div>
+                    </div>
+                    <div class="p-6 rounded-xl bg-white border border-[#E8E2D5] shadow-sm space-y-2">
+                        <div class="text-xs text-[#7A6B63] font-medium">Pembayaran Terverifikasi</div>
+                        <div class="font-serif text-3xl font-bold text-[#6D281A]" x-text="registrations.filter(r => r.paymentStatus === 'success').length + ' Tiket'"></div>
+                    </div>
+                    <div class="p-6 rounded-xl bg-white border border-[#E8E2D5] shadow-sm space-y-2">
+                        <div class="text-xs text-[#7A6B63] font-medium">Total Pendapatan</div>
+                        <div class="font-serif text-3xl font-bold text-[#6D281A]" x-text="'Rp ' + totalRevenue.toLocaleString('id-ID')"></div>
+                    </div>
+                    <div class="p-6 rounded-xl bg-white border border-[#E8E2D5] shadow-sm space-y-2">
+                        <div class="text-xs text-[#7A6B63] font-medium">Kehadiran (Check-in)</div>
+                        <div class="font-serif text-3xl font-bold text-[#6D281A]" x-text="registrations.filter(r => r.checkedIn).length + ' Peserta'"></div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl border border-[#E8E2D5] shadow-sm overflow-hidden">
+                    <div class="p-6 border-b border-[#E8E2D5]">
+                        <h3 class="font-serif font-bold text-lg text-[#6D281A]">Pendaftaran Peserta Terbaru</h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-[#FAF7F2] text-[#7A6B63] uppercase font-semibold">
+                                <tr>
+                                    <th class="p-4">ID</th>
+                                    <th class="p-4">Nama</th>
+                                    <th class="p-4">Acara</th>
+                                    <th class="p-4">Tiket</th>
+                                    <th class="p-4">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-[#E8E2D5]">
+                                <template x-for="reg in registrations">
+                                    <tr class="hover:bg-[#FAF7F2]/50">
+                                        <td class="p-4 font-mono font-bold text-[#6D281A]" x-text="reg.id"></td>
+                                        <td class="p-4 font-semibold text-[#2C221E]" x-text="reg.fullName"></td>
+                                        <td class="p-4 text-[#7A6B63] truncate max-w-xs" x-text="reg.eventTitle"></td>
+                                        <td class="p-4 text-[#2C221E]" x-text="reg.ticketTypeName"></td>
+                                        <td class="p-4">
+                                            <span class="px-2.5 py-1 rounded text-[10px] font-semibold bg-[#F4EBE6] text-[#6D281A]" x-text="reg.paymentStatus.toUpperCase()"></span>
+                                        </td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Registrations Subtab -->
+            <div x-show="adminSubTab === 'registrations'" class="space-y-6" style="display: none;">
+                <h3 class="font-serif font-bold text-xl text-[#6D281A]">Semua Data Pendaftar</h3>
+                <div class="bg-white rounded-xl border border-[#E8E2D5] shadow-sm overflow-hidden">
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-[#FAF7F2] text-[#7A6B63] uppercase font-semibold">
+                            <tr>
+                                <th class="p-4">ID</th>
+                                <th class="p-4">Nama</th>
+                                <th class="p-4">WhatsApp</th>
+                                <th class="p-4">Acara</th>
+                                <th class="p-4">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-[#E8E2D5]">
+                            <template x-for="reg in registrations">
+                                <tr class="hover:bg-[#FAF7F2]/50">
+                                    <td class="p-4 font-mono font-bold text-[#6D281A]" x-text="reg.id"></td>
+                                    <td class="p-4 font-semibold text-[#2C221E]" x-text="reg.fullName"></td>
+                                    <td class="p-4 text-[#7A6B63]" x-text="reg.whatsapp"></td>
+                                    <td class="p-4 text-[#7A6B63] truncate max-w-xs" x-text="reg.eventTitle"></td>
+                                    <td class="p-4 font-semibold" x-text="'Rp ' + reg.totalAmount.toLocaleString('id-ID')"></td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Reports Subtab -->
+            <div x-show="adminSubTab === 'reports'" class="space-y-6" style="display: none;">
+                <h3 class="font-serif font-bold text-xl text-[#6D281A]">Laporan Keuangan & Statistik</h3>
+                <div class="p-6 rounded-xl bg-white border border-[#E8E2D5] shadow-sm space-y-4">
+                    <div class="flex justify-between py-2 border-b border-[#E8E2D5] text-xs">
+                        <span class="text-[#7A6B63]">Total Pendapatan Terverifikasi</span>
+                        <span class="font-bold text-[#6D281A]" x-text="'Rp ' + totalRevenue.toLocaleString('id-ID')"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-[#2C221E] text-white mt-20 border-t border-[#C59B27]/30">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div class="space-y-3 md:col-span-2">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-[#C59B27] flex items-center justify-center text-[#2C221E]">
+                        <i data-lucide="book-open" class="w-4 h-4"></i>
+                    </div>
+                    <h2 class="font-serif text-lg font-bold">Sakinah Academy</h2>
+                </div>
+                <p class="text-xs text-[#E8E2D5] leading-relaxed max-w-sm">
+                    Platform event registrasi dan edukasi pranikah profesional dengan estetika warm terracotta dan deep burgundy.
+                </p>
+            </div>
+            <div class="space-y-2">
+                <h4 class="text-xs font-semibold uppercase tracking-wider text-[#C59B27]">Tautan Cepat</h4>
+                <ul class="space-y-1.5 text-xs text-[#E8E2D5]">
+                    <li><button @click="currentTab = 'public'" class="hover:text-white transition-colors">Beranda</button></li>
+                    <li><button @click="currentTab = 'scanner'" class="hover:text-white transition-colors">Scanner Panitia</button></li>
+                    <li><button @click="currentTab = 'admin'" class="hover:text-white transition-colors">Dashboard Admin</button></li>
+                </ul>
+            </div>
+            <div class="space-y-2">
+                <h4 class="text-xs font-semibold uppercase tracking-wider text-[#C59B27]">Bantuan & Kontak</h4>
+                <p class="text-xs text-[#E8E2D5]">WhatsApp: +62 812-3456-7890</p>
+                <p class="text-xs text-[#E8E2D5]">Email: halo@sakinahacademy.id</p>
+            </div>
+        </div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 border-t border-white/10 text-center text-xs text-[#E8E2D5]">
+            &copy; 2026 Sakinah Academy. Seluruh hak cipta dilindungi undang-undang.
+        </div>
+    </footer>
+
+    <!-- Alpine.js & App Logic -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            lucide.createIcons();
+        });
+
+        function appState() {
+            return {
+                currentTab: 'public',
+                adminSubTab: 'overview',
+                searchQuery: '',
+                activeCategoryFilter: 'Semua',
+                toastMessage: null,
+                
+                events: [
+                    {
+                        id: 'evt-1',
+                        title: 'Bekal Menuju Pernikahan: Komunikasi, Komitmen, dan Kesiapan Diri',
+                        eyebrow: 'SEMINAR PRANIKAH UTAMA',
+                        format: 'Offline',
+                        category: 'Pranikah',
+                        date: '28 Oktober 2026',
+                        time: '08.30 - 15.30 WIB',
+                        location: 'Auditorium Al-Falah, Jl. Sudirman No. 45, Jakarta Selatan',
+                        priceStarting: '125000',
+                        quota: 150,
+                        registeredCount: 112,
+                        image: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&q=80&w=1200',
+                        speakers: [
+                            { name: 'Dr. H. Ahmad Fauzi, M.Psi.', role: 'Psikolog Keluarga', bio: 'Praktisi bimbingan pranikah dan penulis buku keluarga sakinah.' },
+                            { name: 'Ustadzah Hj. Maryam Qanita, Lc.', role: 'Pakar Fiqh Muamalah', bio: 'Pengasuh kajian parenting Islami.' }
+                        ],
+                        description: 'Pernikahan bukan sekadar penyatuan dua insan, melainkan ibadah terpanjang yang membutuhkan bekal ilmu yang kokoh.',
+                        agenda: [
+                            { time: '08.30 - 09.00', title: 'Registrasi' },
+                            { time: '09.00 - 10.30', title: 'Sesi 1: Visi Ilahiah dalam Rumah Tangga' }
+                        ],
+                        ticketTypes: [
+                            { id: 'tkt-reg', name: 'Reguler Individual', price: 125000, desc: 'Akses penuh + modul digital', quota: 100, remaining: 30 },
+                            { id: 'tkt-vip', name: 'VIP Pasangan (2 Orang)', price: 230000, desc: 'Barisan depan + konsultasi privat', quota: 50, remaining: 8 }
+                        ]
+                    },
+                    {
+                        id: 'evt-2',
+                        title: 'Membangun Komunikasi & Menyelesaikan Konflik dalam Rumah Tangga',
+                        eyebrow: 'KELAS KELUARGA SAKINAH',
+                        format: 'Online',
+                        category: 'Keluarga Sakinah',
+                        date: '10 November 2026',
+                        time: '19.30 - 21.30 WIB',
+                        location: 'Live via Zoom Meeting',
+                        priceStarting: '50000',
+                        quota: 300,
+                        registeredCount: 184,
+                        image: 'https://images.unsplash.com/photo-1516627145497-ae6968895b74?auto=format&fit=crop&q=80&w=1200',
+                        speakers: [
+                            { name: 'Ust. Salim A. Fillah', role: 'Penulis & Pembina Keluarga', bio: 'Penulis buku-buku pernikahan terkemuka.' }
+                        ],
+                        description: 'Komunikasi adalah jembatan hati dalam rumah tangga.',
+                        agenda: [
+                            { time: '19.30 - 19.40', title: 'Pembukaan' }
+                        ],
+                        ticketTypes: [
+                            { id: 'tkt-online', name: 'Tiket Peserta Online', price: 50000, desc: 'Akses Zoom live + rekaman', quota: 300, remaining: 116 }
+                        ]
+                    }
+                ],
+
+                registrations: [
+                    {
+                        id: 'REG-882149',
+                        eventId: 'evt-1',
+                        eventTitle: 'Bekal Menuju Pernikahan: Komunikasi, Komitmen, dan Kesiapan Diri',
+                        ticketTypeName: 'VIP Pasangan (2 Orang)',
+                        fullName: 'Muhammad Farhan & Aisyah Zahirah',
+                        email: 'farhan.aisy@gmail.com',
+                        whatsapp: '081234567890',
+                        totalAmount: 230000,
+                        paymentStatus: 'success',
+                        checkedIn: true
+                    }
+                ],
+
+                selectedEvent: null,
+                selectedTicket: null,
+                formData: { fullName: '', email: '', whatsapp: '', institution: '', agreeTerms: false },
+                paymentMethod: 'QRIS',
+                paymentState: 'waiting',
+                latestRegistration: null,
+                viewingTicket: null,
+                scannerCodeInput: '',
+                scannerResult: null,
+
+                get filteredEvents() {
+                    return this.events.filter(evt => {
+                        const matchCat = this.activeCategoryFilter === 'Semua' || evt.category === this.activeCategoryFilter || evt.format === this.activeCategoryFilter;
+                        const matchSearch = evt.title.toLowerCase().includes(this.searchQuery.toLowerCase());
+                        return matchCat && matchSearch;
+                    });
+                },
+
+                get totalRevenue() {
+                    return this.registrations.filter(r => r.paymentStatus === 'success').reduce((sum, r) => sum + r.totalAmount, 0);
+                },
+
+                showToast(msg) {
+                    this.toastMessage = msg;
+                    setTimeout(() => this.toastMessage = null, 4000);
+                },
+
+                openEventDetail(evt) {
+                    this.selectedEvent = evt;
+                    this.selectedTicket = evt.ticketTypes[0];
+                    this.currentTab = 'detail';
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    setTimeout(() => lucide.createIcons(), 50);
+                },
+
+                startRegistration() {
+                    this.currentTab = 'register';
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    setTimeout(() => lucide.createIcons(), 50);
+                },
+
+                processToPayment() {
+                    if (!this.formData.fullName || !this.formData.email || !this.formData.whatsapp) {
+                        this.showToast('Mohon lengkapi data wajib.');
+                        return;
+                    }
+                    this.paymentState = 'waiting';
+                    this.currentTab = 'payment';
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    setTimeout(() => lucide.createIcons(), 50);
+                },
+
+                executePayment() {
+                    this.paymentState = 'processing';
+                    setTimeout(() => {
+                        this.paymentState = 'success';
+                        const newReg = {
+                            id: 'REG-' + Math.floor(100000 + Math.random() * 900000),
+                            eventId: this.selectedEvent.id,
+                            eventTitle: this.selectedEvent.title,
+                            ticketTypeName: this.selectedTicket.name,
+                            fullName: this.formData.fullName,
+                            email: this.formData.email,
+                            whatsapp: this.formData.whatsapp,
+                            totalAmount: this.selectedTicket.price,
+                            paymentStatus: 'success',
+                            checkedIn: false
+                        };
+                        this.registrations.unshift(newReg);
+                        this.latestRegistration = newReg;
+                        this.showToast('Pembayaran terverifikasi dan registrasi berhasil!');
+                        setTimeout(() => lucide.createIcons(), 50);
+                    }, 1500);
+                },
+
+                viewTicket(reg) {
+                    this.viewingTicket = reg;
+                    this.currentTab = 'ticket';
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    setTimeout(() => lucide.createIcons(), 50);
+                },
+
+                verifyScannerCode(code) {
+                    const found = this.registrations.find(r => r.id.toLowerCase() === code.trim().toLowerCase());
+                    if (!found) {
+                        this.scannerResult = { status: 'error', message: 'Nomor registrasi tidak ditemukan.' };
+                    } else {
+                        found.checkedIn = true;
+                        this.scannerResult = { status: 'success', message: `Check-in berhasil untuk ${found.fullName} (${found.ticketTypeName}).` };
+                    }
+                    setTimeout(() => lucide.createIcons(), 50);
+                }
+            }
+        }
+    </script>
+</body>
+</html>

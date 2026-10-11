@@ -1,0 +1,1342 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yayasan Peduli Sesama - Beranda</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Inter & FontAwesome Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .hide { display: none !important; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 antialiased min-h-screen flex flex-col justify-between">
+
+    <!-- HEADER / NAVIGATION -->
+    <header class="bg-white sticky top-0 z-50 shadow-sm border-b border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchView('public-home')">
+                <div class="w-10 h-10 rounded-xl bg-brand-600 flex items-center justify-center text-white font-bold text-xl shadow-md">
+                    <i class="fa-solid fa-hands-holding-child"></i>
+                </div>
+                <div>
+                    <span class="text-xl font-bold tracking-tight text-gray-900 block leading-tight">Yayasan Peduli</span>
+                    <span class="text-xs font-medium text-brand-600 uppercase tracking-widest">Sesama Nusantara</span>
+                </div>
+            </div>
+            
+            <nav class="hidden md:flex items-center space-x-8 text-sm font-medium text-gray-600">
+                <button onclick="switchView('public-home')" class="hover:text-brand-600 transition">Beranda</button>
+                <button onclick="switchView('public-profile')" class="hover:text-brand-600 transition">Profil & Legalitas</button>
+                <button onclick="switchView('public-programs')" class="hover:text-brand-600 transition">Program Kerja</button>
+                <button onclick="switchView('public-agenda')" class="hover:text-brand-600 transition">Agenda & Relawan</button>
+                <button onclick="switchView('public-reports')" class="hover:text-brand-600 transition">Laporan & Transparansi</button>
+            </nav>
+
+            <div class="flex items-center space-x-4">
+                <button onclick="openDonationModal()" class="bg-brand-600 hover:bg-brand-700 text-white px-5 py-2.5 rounded-xl font-semibold shadow-lg shadow-brand-500/20 transition flex items-center space-x-2">
+                    <i class="fa-solid fa-heart"></i>
+                    <span>Donasi Sekarang</span>
+                </button>
+                <button onclick="switchView('admin-dashboard')" class="text-gray-400 hover:text-gray-700 p-2 rounded-lg transition" title="CMS Admin">
+                    <i class="fa-solid fa-user-shield text-lg"></i>
+                </button>
+                <button class="md:hidden text-gray-600 focus:outline-none" onclick="toggleMobileMenu()">
+                    <i class="fa-solid fa-bars text-2xl"></i>
+                </button>
+            </div>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-b border-gray-200 px-4 pt-2 pb-4 space-y-2">
+            <button onclick="switchView('public-home'); toggleMobileMenu();" class="block w-full text-left py-2 font-medium text-gray-700">Beranda</button>
+            <button onclick="switchView('public-profile'); toggleMobileMenu();" class="block w-full text-left py-2 font-medium text-gray-700">Profil & Legalitas</button>
+            <button onclick="switchView('public-programs'); toggleMobileMenu();" class="block w-full text-left py-2 font-medium text-gray-700">Program Kerja</button>
+            <button onclick="switchView('public-agenda'); toggleMobileMenu();" class="block w-full text-left py-2 font-medium text-gray-700">Agenda & Relawan</button>
+            <button onclick="switchView('public-reports'); toggleMobileMenu();" class="block w-full text-left py-2 font-medium text-gray-700">Laporan & Transparansi</button>
+            <button onclick="switchView('admin-dashboard'); toggleMobileMenu();" class="block w-full text-left py-2 font-medium text-brand-600"><i class="fa-solid fa-lock mr-2"></i> CMS Admin</button>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="flex-grow">
+
+        <!-- VIEW: PUBLIC HOME -->
+        <section id="view-public-home" class="space-y-16 pb-20">
+            <!-- Hero Banner -->
+            <div class="relative bg-gradient-to-br from-brand-800 via-brand-700 to-emerald-900 text-white overflow-hidden py-24 px-4 sm:px-6 lg:px-8">
+                <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:16px_16px]"></div>
+                <div class="max-w-7xl mx-auto relative z-10 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                    <div class="space-y-6">
+                        <span class="bg-brand-600/60 text-brand-100 text-xs font-semibold px-3 py-1.5 rounded-full uppercase tracking-wider border border-brand-500">Terpercaya & Akuntabel</span>
+                        <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight leading-tight">Bersama Kita Wujudkan Kepedulian Tanpa Batas</h1>
+                        <p class="text-lg text-brand-100 max-w-xl">Yayasan Peduli Sesama Nusantara hadir menjembatani uluran tangan Anda kepada saudara-saudara kita yang membutuhkan di seluruh penjuru negeri.</p>
+                        <div class="flex flex-wrap gap-4 pt-4">
+                            <button onclick="openDonationModal()" class="bg-white text-brand-700 hover:bg-brand-50 px-8 py-3.5 rounded-xl font-bold shadow-xl transition">Donasi Program</button>
+                            <button onclick="switchView('public-agenda')" class="bg-brand-600/40 hover:bg-brand-600/60 text-white border border-brand-400 px-8 py-3.5 rounded-xl font-bold transition">Gabung Relawan</button>
+                        </div>
+                    </div>
+                    <div class="relative">
+                        <div class="bg-white/10 backdrop-blur-md p-6 rounded-3xl border border-white/20 shadow-2xl space-y-6">
+                            <div class="flex items-center justify-between">
+                                <h3 class="font-bold text-lg">Penyaluran Bulan Ini</h3>
+                                <span class="bg-emerald-500 text-white text-xs px-2.5 py-1 rounded-full font-semibold">Live Update</span>
+                            </div>
+                            <div class="space-y-4">
+                                <div>
+                                    <div class="flex justify-between text-sm mb-1">
+                                        <span class="text-brand-100">Bantuan Pendidikan 1.000 Anak Yatim</span>
+                                        <span class="font-bold">Rp 85.000.000 / Rp 100.000.000</span>
+                                    </div>
+                                    <div class="w-full bg-white/20 rounded-full h-3">
+                                        <div class="bg-emerald-400 h-3 rounded-full" style="width: 85%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between text-sm mb-1">
+                                        <span class="text-brand-100">Operasi Katarak Massal Pelosok</span>
+                                        <span class="font-bold">Rp 42.000.000 / Rp 50.000.000</span>
+                                    </div>
+                                    <div class="w-full bg-white/20 rounded-full h-3">
+                                        <div class="bg-emerald-400 h-3 rounded-full" style="width: 84%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="pt-2 border-t border-white/10 flex justify-between items-center text-sm">
+                                <span class="text-brand-100"><i class="fa-solid fa-users mr-1"></i> 1.420 Donatur Terdaftar</span>
+                                <button onclick="switchView('public-reports')" class="text-emerald-300 hover:underline font-semibold">Lihat Laporan &rarr;</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Stats & Highlights -->
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-12 relative z-20">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div class="bg-white p-6 rounded-2xl shadow-xl border border-gray-100 flex items-center space-x-4">
+                        <div class="w-14 h-14 rounded-2xl bg-brand-50 text-brand-600 flex items-center justify-center text-2xl font-bold">
+                            <i class="fa-solid fa-hand-holding-heart"></i>
+                        </div>
+                        <div>
+                            <p class="text-2xl font-extrabold text-gray-900">Rp 1.4 M+</p>
+                            <p class="text-sm text-gray-500 font-medium">Dana Disalurkan</p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-xl border border-gray-100 flex items-center space-x-4">
+                        <div class="w-14 h-14 rounded-2xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center text-2xl font-bold">
+                            <i class="fa-solid fa-people-group"></i>
+                        </div>
+                        <div>
+                            <p class="text-2xl font-extrabold text-gray-900">520+</p>
+                            <p class="text-sm text-gray-500 font-medium">Relawan Aktif</p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-xl border border-gray-100 flex items-center space-x-4">
+                        <div class="w-14 h-14 rounded-2xl bg-amber-500/10 text-amber-600 flex items-center justify-center text-2xl font-bold">
+                            <i class="fa-solid fa-bullseye"></i>
+                        </div>
+                        <div>
+                            <p class="text-2xl font-extrabold text-gray-900">38 Program</p>
+                            <p class="text-sm text-gray-500 font-medium">Telah Dijalankan</p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-xl border border-gray-100 flex items-center space-x-4">
+                        <div class="w-14 h-14 rounded-2xl bg-blue-500/10 text-blue-600 flex items-center justify-center text-2xl font-bold">
+                            <i class="fa-solid fa-map-location-dot"></i>
+                        </div>
+                        <div>
+                            <p class="text-2xl font-extrabold text-gray-900">14 Provinsi</p>
+                            <p class="text-sm text-gray-500 font-medium">Jangkauan Wilayah</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Featured Programs -->
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+                <div class="flex justify-between items-end">
+                    <div>
+                        <span class="text-brand-600 font-semibold text-sm uppercase tracking-wider">Program Unggulan</span>
+                        <h2 class="text-3xl font-extrabold text-gray-900 mt-1">Pilih Kebaikan Hari Ini</h2>
+                    </div>
+                    <button onclick="switchView('public-programs')" class="text-brand-600 font-semibold hover:text-brand-700 flex items-center space-x-1">
+                        <span>Lihat Semua Program</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+                
+                <div id="home-programs-grid" class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- Dynamic Program Cards injected via JS -->
+                </div>
+            </div>
+
+            <!-- Transparency / Live Donors Ticker -->
+            <div class="bg-white py-16 border-y border-gray-100">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+                    <div class="text-center max-w-2xl mx-auto">
+                        <span class="text-brand-600 font-semibold text-sm uppercase tracking-wider">Transparansi Donatur</span>
+                        <h2 class="text-3xl font-extrabold text-gray-900 mt-1">Donatur & Orang Baik Terbaru</h2>
+                        <p class="text-gray-500 mt-2">Terima kasih atas kebaikan dan doa tulus yang telah disalurkan melalui platform kami.</p>
+                    </div>
+
+                    <div id="home-donors-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                        <!-- Dynamic Donors -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW: PUBLIC PROFILE & LEGALITIES -->
+        <section id="view-public-profile" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-16">
+            <div class="text-center max-w-3xl mx-auto space-y-4">
+                <span class="bg-brand-100 text-brand-700 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">Tentang Kami</span>
+                <h1 class="text-4xl font-extrabold text-gray-900">Profil & Legalitas Yayasan</h1>
+                <p class="text-gray-600 text-lg">Mengenal lebih dekat visi, misi, rekam jejak, serta legalitas formal Yayasan Peduli Sesama Nusantara.</p>
+            </div>
+
+            <!-- Background & Vision Mission -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                <div class="space-y-6">
+                    <div class="bg-brand-50 border-l-4 border-brand-600 p-6 rounded-r-2xl space-y-3">
+                        <h3 class="text-xl font-bold text-gray-900">Latar Belakang</h3>
+                        <p class="text-gray-700 leading-relaxed">Berdiri sejak tahun 2018 di Padang, Yayasan Peduli Sesama berawal dari komunitas akar rumput yang peduli terhadap pendidikan anak yatim dan dhuafa. Kini telah berkembang menjadi lembaga resmi berbadan hukum yang berfokus pada pemberdayaan sosial, kemanusiaan, dan tanggap darurat bencana.</p>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="flex items-start space-x-4">
+                            <div class="w-10 h-10 rounded-xl bg-brand-100 text-brand-700 flex items-center justify-center font-bold flex-shrink-0 mt-1">
+                                <i class="fa-solid fa-eye"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-lg text-gray-900">Visi</h4>
+                                <p class="text-gray-600">Menjadi lembaga filantropi terdepan yang amanah dan profesional dalam mewujudkan kesejahteraan sosial masyarakat.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-4">
+                            <div class="w-10 h-10 rounded-xl bg-brand-100 text-brand-700 flex items-center justify-center font-bold flex-shrink-0 mt-1">
+                                <i class="fa-solid fa-bullseye"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-lg text-gray-900">Misi</h4>
+                                <ul class="text-gray-600 list-disc list-inside space-y-1 mt-1">
+                                    <li>Menyalurkan bantuan tepat sasaran secara transparan.</li>
+                                    <li>Meningkatkan kualitas pendidikan dan kesehatan dhuafa.</li>
+                                    <li>Membangun solidaritas sosial melalui gerakan kerelawanan.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Legalitas Card -->
+                <div class="bg-white p-8 rounded-3xl shadow-xl border border-gray-100 space-y-6">
+                    <div class="flex items-center space-x-3 pb-4 border-b border-gray-100">
+                        <div class="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-600 flex items-center justify-center text-xl font-bold">
+                            <i class="fa-solid fa-file-shield"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-900">Legalitas & Badan Hukum</h3>
+                            <p class="text-sm text-gray-500">Resmi dan diakui oleh negara</p>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div class="bg-gray-50 p-4 rounded-xl flex justify-between items-center">
+                            <div>
+                                <p class="text-xs text-gray-500 font-semibold uppercase">Akta Pendirian Notaris</p>
+                                <p class="font-bold text-gray-800">Notaris H. Ahmad Fauzi, S.H., M.Kn.</p>
+                                <p class="text-xs text-brand-600 font-medium">Nomor 14 Tanggal 12 Mei 2018</p>
+                            </div>
+                            <i class="fa-solid fa-check-circle text-emerald-500 text-xl"></i>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-xl flex justify-between items-center">
+                            <div>
+                                <p class="text-xs text-gray-500 font-semibold uppercase">Keputusan Kementerian Hukum & HAM</p>
+                                <p class="font-bold text-gray-800">AHU-0018929.AH.01.04.Tahun 2018</p>
+                            </div>
+                            <i class="fa-solid fa-check-circle text-emerald-500 text-xl"></i>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-xl flex justify-between items-center">
+                            <div>
+                                <p class="text-xs text-gray-500 font-semibold uppercase">Izin Operasional Kemensos / Dinas Sosial</p>
+                                <p class="font-bold text-gray-800">SK Dinsos No. 460/221/YYS/2021</p>
+                            </div>
+                            <i class="fa-solid fa-check-circle text-emerald-500 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Struktur Pengurus -->
+            <div class="space-y-8 pt-12">
+                <div class="text-center max-w-2xl mx-auto">
+                    <span class="text-brand-600 font-semibold text-sm uppercase tracking-wider">Kepengurusan</span>
+                    <h2 class="text-3xl font-extrabold text-gray-900 mt-1">Struktur Pengurus Yayasan</h2>
+                    <p class="text-gray-500 mt-2">Dipimpin oleh profesional dan relawan berdedikasi tinggi di bidang sosial.</p>
+                </div>
+
+                <div id="team-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+                    <!-- Dynamic Team -->
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW: PUBLIC PROGRAMS -->
+        <section id="view-public-programs" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-12">
+            <div class="text-center max-w-3xl mx-auto space-y-4">
+                <span class="bg-brand-100 text-brand-700 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">Daftar Program</span>
+                <h1 class="text-4xl font-extrabold text-gray-900">Program Kerja & Penggalangan Dana</h1>
+                <p class="text-gray-600 text-lg">Pilih program kemaslahatan yang ingin Anda dukung. Setiap donasi tercatat transparan dan langsung disalurkan.</p>
+            </div>
+
+            <!-- Filter Categories -->
+            <div class="flex justify-center flex-wrap gap-2">
+                <button onclick="filterPrograms('all')" class="px-5 py-2 rounded-xl font-semibold bg-brand-600 text-white shadow-md transition program-filter-btn active" data-cat="all">Semua Program</button>
+                <button onclick="filterPrograms('Pendidikan')" class="px-5 py-2 rounded-xl font-semibold bg-white text-gray-600 hover:bg-gray-100 border border-gray-200 transition program-filter-btn" data-cat="Pendidikan">Pendidikan</button>
+                <button onclick="filterPrograms('Kesehatan')" class="px-5 py-2 rounded-xl font-semibold bg-white text-gray-600 hover:bg-gray-100 border border-gray-200 transition program-filter-btn" data-cat="Kesehatan">Kesehatan</button>
+                <button onclick="filterPrograms('Sosial')" class="px-5 py-2 rounded-xl font-semibold bg-white text-gray-600 hover:bg-gray-100 border border-gray-200 transition program-filter-btn" data-cat="Sosial">Sosial & Ekonomi</button>
+                <button onclick="filterPrograms('Bencana')" class="px-5 py-2 rounded-xl font-semibold bg-white text-gray-600 hover:bg-gray-100 border border-gray-200 transition program-filter-btn" data-cat="Bencana">Tanggap Bencana</button>
+            </div>
+
+            <div id="all-programs-grid" class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Dynamic All Programs -->
+            </div>
+        </section>
+
+        <!-- VIEW: PUBLIC AGENDA & VOLUNTEER -->
+        <section id="view-public-agenda" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-16">
+            <div class="text-center max-w-3xl mx-auto space-y-4">
+                <span class="bg-brand-100 text-brand-700 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">Agenda & Aksi</span>
+                <h1 class="text-4xl font-extrabold text-gray-900">Agenda Kegiatan & Pendaftaran Relawan</h1>
+                <p class="text-gray-600 text-lg">Mari turun langsung berkontribusi bersama kami dalam berbagai agenda sosial di lapangan.</p>
+            </div>
+
+            <!-- Agenda List -->
+            <div class="space-y-8">
+                <h2 class="text-2xl font-bold text-gray-900">Agenda Kegiatan Mendatang</h2>
+                <div id="agenda-grid" class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Dynamic Agendas -->
+                </div>
+            </div>
+
+            <!-- Volunteer Registration Modal/Form Section -->
+            <div class="bg-gradient-to-r from-brand-700 to-emerald-800 rounded-3xl p-8 md:p-12 text-white shadow-2xl grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                <div class="space-y-6">
+                    <span class="bg-brand-500 text-white text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">Aksi Nyata</span>
+                    <h2 class="text-3xl font-extrabold">Daftarkan Diri Menjadi Relawan / Peserta</h2>
+                    <p class="text-brand-100 leading-relaxed">Dengan bergabung sebagai relawan, Anda akan otomatis terhubung dengan grup koordinasi kegiatan dan menerima info jadwal aksi sosial terdekat via email / WhatsApp.</p>
+                    <div class="space-y-3">
+                        <div class="flex items-center space-x-3">
+                            <i class="fa-solid fa-circle-check text-emerald-300"></i>
+                            <span>Sertifikat Resmi Relawan Yayasan</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <i class="fa-solid fa-circle-check text-emerald-300"></i>
+                            <span>Jaringan Relawan Luas & Pelatihan Kepemimpinan</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white text-gray-800 p-8 rounded-2xl shadow-xl space-y-4">
+                    <h3 class="text-xl font-bold text-gray-900">Form Pendaftaran Relawan</h3>
+                    <form id="volunteer-form" onsubmit="submitVolunteerForm(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
+                            <input type="text" id="vol-name" required class="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="cth: Budi Santoso">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nomor WhatsApp / HP</label>
+                            <input type="tel" id="vol-phone" required class="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="cth: 081234567890">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Email Aktif</label>
+                            <input type="email" id="vol-email" required class="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="cth: budi@gmail.com">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Pilih Agenda / Minat Bidang</label>
+                            <select id="vol-agenda" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                                <option value="Bakti Sosial & Pengobatan Gratis">Bakti Sosial & Pengobatan Gratis</option>
+                                <option value="Relawan Pengajar Anak Pelosok">Relawan Pengajar Anak Pelosok</option>
+                                <option value="Tim Tanggap Darurat Bencana">Tim Tanggap Darurat Bencana</option>
+                                <option value="Distribusi Sembako Yatim">Distribusi Sembako Yatim</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="w-full bg-brand-600 hover:bg-brand-700 text-white py-3 rounded-xl font-bold shadow-lg transition">Daftar Sekarang</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW: PUBLIC REPORTS & TRANSPARENCY -->
+        <section id="view-public-reports" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-12">
+            <div class="text-center max-w-3xl mx-auto space-y-4">
+                <span class="bg-brand-100 text-brand-700 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">Akuntabilitas Publik</span>
+                <h1 class="text-4xl font-extrabold text-gray-900">Laporan Penyaluran & Keuangan</h1>
+                <p class="text-gray-600 text-lg">Komitmen kami untuk selalu transparan dalam mengelola dan menyalurkan amanah donatur.</p>
+            </div>
+
+            <!-- Tabs for Reports -->
+            <div class="flex justify-center space-x-4">
+                <button onclick="switchReportTab('progress')" id="tab-btn-progress" class="px-6 py-2.5 rounded-xl font-bold bg-brand-600 text-white shadow-md transition">Progress Program & Dokumentasi</button>
+                <button onclick="switchReportTab('financial')" id="tab-btn-financial" class="px-6 py-2.5 rounded-xl font-bold bg-white text-gray-600 border border-gray-200 transition">Laporan Keuangan (PDF)</button>
+            </div>
+
+            <!-- Report Tab Content: Progress & Documentation -->
+            <div id="report-content-progress" class="space-y-8">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8" id="public-reports-grid">
+                    <!-- Dynamic Reports -->
+                </div>
+            </div>
+
+            <!-- Report Tab Content: Financial PDFs -->
+            <div id="report-content-financial" class="hidden space-y-6 max-w-4xl mx-auto">
+                <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 flex justify-between items-center">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-12 h-12 rounded-xl bg-red-500/10 text-red-600 flex items-center justify-center text-2xl font-bold">
+                            <i class="fa-solid fa-file-pdf"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-lg text-gray-900">Laporan Keuangan Audited Q3 2026</h3>
+                            <p class="text-sm text-gray-500">Periode Juli - September 2026 • Ukuran: 2.4 MB</p>
+                        </div>
+                    </div>
+                    <button onclick="downloadPdfReport('Laporan Keuangan Q3 2026')" class="bg-brand-50 hover:bg-brand-100 text-brand-700 px-5 py-2.5 rounded-xl font-semibold transition flex items-center space-x-2">
+                        <i class="fa-solid fa-download"></i>
+                        <span>Unduh PDF</span>
+                    </button>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 flex justify-between items-center">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-12 h-12 rounded-xl bg-red-500/10 text-red-600 flex items-center justify-center text-2xl font-bold">
+                            <i class="fa-solid fa-file-pdf"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-lg text-gray-900">Laporan Tahunan & Penyaluran Semester 1 2026</h3>
+                            <p class="text-sm text-gray-500">Periode Januari - Juni 2026 • Ukuran: 4.1 MB</p>
+                        </div>
+                    </div>
+                    <button onclick="downloadPdfReport('Laporan Semester 1 2026')" class="bg-brand-50 hover:bg-brand-100 text-brand-700 px-5 py-2.5 rounded-xl font-semibold transition flex items-center space-x-2">
+                        <i class="fa-solid fa-download"></i>
+                        <span>Unduh PDF</span>
+                    </button>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 flex justify-between items-center">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-12 h-12 rounded-xl bg-red-500/10 text-red-600 flex items-center justify-center text-2xl font-bold">
+                            <i class="fa-solid fa-file-pdf"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-lg text-gray-900">Laporan Tahunan 2025 (Full Year Audited)</h3>
+                            <p class="text-sm text-gray-500">Periode Januari - Desember 2025 • Ukuran: 6.8 MB</p>
+                        </div>
+                    </div>
+                    <button onclick="downloadPdfReport('Laporan Tahunan 2025')" class="bg-brand-50 hover:bg-brand-100 text-brand-700 px-5 py-2.5 rounded-xl font-semibold transition flex items-center space-x-2">
+                        <i class="fa-solid fa-download"></i>
+                        <span>Unduh PDF</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW: ADMIN CMS DASHBOARD -->
+        <section id="view-admin-dashboard" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8">
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-200 flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="flex items-center space-x-4">
+                    <div class="w-14 h-14 rounded-2xl bg-brand-600 text-white flex items-center justify-center text-2xl font-bold shadow-md">
+                        <i class="fa-solid fa-user-shield"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <h1 class="text-2xl font-extrabold text-gray-900">CMS Admin Panel</h1>
+                            <span class="bg-emerald-100 text-emerald-800 text-xs px-2.5 py-0.5 rounded-full font-semibold">Active Session</span>
+                        </div>
+                        <p class="text-sm text-gray-500">Kelola program, verifikasi donasi, data relawan, dan publikasi laporan</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <button onclick="switchView('public-home')" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-xl font-semibold text-sm transition">
+                        <i class="fa-solid fa-globe mr-1"></i> Lihat Website
+                    </button>
+                </div>
+            </div>
+
+            <!-- Admin Nav Tabs -->
+            <div class="flex flex-wrap gap-2 border-b border-gray-200 pb-4">
+                <button onclick="switchAdminTab('programs')" id="admin-tab-programs" class="px-5 py-2.5 rounded-xl font-bold bg-brand-600 text-white text-sm shadow-sm transition">Kelola Program & Donasi</button>
+                <button onclick="switchAdminTab('donations')" id="admin-tab-donations" class="px-5 py-2.5 rounded-xl font-bold bg-white text-gray-600 hover:bg-gray-100 text-sm transition">Verifikasi Donasi Manual</button>
+                <button onclick="switchAdminTab('volunteers')" id="admin-tab-volunteers" class="px-5 py-2.5 rounded-xl font-bold bg-white text-gray-600 hover:bg-gray-100 text-sm transition">Kelola Pendaftar Relawan</button>
+                <button onclick="switchAdminTab('agenda')" id="admin-tab-agenda" class="px-5 py-2.5 rounded-xl font-bold bg-white text-gray-600 hover:bg-gray-100 text-sm transition">Agenda & Artikel</button>
+                <button onclick="switchAdminTab('reports')" id="admin-tab-reports" class="px-5 py-2.5 rounded-xl font-bold bg-white text-gray-600 hover:bg-gray-100 text-sm transition">Publikasi Laporan</button>
+            </div>
+
+            <!-- Admin Tab 1: Programs -->
+            <div id="admin-content-programs" class="space-y-6">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-xl font-bold text-gray-900">Daftar Program Kerja Yayasan</h2>
+                    <button onclick="openAddProgramModal()" class="bg-brand-600 hover:bg-brand-700 text-white px-4 py-2.5 rounded-xl font-semibold text-sm shadow-md transition flex items-center space-x-2">
+                        <i class="fa-solid fa-plus"></i>
+                        <span>Tambah Program Baru</span>
+                    </button>
+                </div>
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-gray-50 border-b border-gray-200 text-xs font-semibold text-gray-500 uppercase">
+                                <th class="p-4">Program</th>
+                                <th class="p-4">Kategori</th>
+                                <th class="p-4">Target & Terkumpul</th>
+                                <th class="p-4">Penerima Manfaat</th>
+                                <th class="p-4 text-right">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-programs-table" class="divide-y divide-gray-100 text-sm">
+                            <!-- Dynamic rows -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Admin Tab 2: Donations Verification -->
+            <div id="admin-content-donations" class="hidden space-y-6">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h2 class="text-xl font-bold text-gray-900">Verifikasi Donasi Transfer Manual</h2>
+                        <p class="text-sm text-gray-500">Periksa bukti transfer dan ubah status menjadi Diterima untuk memperbarui progress bar secara otomatis.</p>
+                    </div>
+                </div>
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-gray-50 border-b border-gray-200 text-xs font-semibold text-gray-500 uppercase">
+                                <th class="p-4">Donatur</th>
+                                <th class="p-4">Program</th>
+                                <th class="p-4">Nominal</th>
+                                <th class="p-4">Metode / Bukti</th>
+                                <th class="p-4">Status</th>
+                                <th class="p-4 text-right">Aksi Verifikasi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-donations-table" class="divide-y divide-gray-100 text-sm">
+                            <!-- Dynamic rows -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Admin Tab 3: Volunteers -->
+            <div id="admin-content-volunteers" class="hidden space-y-6">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h2 class="text-xl font-bold text-gray-900">Kelola Pendaftar Relawan & Peserta</h2>
+                        <p class="text-sm text-gray-500">Kirimkan informasi kegiatan atau broadcast broadcast info ke relawan terdaftar.</p>
+                    </div>
+                </div>
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-gray-50 border-b border-gray-200 text-xs font-semibold text-gray-500 uppercase">
+                                <th class="p-4">Nama Relawan</th>
+                                <th class="p-4">Kontak (WhatsApp / Email)</th>
+                                <th class="p-4">Pilihan Kegiatan</th>
+                                <th class="p-4">Tanggal Daftar</th>
+                                <th class="p-4 text-right">Aksi Kirim Info</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-volunteers-table" class="divide-y divide-gray-100 text-sm">
+                            <!-- Dynamic rows -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Admin Tab 4: Agenda & Articles -->
+            <div id="admin-content-agenda" class="hidden space-y-6">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-xl font-bold text-gray-900">Kelola Agenda Kegiatan & Artikel</h2>
+                    <button onclick="openAddAgendaModal()" class="bg-brand-600 hover:bg-brand-700 text-white px-4 py-2.5 rounded-xl font-semibold text-sm shadow-md transition flex items-center space-x-2">
+                        <i class="fa-solid fa-plus"></i>
+                        <span>Tambah Agenda</span>
+                    </button>
+                </div>
+                <div id="admin-agenda-list" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Dynamic -->
+                </div>
+            </div>
+
+            <!-- Admin Tab 5: Reports -->
+            <div id="admin-content-reports" class="hidden space-y-6">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h2 class="text-xl font-bold text-gray-900">Publikasi Laporan Kegiatan & Keuangan (PDF)</h2>
+                        <p class="text-sm text-gray-500">Upload laporan berkala per periode untuk transparansi kepada publik.</p>
+                    </div>
+                    <button onclick="openUploadReportModal()" class="bg-brand-600 hover:bg-brand-700 text-white px-4 py-2.5 rounded-xl font-semibold text-sm shadow-md transition flex items-center space-x-2">
+                        <i class="fa-solid fa-upload"></i>
+                        <span>Upload Laporan Baru</span>
+                    </button>
+                </div>
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 space-y-4">
+                    <p class="text-sm text-gray-600">Laporan yang dipublikasikan dari panel ini akan otomatis muncul di halaman publik "Laporan & Transparansi" untuk diunduh oleh donatur dan masyarakat umum.</p>
+                    <div id="admin-reports-list" class="space-y-3">
+                        <!-- Dynamic list -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- MODAL: DONATION FLOW -->
+    <div id="donation-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-8 shadow-2xl relative space-y-6 max-h-[90vh] overflow-y-auto">
+            <button onclick="closeDonationModal()" class="absolute top-6 right-6 text-gray-400 hover:text-gray-700 text-xl">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="flex items-center space-x-3">
+                <div class="w-12 h-12 rounded-2xl bg-brand-50 text-brand-600 flex items-center justify-center text-xl font-bold">
+                    <i class="fa-solid fa-hand-holding-dollar"></i>
+                </div>
+                <div>
+                    <h3 class="text-xl font-extrabold text-gray-900">Salurkan Donasi Terbaik</h3>
+                    <p class="text-sm text-gray-500">Langkah nyata menebar kebaikan</p>
+                </div>
+            </div>
+
+            <form id="donation-form" onsubmit="processDonation(event)" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Pilih Program / Kampanye</label>
+                    <select id="don-program" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                        <!-- Options populated via JS -->
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Pilih / Ketik Nominal Donasi</label>
+                    <div class="grid grid-cols-3 gap-2 mb-2">
+                        <button type="button" onclick="setNominal(50000)" class="py-2.5 rounded-xl border border-gray-200 hover:border-brand-500 font-bold text-sm text-gray-700 nominal-btn">Rp 50.000</button>
+                        <button type="button" onclick="setNominal(100000)" class="py-2.5 rounded-xl border border-gray-200 hover:border-brand-500 font-bold text-sm text-gray-700 nominal-btn">Rp 100.000</button>
+                        <button type="button" onclick="setNominal(250000)" class="py-2.5 rounded-xl border border-gray-200 hover:border-brand-500 font-bold text-sm text-gray-700 nominal-btn">Rp 250.000</button>
+                    </div>
+                    <input type="number" id="don-amount" required min="10000" placeholder="Atau isi nominal bebas (min Rp 10.000)" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Nama Donatur</label>
+                        <input type="text" id="don-name" placeholder="cth: Hamba Allah / Nama Anda" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                        <div class="flex items-center mt-1.5 space-x-2">
+                            <input type="checkbox" id="don-anonymous" onchange="toggleAnonymous(this)" class="rounded text-brand-600 focus:ring-brand-500">
+                            <label for="don-anonymous" class="text-xs text-gray-500">Tulis sebagai Anonim / Hamba Allah</label>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Email / WhatsApp</label>
+                        <input type="text" id="don-contact" required placeholder="Untuk kirim bukti & doa" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Doa & Pesan Dukungan</label>
+                    <textarea id="don-message" rows="2" placeholder="Tuliskan doa atau pesan penyemangat..." class="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:ring-2 focus:ring-brand-500 focus:outline-none"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Metode Pembayaran</label>
+                    <select id="don-payment-method" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                        <option value="QRIS (Instant Otomatis)">QRIS (Scan & Bayar Instant Otomatis)</option>
+                        <option value="Virtual Account BCA/Mandiri (Instant Otomatis)">Virtual Account BCA / Mandiri (Instant)</option>
+                        <option value="E-Wallet (GoPay/OVO/Dana Instant)">E-Wallet (GoPay / OVO / Dana Instant)</option>
+                        <option value="Transfer Bank Manual (BCA 883019283 - An. Yayasan Peduli Sesama)">Transfer Bank Manual (Butuh Upload Bukti)</option>
+                    </select>
+                </div>
+
+                <div id="manual-upload-group" class="hidden space-y-2 bg-amber-50 p-4 rounded-xl border border-amber-200">
+                    <p class="text-xs text-amber-800 font-semibold">Silakan transfer ke BCA 883019283 dan lampirkan bukti transfer:</p>
+                    <input type="file" id="don-proof" class="text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-amber-100 file:text-amber-700 hover:file:bg-amber-200">
+                </div>
+
+                <button type="submit" class="w-full bg-brand-600 hover:bg-brand-700 text-white py-3.5 rounded-xl font-bold shadow-lg transition flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-lock"></i>
+                    <span>Bayar Donasi Sekarang</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: SUCCESS / RECEIPT -->
+    <div id="receipt-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl text-center space-y-6">
+            <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-3xl mx-auto">
+                <i class="fa-solid fa-check"></i>
+            </div>
+            <div class="space-y-2">
+                <h3 class="text-2xl font-extrabold text-gray-900">Terima Kasih, Orang Baik!</h3>
+                <p id="receipt-text" class="text-sm text-gray-600">Donasi Anda telah tercatat dan bukti terima telah dikirimkan via email/WhatsApp.</p>
+            </div>
+            <div class="bg-gray-50 p-4 rounded-2xl text-left space-y-2 text-sm">
+                <div class="flex justify-between"><span class="text-gray-500">ID Transaksi:</span> <span id="rec-id" class="font-bold">#TRX-94821</span></div>
+                <div class="flex justify-between"><span class="text-gray-500">Program:</span> <span id="rec-prog" class="font-bold">Bantuan Pendidikan</span></div>
+                <div class="flex justify-between"><span class="text-gray-500">Nominal:</span> <span id="rec-amount" class="font-bold text-brand-600">Rp 100.000</span></div>
+                <div class="flex justify-between"><span class="text-gray-500">Status:</span> <span id="rec-status" class="font-bold text-emerald-600">Terverifikasi Otomatis</span></div>
+            </div>
+            <button onclick="closeReceiptModal()" class="w-full bg-brand-600 hover:bg-brand-700 text-white py-3 rounded-xl font-bold transition">Selesai</button>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="bg-gray-900 text-white pt-16 pb-12 border-t border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-12 pb-12 border-b border-gray-800">
+            <div class="space-y-4">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-brand-600 flex items-center justify-center text-white font-bold text-xl">
+                        <i class="fa-solid fa-hands-holding-child"></i>
+                    </div>
+                    <div>
+                        <span class="text-lg font-bold block leading-tight">Yayasan Peduli</span>
+                        <span class="text-xs text-brand-400 uppercase tracking-widest">Sesama Nusantara</span>
+                    </div>
+                </div>
+                <p class="text-gray-400 text-sm leading-relaxed">Lembaga filantropi resmi yang berdedikasi menyalurkan kebaikan umat secara amanah, transparan, dan profesional.</p>
+                <div class="flex space-x-3 text-gray-400">
+                    <a href="#" class="w-10 h-10 rounded-xl bg-gray-800 hover:bg-brand-600 hover:text-white flex items-center justify-center transition"><i class="fa-brands fa-facebook-f"></i></a>
+                    <a href="#" class="w-10 h-10 rounded-xl bg-gray-800 hover:bg-brand-600 hover:text-white flex items-center justify-center transition"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="#" class="w-10 h-10 rounded-xl bg-gray-800 hover:bg-brand-600 hover:text-white flex items-center justify-center transition"><i class="fa-brands fa-youtube"></i></a>
+                    <a href="#" class="w-10 h-10 rounded-xl bg-gray-800 hover:bg-brand-600 hover:text-white flex items-center justify-center transition"><i class="fa-brands fa-whatsapp"></i></a>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <h3 class="font-bold text-base tracking-wide uppercase">Tautan Cepat</h3>
+                <ul class="space-y-2.5 text-sm text-gray-400">
+                    <li><button onclick="switchView('public-home')" class="hover:text-white transition">Beranda</button></li>
+                    <li><button onclick="switchView('public-profile')" class="hover:text-white transition">Profil & Legalitas</button></li>
+                    <li><button onclick="switchView('public-programs')" class="hover:text-white transition">Program Kerja</button></li>
+                    <li><button onclick="switchView('public-agenda')" class="hover:text-white transition">Agenda Kegiatan</button></li>
+                    <li><button onclick="switchView('public-reports')" class="hover:text-white transition">Laporan Keuangan & PDF</button></li>
+                </ul>
+            </div>
+
+            <div class="space-y-4">
+                <h3 class="font-bold text-base tracking-wide uppercase">Legalitas Resmi</h3>
+                <ul class="space-y-2.5 text-sm text-gray-400">
+                    <li><i class="fa-solid fa-check text-brand-500 mr-2"></i> Akta Notaris No. 14 / 2018</li>
+                    <li><i class="fa-solid fa-check text-brand-500 mr-2"></i> SK Kemenkumham RI</li>
+                    <li><i class="fa-solid fa-check text-brand-500 mr-2"></i> SK Dinsos No. 460/221</li>
+                    <li><i class="fa-solid fa-check text-brand-500 mr-2"></i> Audited by KAP Independen</li>
+                </ul>
+            </div>
+
+            <div class="space-y-4">
+                <h3 class="font-bold text-base tracking-wide uppercase">Kontak Sekretariat</h3>
+                <ul class="space-y-3 text-sm text-gray-400">
+                    <li class="flex items-start space-x-3">
+                        <i class="fa-solid fa-location-dot mt-1 text-brand-500"></i>
+                        <span>Jl. Khatib Sulaiman No. 88, Padang, Sumatera Barat</span>
+                    </li>
+                    <li class="flex items-center space-x-3">
+                        <i class="fa-solid fa-phone text-brand-500"></i>
+                        <span>(0751) 8920192 / 0811-6638-999</span>
+                    </li>
+                    <li class="flex items-center space-x-3">
+                        <i class="fa-solid fa-envelope text-brand-500"></i>
+                        <span>halo@yayasanpedulisesama.or.id</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-xs text-gray-500 pt-8">
+            &copy; 2026 Yayasan Peduli Sesama Nusantara. All Rights Reserved. Transparansi & Amanah untuk Umat.
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT APP LOGIC -->
+    <script>
+        // Initial Mock Database State with Unsplash Images
+        let state = {
+            programs: [
+                { id: 1, title: "Bantuan Pendidikan 1.000 Anak Yatim", category: "Pendidikan", target: 100000000, collected: 85000000, beneficiaries: "1.000 Anak Yatim", desc: "Pemberian beasiswa penuh dan perlengkapan sekolah bagi anak yatim dhuafa di pelosok Sumatera.", image: "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=800&q=80" },
+                { id: 2, title: "Operasi Katarak Massal Pelosok", category: "Kesehatan", target: 50000000, collected: 42000000, beneficiaries: "150 Lansia Dhuafa", desc: "Bantuan operasi katarak gratis bagi lansia prasejahtera yang mengalami kebutaan akibat katarak.", image: "https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?auto=format&fit=crop&w=800&q=80" },
+                { id: 3, title: "Sumur Wakaf & Air Bersih Desa Kering", category: "Sosial", target: 75000000, collected: 60000000, beneficiaries: "450 Kepala Keluarga", desc: "Pembangunan sumur bor air bersih dan instalasi sanitasi di daerah rawan kekeringan.", image: "https://images.unsplash.com/photo-1541888946425-d0fbb18f86f8?auto=format&fit=crop&w=800&q=80" },
+                { id: 4, title: "Tanggap Darurat Bencana Alam", category: "Bencana", target: 150000000, collected: 135000000, beneficiaries: "800 Korban Terdampak", desc: "Distribusi logistik darurat, tenda pengungsian, dan dapur umum bagi korban bencana alam.", image: "https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?auto=format&fit=crop&w=800&q=80" }
+            ],
+            donations: [
+                { id: "TRX-94820", donor: "Hamba Allah", program: "Bantuan Pendidikan 1.000 Anak Yatim", amount: 500000, method: "QRIS (Instant Otomatis)", status: "Diterima", message: "Semoga berkah dan bermanfaat untuk anak-anak." },
+                { id: "TRX-94819", donor: "Rahmat Hidayat", program: "Operasi Katarak Massal Pelosok", amount: 250000, method: "Virtual Account BCA", status: "Diterima", message: "Lekas sembuh mbah, semoga bisa melihat kembali." },
+                { id: "TRX-94818", donor: "Siti Aminah", program: "Sumur Wakaf & Air Bersih Desa Kering", amount: 100000, method: "Transfer Bank Manual", status: "Menunggu Verifikasi", message: "Ikut berdonasi untuk air bersih." }
+            ],
+            volunteers: [
+                { id: 1, name: "Ahmad Fauzan", phone: "081234567891", email: "fauzan@gmail.com", agenda: "Bakti Sosial & Pengobatan Gratis", date: "10 Okt 2026" },
+                { id: 2, name: "Dewi Lestari", phone: "089876543210", email: "dewi@yahoo.com", agenda: "Relawan Pengajar Anak Pelosok", date: "09 Okt 2026" }
+            ],
+            agendas: [
+                { id: 1, title: "Bakti Sosial & Pengobatan Gratis Pelosok Pesisir", date: "25 Oktober 2026", location: "Kec. Bungus Teluk Kabung, Padang", quota: 50, registered: 38, desc: "Aksi pemeriksaan kesehatan gratis dan pembagian vitamin untuk 300 warga pesisir." },
+                { id: 2, title: "Pelatihan & Mentorship Anak Yatim Prestatif", date: "02 November 2026", location: "Aula Gedung Yayasan Peduli Sesama", quota: 100, registered: 74, desc: "Pelatihan kepemimpinan dan motivasi belajar bersama mentor profesional." }
+            ],
+            team: [
+                { name: "Dr. H. M. Ridwan, M.Si", role: "Pembina Yayasan", photo: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80" },
+                { name: "Ir. Hj. Salmawati, M.T.", role: "Ketua Umum", photo: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80" },
+                { name: "Fikri Haikal, S.E.", role: "Sekretaris Eksekutif", photo: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80" },
+                { name: "Rina Marlina, Ak.", role: "Bendahara & Audit", photo: "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=400&q=80" }
+            ],
+            reports: [
+                { title: "Penyaluran Beasiswa Yatim Q3 2026", period: "Triwulan 3 2026", desc: "Penyaluran dana pendidikan kepada 1.000 anak yatim di 5 kabupaten.", pdf: "Laporan_Pendidikan_Q3.pdf" },
+                { title: "Laporan Operasi Katarak Padang Selatan", period: "September 2026", desc: "150 pasien lansia berhasil dioperasi dan pulih penglihatannya.", pdf: "Laporan_Katarak_Sept.pdf" }
+            ]
+        };
+
+        // Navigation Switcher
+        function switchView(viewId) {
+            ['public-home', 'public-profile', 'public-programs', 'public-agenda', 'public-reports', 'admin-dashboard'].forEach(id => {
+                document.getElementById('view-' + id).classList.add('hidden');
+            });
+            document.getElementById('view-' + viewId).classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            renderAllViews();
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        // Render All Dynamic Data
+        function renderAllViews() {
+            renderHomePrograms();
+            renderHomeDonors();
+            renderTeam();
+            renderAllPrograms('all');
+            renderAgendas();
+            renderReports();
+            renderDonationDropdown();
+            renderAdminPrograms();
+            renderAdminDonations();
+            renderAdminVolunteers();
+            renderAdminAgenda();
+            renderAdminReports();
+        }
+
+        // Render Home Programs
+        function renderHomePrograms() {
+            const container = document.getElementById('home-programs-grid');
+            container.innerHTML = state.programs.slice(0, 3).map(p => {
+                const percent = Math.min(Math.round((p.collected / p.target) * 100), 100);
+                return `
+                    <div class="bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden flex flex-col justify-between transition hover:-translate-y-1">
+                        <div>
+                            <img src="${p.image}" alt="${p.title}" class="w-full h-48 object-cover" onerror="this.src='https://placehold.co/600x400/16a34a/ffffff?text=Program'">
+                            <div class="p-6 space-y-4">
+                                <span class="bg-brand-50 text-brand-700 text-xs font-semibold px-3 py-1 rounded-full uppercase">${p.category}</span>
+                                <h3 class="font-bold text-xl text-gray-900 leading-snug">${p.title}</h3>
+                                <p class="text-sm text-gray-600 line-clamp-2">${p.desc}</p>
+                                <div class="space-y-2 pt-2">
+                                    <div class="flex justify-between text-sm">
+                                        <span class="text-gray-500">Terkumpul</span>
+                                        <span class="font-extrabold text-brand-700">Rp ${p.collected.toLocaleString('id-ID')}</span>
+                                    </div>
+                                    <div class="w-full bg-gray-100 rounded-full h-2.5">
+                                        <div class="bg-brand-600 h-2.5 rounded-full" style="width: ${percent}%"></div>
+                                    </div>
+                                    <div class="flex justify-between text-xs text-gray-400">
+                                        <span>Target: Rp ${p.target.toLocaleString('id-ID')}</span>
+                                        <span class="font-bold text-brand-600">${percent}%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-6 pt-0">
+                            <button onclick="openDonationModalWithProgram('${p.title}')" class="w-full bg-brand-600 hover:bg-brand-700 text-white py-3 rounded-xl font-bold shadow-md transition flex items-center justify-center space-x-2">
+                                <i class="fa-solid fa-heart"></i>
+                                <span>Donasi Sekarang</span>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Render Home Donors Ticker (Transparency)
+        function renderHomeDonors() {
+            const container = document.getElementById('home-donors-list');
+            const verifiedDonations = state.donations.filter(d => d.status === 'Diterima');
+            container.innerHTML = verifiedDonations.map(d => `
+                <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100 space-y-2">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center font-bold text-sm">
+                            <i class="fa-solid fa-user"></i>
+                        </div>
+                        <div>
+                            <p class="font-bold text-gray-900 text-sm">${d.donor}</p>
+                            <p class="text-xs text-brand-600 font-semibold">Rp ${d.amount.toLocaleString('id-ID')}</p>
+                        </div>
+                    </div>
+                    <p class="text-xs text-gray-500 italic bg-white p-2.5 rounded-xl border border-gray-100">"${d.message || 'Semoga berkah'}"</p>
+                </div>
+            `).join('');
+        }
+
+        // Render Team Profile
+        function renderTeam() {
+            const container = document.getElementById('team-grid');
+            container.innerHTML = state.team.map(t => `
+                <div class="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden text-center p-6 space-y-4">
+                    <img src="${t.photo}" alt="${t.name}" class="w-28 h-28 mx-auto rounded-full object-cover shadow-inner">
+                    <div>
+                        <h4 class="font-bold text-lg text-gray-900">${t.name}</h4>
+                        <p class="text-sm text-brand-600 font-semibold">${t.role}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Render All Programs in Programs View
+        function renderAllPrograms(category) {
+            const container = document.getElementById('all-programs-grid');
+            const filtered = category === 'all' ? state.programs : state.programs.filter(p => p.category === category);
+            container.innerHTML = filtered.map(p => {
+                const percent = Math.min(Math.round((p.collected / p.target) * 100), 100);
+                return `
+                    <div class="bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden flex flex-col justify-between">
+                        <div>
+                            <img src="${p.image}" alt="${p.title}" class="w-full h-48 object-cover">
+                            <div class="p-6 space-y-4">
+                                <span class="bg-brand-50 text-brand-700 text-xs font-semibold px-3 py-1 rounded-full uppercase">${p.category}</span>
+                                <h3 class="font-bold text-xl text-gray-900">${p.title}</h3>
+                                <p class="text-sm text-gray-600">${p.desc}</p>
+                                <div class="bg-gray-50 p-3 rounded-xl text-xs space-y-1">
+                                    <span class="text-gray-500">Penerima Manfaat:</span>
+                                    <p class="font-bold text-gray-800">${p.beneficiaries}</p>
+                                </div>
+                                <div class="space-y-2 pt-2">
+                                    <div class="flex justify-between text-sm">
+                                        <span class="text-gray-500">Terkumpul</span>
+                                        <span class="font-extrabold text-brand-700">Rp ${p.collected.toLocaleString('id-ID')}</span>
+                                    </div>
+                                    <div class="w-full bg-gray-100 rounded-full h-2.5">
+                                        <div class="bg-brand-600 h-2.5 rounded-full" style="width: ${percent}%"></div>
+                                    </div>
+                                    <div class="flex justify-between text-xs text-gray-400">
+                                        <span>Target: Rp ${p.target.toLocaleString('id-ID')}</span>
+                                        <span class="font-bold text-brand-600">${percent}%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-6 pt-0">
+                            <button onclick="openDonationModalWithProgram('${p.title}')" class="w-full bg-brand-600 hover:bg-brand-700 text-white py-3 rounded-xl font-bold shadow-md transition">Donasi Program Ini</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function filterPrograms(cat) {
+            document.querySelectorAll('.program-filter-btn').forEach(btn => {
+                btn.classList.remove('bg-brand-600', 'text-white', 'shadow-md');
+                btn.classList.add('bg-white', 'text-gray-600', 'border', 'border-gray-200');
+            });
+            event.target.classList.remove('bg-white', 'text-gray-600', 'border', 'border-gray-200');
+            event.target.classList.add('bg-brand-600', 'text-white', 'shadow-md');
+            renderAllPrograms(cat);
+        }
+
+        // Render Agenda
+        function renderAgendas() {
+            const container = document.getElementById('agenda-grid');
+            container.innerHTML = state.agendas.map(a => `
+                <div class="bg-white p-8 rounded-3xl shadow-xl border border-gray-100 space-y-6">
+                    <div class="flex justify-between items-start">
+                        <span class="bg-emerald-50 text-emerald-700 text-xs font-semibold px-3 py-1 rounded-full"><i class="fa-solid fa-calendar mr-1"></i> ${a.date}</span>
+                        <span class="text-xs text-gray-400 font-semibold"><i class="fa-solid fa-users mr-1"></i> Kuota: ${a.registered}/${a.quota}</span>
+                    </div>
+                    <div class="space-y-2">
+                        <h3 class="text-xl font-bold text-gray-900">${a.title}</h3>
+                        <p class="text-sm text-gray-500"><i class="fa-solid fa-location-dot text-brand-600 mr-1"></i> ${a.location}</p>
+                        <p class="text-gray-600 text-sm mt-2">${a.desc}</p>
+                    </div>
+                    <button onclick="quickJoinAgenda('${a.title}')" class="w-full bg-brand-50 hover:bg-brand-100 text-brand-700 py-3 rounded-xl font-bold transition">Daftar Sebagai Relawan Agenda Ini</button>
+                </div>
+            `).join('');
+        }
+
+        function quickJoinAgenda(title) {
+            switchView('public-agenda');
+            document.getElementById('vol-agenda').value = title;
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        }
+
+        // Render Reports View
+        function renderReports() {
+            const container = document.getElementById('public-reports-grid');
+            container.innerHTML = state.reports.map(r => `
+                <div class="bg-white p-6 rounded-3xl shadow-lg border border-gray-100 space-y-4">
+                    <div class="w-12 h-12 rounded-2xl bg-brand-50 text-brand-600 flex items-center justify-center text-xl font-bold">
+                        <i class="fa-solid fa-file-lines"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs text-brand-600 font-semibold">${r.period}</span>
+                        <h3 class="font-bold text-lg text-gray-900 mt-1">${r.title}</h3>
+                        <p class="text-sm text-gray-600 mt-2">${r.desc}</p>
+                    </div>
+                    <button onclick="downloadPdfReport('${r.title}')" class="w-full bg-brand-50 hover:bg-brand-100 text-brand-700 py-2.5 rounded-xl font-bold text-sm transition flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-download"></i>
+                        <span>Unduh Dokumen Laporan</span>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function switchReportTab(tab) {
+            if(tab === 'progress') {
+                document.getElementById('tab-btn-progress').className = "px-6 py-2.5 rounded-xl font-bold bg-brand-600 text-white shadow-md transition";
+                document.getElementById('tab-btn-financial').className = "px-6 py-2.5 rounded-xl font-bold bg-white text-gray-600 border border-gray-200 transition";
+                document.getElementById('report-content-progress').classList.remove('hidden');
+                document.getElementById('report-content-financial').classList.add('hidden');
+            } else {
+                document.getElementById('tab-btn-financial').className = "px-6 py-2.5 rounded-xl font-bold bg-brand-600 text-white shadow-md transition";
+                document.getElementById('tab-btn-progress').className = "px-6 py-2.5 rounded-xl font-bold bg-white text-gray-600 border border-gray-200 transition";
+                document.getElementById('report-content-financial').classList.remove('hidden');
+                document.getElementById('report-content-progress').classList.add('hidden');
+            }
+        }
+
+        function downloadPdfReport(title) {
+            // Document download simulation
+            const msg = document.createElement('div');
+            msg.className = "fixed bottom-5 right-5 bg-gray-900 text-white px-6 py-3 rounded-2xl shadow-2xl z-50 text-sm font-semibold flex items-center space-x-3";
+            msg.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400 text-lg"></i><span>Berhasil mengunduh: ${title}.pdf</span>`;
+            document.body.appendChild(msg);
+            setTimeout(() => msg.remove(), 3500);
+        }
+
+        // Donation Modal Handling
+        function renderDonationDropdown() {
+            const select = document.getElementById('don-program');
+            select.innerHTML = state.programs.map(p => `<option value="${p.title}">${p.title}</option>`).join('');
+        }
+
+        function openDonationModal() {
+            document.getElementById('donation-modal').classList.remove('hidden');
+            renderDonationDropdown();
+        }
+
+        function openDonationModalWithProgram(title) {
+            openDonationModal();
+            document.getElementById('don-program').value = title;
+        }
+
+        function closeDonationModal() {
+            document.getElementById('donation-modal').classList.add('hidden');
+        }
+
+        function setNominal(amount) {
+            document.getElementById('don-amount').value = amount;
+            document.querySelectorAll('.nominal-btn').forEach(btn => {
+                btn.classList.remove('border-brand-600', 'bg-brand-50', 'text-brand-700');
+            });
+            event.target.classList.add('border-brand-600', 'bg-brand-50', 'text-brand-700');
+        }
+
+        function toggleAnonymous(checkbox) {
+            const nameInput = document.getElementById('don-name');
+            if(checkbox.checked) {
+                nameInput.value = "Hamba Allah (Anonim)";
+                nameInput.disabled = true;
+            } else {
+                nameInput.value = "";
+                nameInput.disabled = false;
+            }
+        }
+
+        // Payment Method listener for manual upload
+        document.getElementById('don-payment-method').addEventListener('change', function(e) {
+            const uploadGroup = document.getElementById('manual-upload-group');
+            if(e.target.value.includes('Manual')) {
+                uploadGroup.classList.remove('hidden');
+            } else {
+                uploadGroup.classList.add('hidden');
+            }
+        });
+
+        // Process Donation & Auto-verify or Manual queue
+        function processDonation(e) {
+            e.preventDefault();
+            const programTitle = document.getElementById('don-program').value;
+            const amount = parseInt(document.getElementById('don-amount').value);
+            const name = document.getElementById('don-name').value || "Hamba Allah";
+            const contact = document.getElementById('don-contact').value;
+            const message = document.getElementById('don-message').value;
+            const method = document.getElementById('don-payment-method').value;
+
+            const isManual = method.includes('Manual');
+            const status = isManual ? "Menunggu Verifikasi" : "Diterima";
+            const trxId = "#TRX-" + Math.floor(10000 + Math.random() * 90000);
+
+            // Add to state
+            state.donations.unshift({
+                id: trxId,
+                donor: name,
+                program: programTitle,
+                amount: amount,
+                method: method,
+                status: status,
+                message: message
+            });
+
+            // If automatic, update program collected immediately (System Process 1)
+            if(!isManual) {
+                const prog = state.programs.find(p => p.title === programTitle);
+                if(prog) {
+                    prog.collected += amount;
+                }
+            }
+
+            closeDonationModal();
+
+            // Show Receipt Modal
+            document.getElementById('rec-id').innerText = trxId;
+            document.getElementById('rec-prog').innerText = programTitle;
+            document.getElementById('rec-amount').innerText = "Rp " + amount.toLocaleString('id-ID');
+            document.getElementById('rec-status').innerText = status === "Diterima" ? "Terverifikasi Otomatis (Sukses)" : "Menunggu Verifikasi Admin";
+            document.getElementById('receipt-modal').classList.remove('hidden');
+
+            renderAllViews();
+        }
+
+        function closeReceiptModal() {
+            document.getElementById('receipt-modal').classList.add('hidden');
+        }
+
+        // Volunteer Form Submit
+        function submitVolunteerForm(e) {
+            e.preventDefault();
+            const name = document.getElementById('vol-name').value;
+            const phone = document.getElementById('vol-phone').value;
+            const email = document.getElementById('vol-email').value;
+            const agenda = document.getElementById('vol-agenda').value;
+
+            state.volunteers.unshift({
+                id: Date.now(),
+                name: name,
+                phone: phone,
+                email: email,
+                agenda: agenda,
+                date: "Hari ini"
+            });
+
+            alert(`Terima kasih ${name}! Pendaftaran relawan Anda berhasil disimpan. Info kegiatan akan dikirimkan otomatis ke ${email} / WhatsApp.`);
+            document.getElementById('volunteer-form').reset();
+            renderAllViews();
+        }
+
+        // ADMIN PANEL TABS & LOGIC
+        function switchAdminTab(tab) {
+            ['programs', 'donations', 'volunteers', 'agenda', 'reports'].forEach(t => {
+                document.getElementById('admin-content-' + t).classList.add('hidden');
+                document.getElementById('admin-tab-' + t).className = "px-5 py-2.5 rounded-xl font-bold bg-white text-gray-600 hover:bg-gray-100 text-sm transition";
+            });
+            document.getElementById('admin-content-' + tab).classList.remove('hidden');
+            document.getElementById('admin-tab-' + tab).className = "px-5 py-2.5 rounded-xl font-bold bg-brand-600 text-white text-sm shadow-sm transition";
+        }
+
+        function renderAdminPrograms() {
+            const tbody = document.getElementById('admin-programs-table');
+            tbody.innerHTML = state.programs.map((p, idx) => `
+                <tr class="hover:bg-gray-50">
+                    <td class="p-4 font-bold text-gray-800">${p.title}</td>
+                    <td class="p-4"><span class="bg-gray-100 px-2.5 py-1 rounded-full text-xs font-semibold">${p.category}</span></td>
+                    <td class="p-4">Rp ${p.collected.toLocaleString('id-ID')} / <span class="text-gray-400">Rp ${p.target.toLocaleString('id-ID')}</span></td>
+                    <td class="p-4 text-gray-600">${p.beneficiaries}</td>
+                    <td class="p-4 text-right space-x-2">
+                        <button onclick="deleteProgram(${idx})" class="text-red-500 hover:text-red-700 p-2"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function deleteProgram(idx) {
+            if(confirm("Yakin ingin menghapus program ini?")) {
+                state.programs.splice(idx, 1);
+                renderAllViews();
+            }
+        }
+
+        function openAddProgramModal() {
+            const title = prompt("Judul Program Baru:");
+            if(!title) return;
+            const cat = prompt("Kategori (Pendidikan/Kesehatan/Sosial/Bencana):", "Pendidikan");
+            const target = parseInt(prompt("Target Donasi (Angka):", "50000000"));
+            const beneficiaries = prompt("Penerima Manfaat:", "Masyarakat Dhuafa");
+            const desc = prompt("Deskripsi singkat program:");
+
+            state.programs.push({
+                id: Date.now(),
+                title: title,
+                category: cat || "Sosial",
+                target: target || 25000000,
+                collected: 0,
+                beneficiaries: beneficiaries || "Warga",
+                desc: desc || "Program kemaslahatan.",
+                image: "https://images.unsplash.com/photo-1532629345422-7515f3d16bb0?auto=format&fit=crop&w=800&q=80"
+            });
+            renderAllViews();
+        }
+
+        function renderAdminDonations() {
+            const tbody = document.getElementById('admin-donations-table');
+            tbody.innerHTML = state.donations.map((d, idx) => `
+                <tr class="hover:bg-gray-50">
+                    <td class="p-4 font-bold text-gray-800">${d.donor}<br><span class="text-xs text-gray-400 font-normal">${d.id}</span></td>
+                    <td class="p-4 text-gray-600">${d.program}</td>
+                    <td class="p-4 font-bold text-brand-600">Rp ${d.amount.toLocaleString('id-ID')}</td>
+                    <td class="p-4 text-xs text-gray-500">${d.method}</td>
+                    <td class="p-4"><span class="px-2.5 py-1 rounded-full text-xs font-semibold ${d.status === 'Diterima' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${d.status}</span></td>
+                    <td class="p-4 text-right">
+                        ${d.status === 'Menunggu Verifikasi' ? `
+                            <button onclick="verifyDonation(${idx})" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition">Terima & Update</button>
+                        ` : `<span class="text-xs text-gray-400 font-medium">Terverifikasi</span>`}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Admin Action: Verify manual donation and update progress bar automatically (System Process 1 & Admin Action 3)
+        function verifyDonation(idx) {
+            const d = state.donations[idx];
+            d.status = "Diterima";
+
+            // Update program collected amount
+            const prog = state.programs.find(p => p.title === d.program);
+            if(prog) {
+                prog.collected += d.amount;
+            }
+
+            alert(`Donasi dari ${d.donor} senilai Rp ${d.amount.toLocaleString('id-ID')} telah diverifikasi. Progress program diperbarui otomatis!`);
+            renderAllViews();
+        }
+
+        function renderAdminVolunteers() {
+            const tbody = document.getElementById('admin-volunteers-table');
+            tbody.innerHTML = state.volunteers.map(v => `
+                <tr class="hover:bg-gray-50">
+                    <td class="p-4 font-bold text-gray-800">${v.name}</td>
+                    <td class="p-4 text-gray-600 text-xs">${v.phone}<br>${v.email}</td>
+                    <td class="p-4 text-brand-600 font-medium text-xs">${v.agenda}</td>
+                    <td class="p-4 text-gray-400 text-xs">${v.date}</td>
+                    <td class="p-4 text-right">
+                        <button onclick="sendVolunteerBroadcast('${v.name}', '${v.email}')" class="bg-brand-50 hover:bg-brand-100 text-brand-700 px-3 py-1.5 rounded-lg text-xs font-bold transition">Kirim Info Kegiatan</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function sendVolunteerBroadcast(name, email) {
+            alert(`Email/WA berhasil dikirim ke ${name} (${email}) berisi detail jadwal & lokasi kegiatan terbaru!`);
+        }
+
+        function renderAdminAgenda() {
+            const container = document.getElementById('admin-agenda-list');
+            container.innerHTML = state.agendas.map((a, idx) => `
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 space-y-3">
+                    <div class="flex justify-between items-start">
+                        <span class="text-xs font-semibold text-brand-600 bg-brand-50 px-2.5 py-1 rounded-full">${a.date}</span>
+                        <button onclick="deleteAgenda(${idx})" class="text-red-500 hover:text-red-700 text-xs"><i class="fa-solid fa-trash"></i> Hapus</button>
+                    </div>
+                    <h4 class="font-bold text-lg text-gray-900">${a.title}</h4>
+                    <p class="text-sm text-gray-500">${a.location}</p>
+                    <p class="text-xs text-gray-600">${a.desc}</p>
+                </div>
+            `).join('');
+        }
+
+        function deleteAgenda(idx) {
+            if(confirm("Hapus agenda ini?")) {
+                state.agendas.splice(idx, 1);
+                renderAllViews();
+            }
+        }
+
+        function openAddAgendaModal() {
+            const title = prompt("Judul Agenda Kegiatan:");
+            if(!title) return;
+            const date = prompt("Tanggal Kegiatan (cth: 15 Nov 2026):", "15 Nov 2026");
+            const location = prompt("Lokasi Kegiatan:", "Padang");
+            const desc = prompt("Deskripsi Kegiatan:");
+
+            state.agendas.push({
+                id: Date.now(),
+                title: title,
+                date: date || "Segera",
+                location: location || "Padang",
+                quota: 50,
+                registered: 0,
+                desc: desc || "Kegiatan sosial."
+            });
+            renderAllViews();
+        }
+
+        function renderAdminReports() {
+            const container = document.getElementById('admin-reports-list');
+            container.innerHTML = state.reports.map((r, idx) => `
+                <div class="bg-gray-50 p-4 rounded-xl flex justify-between items-center text-sm">
+                    <div>
+                        <p class="font-bold text-gray-800">${r.title}</p>
+                        <p class="text-xs text-gray-500">${r.period} • ${r.desc}</p>
+                    </div>
+                    <button onclick="deleteReport(${idx})" class="text-red-500 hover:text-red-700 p-2"><i class="fa-solid fa-trash"></i></button>
+                </div>
+            `).join('');
+        }
+
+        function deleteReport(idx) {
+            if(confirm("Hapus laporan ini dari publikasi publik?")) {
+                state.reports.splice(idx, 1);
+                renderAllViews();
+            }
+        }
+
+        function openUploadReportModal() {
+            const title = prompt("Judul Laporan (cth: Laporan Keuangan Q4):");
+            if(!title) return;
+            const period = prompt("Periode Laporan:", "Desember 2026");
+            const desc = prompt("Deskripsi singkat laporan:");
+
+            state.reports.push({
+                title: title,
+                period: period || "2026",
+                desc: desc || "Laporan berkala.",
+                pdf: "Laporan_Baru.pdf"
+            });
+            renderAllViews();
+        }
+
+        // Initialize on load
+        window.onload = function() {
+            renderAllViews();
+        };
+    </script>
+</body>
+</html>

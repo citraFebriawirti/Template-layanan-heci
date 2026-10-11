@@ -1,0 +1,1317 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mise Restaurant OS — Premium Restaurant Management System</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        terracotta: {
+                            DEFAULT: '#C65D3A',
+                            dark: '#98452D',
+                            light: '#F4E3DA'
+                        },
+                        cream: {
+                            DEFAULT: '#F7F3ED',
+                            surface: '#FFFDF9',
+                            neutral: '#F0EDE7',
+                            border: '#E8E0D6'
+                        },
+                        charcoal: {
+                            DEFAULT: '#292824',
+                            secondary: '#77736C'
+                        },
+                        amber: {
+                            soft: '#E7AD55'
+                        },
+                        rose: {
+                            muted: '#B85C5C'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F7F3ED;
+            color: #292824;
+        }
+        /* Custom Scrollbar for sleek SaaS feel */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #F7F3ED;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #E8E0D6;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #C65D3A;
+        }
+    </style>
+</head>
+<body class="bg-[#F7F3ED] text-[#292824] antialiased h-screen flex overflow-hidden select-none">
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col space-y-2 pointer-events-none"></div>
+
+    <!-- Application Sidebar -->
+    <aside id="sidebar" class="bg-[#FFFDF9] border-r border-[#E8E0D6] flex flex-col transition-all duration-300 z-30 w-64 shrink-0">
+        <!-- Brand Header -->
+        <div class="p-4 border-b border-[#E8E0D6] flex items-center justify-between">
+            <div class="flex items-center space-x-3 overflow-hidden">
+                <div class="w-10 h-10 rounded-xl bg-[#C65D3A] flex items-center justify-center text-[#FFFDF9] font-bold shadow-sm shrink-0">
+                    <i data-lucide="utensils-crossed" class="w-5 h-5"></i>
+                </div>
+                <div id="brand-text">
+                    <h1 class="font-bold text-base tracking-tight text-[#292824]">Mise OS</h1>
+                    <p class="text-[11px] text-[#77736C]">Restaurant Operations</p>
+                </div>
+            </div>
+            <button onclick="toggleSidebar()" class="text-[#77736C] hover:text-[#292824] p-1.5 rounded-lg hover:bg-[#F0EDE7]">
+                <i data-lucide="menu" class="w-4 h-4"></i>
+            </button>
+        </div>
+
+        <!-- Navigation Scroll Area -->
+        <div id="nav-container" class="flex-1 overflow-y-auto px-3 py-4 space-y-6">
+            <!-- Navigation items injected via JS -->
+        </div>
+
+        <!-- User Role Switcher at Bottom -->
+        <div class="p-3 border-t border-[#E8E0D6] bg-[#F7F3ED]/50 flex items-center justify-between">
+            <div class="flex items-center space-x-2 overflow-hidden" id="sidebar-user-info">
+                <div class="w-8 h-8 rounded-full bg-[#E7AD55]/30 text-[#292824] flex items-center justify-center font-bold text-xs shrink-0" id="user-avatar-initial">M</div>
+                <div class="overflow-hidden">
+                    <p class="text-xs font-bold truncate text-[#292824]" id="sidebar-user-name">Marcus Executive</p>
+                    <p class="text-[10px] text-[#77736C] truncate" id="sidebar-user-role">Owner</p>
+                </div>
+            </div>
+            <select id="role-switcher" onchange="switchUserRole(this.value)" class="text-[11px] bg-[#FFFDF9] border border-[#E8E0D6] rounded p-1 text-[#292824] focus:outline-none">
+                <!-- Options populated by JS -->
+            </select>
+        </div>
+    </aside>
+
+    <!-- Main Content Shell -->
+    <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+        
+        <!-- Top Navigation Bar -->
+        <header class="h-16 bg-[#FFFDF9] border-b border-[#E8E0D6] px-6 flex items-center justify-between z-20 shrink-0">
+            <div class="flex items-center space-x-4">
+                <span class="text-xs font-semibold uppercase tracking-wider text-[#77736C]">Mise OS</span>
+                <span class="text-[#E8E0D6]">/</span>
+                <span id="top-breadcrumb" class="text-sm font-bold text-[#292824]">Dashboard</span>
+            </div>
+
+            <div class="flex items-center space-x-4">
+                <!-- Outlet Selector -->
+                <div class="flex items-center space-x-2 bg-[#F0EDE7] px-3 py-1.5 rounded-lg border border-[#E8E0D6]">
+                    <i data-lucide="building-2" class="w-4 h-4 text-[#C65D3A]"></i>
+                    <select id="outlet-selector" onchange="switchActiveOutlet(this.value)" class="bg-transparent text-xs font-medium text-[#292824] focus:outline-none cursor-pointer">
+                        <option value="All Outlets">🌐 All Outlets (Group View)</option>
+                    </select>
+                </div>
+
+                <!-- Notification Bell -->
+                <div class="relative">
+                    <button onclick="toggleNotificationDropdown()" class="relative p-2 text-[#77736C] hover:text-[#292824] hover:bg-[#F0EDE7] rounded-lg transition-colors">
+                        <i data-lucide="bell" class="w-5 h-5"></i>
+                        <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-[#C65D3A] rounded-full"></span>
+                    </button>
+                    <div id="notification-dropdown" class="hidden absolute right-0 mt-2 w-80 bg-[#FFFDF9] border border-[#E8E0D6] rounded-xl shadow-xl z-50 p-4 space-y-3">
+                        <div class="flex items-center justify-between border-b border-[#E8E0D6] pb-2">
+                            <h4 class="font-bold text-xs uppercase tracking-wider text-[#292824]">Notifikasi Operasional</h4>
+                            <span class="text-[10px] bg-[#F4E3DA] text-[#C65D3A] px-2 py-0.5 rounded font-medium">3 Baru</span>
+                        </div>
+                        <div class="space-y-2.5 text-xs">
+                            <div class="p-2.5 bg-[#F0EDE7] rounded-lg border border-[#E8E0D6]">
+                                <p class="font-semibold text-[#292824]">Stok Kritis: Kopi Arabika</p>
+                                <p class="text-[#77736C] text-[11px] mt-0.5">Stok tersisa 3,000 gram di bawah minimum (5,000 gram).</p>
+                            </div>
+                            <div class="p-2.5 bg-[#F0EDE7] rounded-lg border border-[#E8E0D6]">
+                                <p class="font-semibold text-[#292824]">PO-2026-002 Menunggu Penerimaan</p>
+                                <p class="text-[#77736C] text-[11px] mt-0.5">Pengiriman dari CV Sumber Protein terjadwal hari ini.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- User Profile Pill -->
+                <div class="flex items-center space-x-3 pl-2 border-l border-[#E8E0D6]">
+                    <div id="top-user-avatar" class="w-8 h-8 rounded-full bg-[#C65D3A] text-[#FFFDF9] font-bold flex items-center justify-center text-xs">M</div>
+                    <div class="hidden md:block text-left">
+                        <p id="top-user-name" class="text-xs font-bold text-[#292824]">Marcus Executive</p>
+                        <p id="top-user-role" class="text-[10px] text-[#77736C]">Owner</p>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Dynamic Page Content Area -->
+        <main id="main-content" class="flex-1 overflow-y-auto p-6 bg-[#F7F3ED]">
+            <!-- Dynamic Module Rendered Here -->
+        </main>
+
+    </div>
+
+    <!-- Modals Container -->
+    <div id="modal-backdrop" class="hidden fixed inset-0 z-50 bg-[#292824]/40 backdrop-blur-sm flex items-center justify-center p-4">
+        <div id="modal-content" class="bg-[#FFFDF9] rounded-xl border border-[#E8E0D6] shadow-2xl w-full max-w-lg p-6 space-y-4 max-h-[90vh] overflow-y-auto">
+            <!-- Modal Content injected dynamically -->
+        </div>
+    </div>
+
+    <!-- Application Core Logic & Mock Database -->
+    <script>
+        const APP_STATE = {
+            activeNav: 'Dashboard',
+            activeOutlet: 'All Outlets',
+            sidebarCollapsed: false,
+            currentUser: null,
+            outlets: [
+                { id: 'OUT-01', code: 'SCBD', name: 'Mise Bistro SCBD', address: 'Jl. Jend. Sudirman No. 52, Jakarta Selatan', contact: 'Budi Santoso', phone: '+62 811-9988-1122', status: 'Active', openingHours: '10:00 - 22:00' },
+                { id: 'OUT-02', code: 'SEN', name: 'Mise Senopati Cafe', address: 'Jl. Senopati Raya No. 18, Jakarta Selatan', contact: 'Siti Rahma', phone: '+62 812-3344-5566', status: 'Active', openingHours: '08:00 - 23:00' },
+                { id: 'OUT-03', code: 'PIK', name: 'Mise Kitchen & Bar PIK', address: 'Golf Island PIK Boulevard Blok B/12', contact: 'Kevin Chandra', phone: '+62 818-7766-5544', status: 'Active', openingHours: '11:00 - 00:00' },
+            ],
+            ingredients: [
+                { id: 'ING-01', code: 'BRS-01', name: 'Beras Premium (Pandan Wangi)', category: 'Dry Goods', baseUnit: 'gram', purchaseUnit: 'kg', conversionFactor: 1000, latestCost: 15000, avgCost: 14500, stock: 150000, minStock: 25000, supplier: 'PT Sembako Nusantara', location: 'Gudang Kering A1', status: 'In Stock' },
+                { id: 'ING-02', code: 'AYM-01', name: 'Ayam Broiler Fillet Dada', category: 'Protein', baseUnit: 'gram', purchaseUnit: 'kg', conversionFactor: 1000, latestCost: 38000, avgCost: 37500, stock: 45000, minStock: 10000, supplier: 'CV Sumber Protein', location: 'Cold Storage 01', status: 'In Stock' },
+                { id: 'ING-03', code: 'TLR-01', name: 'Telur Ayam Negeri', category: 'Protein', baseUnit: 'pcs', purchaseUnit: 'crate', conversionFactor: 30, latestCost: 54000, avgCost: 52000, stock: 300, minStock: 90, supplier: 'CV Sumber Protein', location: 'Chiller 02', status: 'In Stock' },
+                { id: 'ING-04', code: 'MKS-01', name: 'Minyak Goreng Sawit', category: 'Dry Goods', baseUnit: 'ml', purchaseUnit: 'jerigen', conversionFactor: 5000, latestCost: 75000, avgCost: 72000, stock: 25000, minStock: 10000, supplier: 'PT Sembako Nusantara', location: 'Gudang Kering A2', status: 'In Stock' },
+                { id: 'ING-05', code: 'BMB-01', name: 'Bumbu Dasar Merah (Bawang/Cabai)', category: 'Bumbu', baseUnit: 'gram', purchaseUnit: 'kg', conversionFactor: 1000, latestCost: 45000, avgCost: 44000, stock: 8000, minStock: 15000, supplier: 'Pasar Induk Supplier', location: 'Chiller 01', status: 'Low Stock' },
+                { id: 'ING-06', code: 'KCP-01', name: 'Kecap Manis Special', category: 'Dry Goods', baseUnit: 'ml', purchaseUnit: 'jerigen', conversionFactor: 5000, latestCost: 85000, avgCost: 85000, stock: 12000, minStock: 5000, supplier: 'PT Sembako Nusantara', location: 'Gudang Kering B1', status: 'In Stock' },
+                { id: 'ING-07', code: 'KPS-01', name: 'Kopi Arabika Blend', category: 'Minuman', baseUnit: 'gram', purchaseUnit: 'kg', conversionFactor: 1000, latestCost: 180000, avgCost: 175000, stock: 3000, minStock: 5000, supplier: 'Java Roastery Co', location: 'Dry Store Coffee', status: 'Low Stock' },
+                { id: 'ING-08', code: 'SST-01', name: 'Susu Segar Fresh Milk', category: 'Dairy', baseUnit: 'ml', purchaseUnit: 'liter', conversionFactor: 1000, latestCost: 22000, avgCost: 21500, stock: 4500, minStock: 8000, supplier: 'Dairy Farm Indo', location: 'Chiller 03', status: 'Low Stock' },
+            ],
+            suppliers: [
+                { id: 'SUP-01', code: 'PT-SN', name: 'PT Sembako Nusantara', contact: 'Pak Hendra', phone: '+62 21-5551234', email: 'order@sembakonusantara.co.id', address: 'Jl. Industri Raya No. 45, Jakarta', terms: 'Net 30 Days', status: 'Active' },
+                { id: 'SUP-02', code: 'CV-SP', name: 'CV Sumber Protein', contact: 'Ibu Dewi', phone: '+62 21-7778899', email: 'sales@sumberprotein.com', address: 'Jl. Rorotan No. 12, Jakarta Utara', terms: 'Cash on Delivery', status: 'Active' },
+                { id: 'SUP-03', code: 'JR-CO', name: 'Java Roastery Co', contact: 'Rian Pratama', phone: '+62 813-5566-7788', email: 'rian@javaroastery.id', address: 'Jl. Senopati No. 8, Jakarta Selatan', terms: 'Net 14 Days', status: 'Active' },
+            ],
+            employees: [
+                { id: 'EMP-01', empId: 'MGR-001', name: 'Budi Santoso', role: 'Restaurant Manager', outlet: 'Mise Bistro SCBD', phone: '+62 811-9988-1122', email: 'budi@miserestaurant.id', status: 'Active', joinDate: '2023-01-15' },
+                { id: 'EMP-02', empId: 'KCH-001', name: 'Chef Joko Widodo', role: 'Kitchen Staff', outlet: 'Mise Bistro SCBD', phone: '+62 812-4455-6677', email: 'joko@miserestaurant.id', status: 'Active', joinDate: '2023-03-01' },
+                { id: 'EMP-03', empId: 'WHS-001', name: 'Agus Warehouse', role: 'Warehouse Staff', outlet: 'Mise Bistro SCBD', phone: '+62 813-2233-4455', email: 'agus@miserestaurant.id', status: 'Active', joinDate: '2023-06-10' },
+                { id: 'EMP-04', empId: 'PUR-001', name: 'Siti Purchasing', role: 'Purchasing', outlet: 'All Outlets', phone: '+62 815-9988-2233', email: 'siti@miserestaurant.id', status: 'Active', joinDate: '2022-11-20' },
+                { id: 'EMP-05', empId: 'OWN-001', name: 'Marcus Executive', role: 'Owner', outlet: 'All Outlets', phone: '+62 811-1122-3344', email: 'marcus@miserestaurant.id', status: 'Active', joinDate: '2022-01-01' },
+            ],
+            menus: [
+                { 
+                    id: 'MNU-01', code: 'NSG-01', name: 'Nasi Goreng Spesial Mise', category: 'Main Course', price: 55000, version: 'v1.2', status: 'Active',
+                    recipe: [
+                        { ingredientId: 'ING-01', qty: 200, unit: 'gram' },
+                        { ingredientId: 'ING-02', qty: 80, unit: 'gram' },
+                        { ingredientId: 'ING-03', qty: 1, unit: 'pcs' },
+                        { ingredientId: 'ING-04', qty: 20, unit: 'ml' },
+                        { ingredientId: 'ING-05', qty: 30, unit: 'gram' },
+                    ]
+                },
+                { 
+                    id: 'MNU-02', code: 'AYB-01', name: 'Ayam Bakar Madu Bakar', category: 'Main Course', price: 68000, version: 'v1.0', status: 'Active',
+                    recipe: [
+                        { ingredientId: 'ING-02', qty: 180, unit: 'gram' },
+                        { ingredientId: 'ING-05', qty: 40, unit: 'gram' },
+                    ]
+                },
+                { 
+                    id: 'MNU-03', code: 'KPS-01', name: 'Kopi Susu Gula Aren', category: 'Beverage', price: 32000, version: 'v1.1', status: 'Active',
+                    recipe: [
+                        { ingredientId: 'ING-07', qty: 18, unit: 'gram' },
+                        { ingredientId: 'ING-08', qty: 120, unit: 'ml' },
+                    ]
+                }
+            ],
+            posTransactions: [
+                { id: 'TRX-1001', date: '2026-10-11 12:30', outlet: 'Mise Bistro SCBD', items: [{ menuId: 'MNU-01', qty: 3 }], total: 165000, status: 'Posted' },
+                { id: 'TRX-1002', date: '2026-10-11 13:15', outlet: 'Mise Bistro SCBD', items: [{ menuId: 'MNU-02', qty: 2 }, { menuId: 'MNU-03', qty: 4 }], total: 264000, status: 'Posted' },
+                { id: 'TRX-1003', date: '2026-10-11 14:00', outlet: 'Mise Senopati Cafe', items: [{ menuId: 'MNU-03', qty: 10 }], total: 320000, status: 'Posted' },
+            ],
+            purchaseOrders: [
+                { poNumber: 'PO-2026-001', supplier: 'PT Sembako Nusantara', outlet: 'Mise Bistro SCBD', orderDate: '2026-10-08', expectedDelivery: '2026-10-10', totalAmount: 3250000, createdBy: 'Siti Purchasing', status: 'Received', items: [{ ingredientId: 'ING-01', qty: 100, unit: 'kg', price: 15000 }] },
+                { poNumber: 'PO-2026-002', supplier: 'CV Sumber Protein', outlet: 'Mise Bistro SCBD', orderDate: '2026-10-10', expectedDelivery: '2026-10-12', totalAmount: 1850000, createdBy: 'Siti Purchasing', status: 'Approved', items: [{ ingredientId: 'ING-02', qty: 30, unit: 'kg', price: 38000 }] },
+            ],
+            transfers: [
+                { refNumber: 'TRF-501', date: '2026-10-09 10:00', fromOutlet: 'Mise Bistro SCBD', toOutlet: 'Mise Senopati Cafe', items: [{ ingredientId: 'ING-01', qty: 20, unit: 'kg' }], status: 'Completed', createdBy: 'Agus Warehouse' },
+            ],
+            wasteRecords: [
+                { id: 'WST-001', date: '2026-10-10 16:30', outlet: 'Mise Bistro SCBD', ingredientId: 'ING-08', qty: 1000, unit: 'ml', cost: 21500, totalValue: 21500, reason: 'Expired', notes: 'Susu melewati tanggal kadaluarsa chilling', recordedBy: 'Chef Joko' },
+            ],
+            stockOpnameList: [
+                { id: 'SO-001', date: '2026-10-07', outlet: 'Mise Bistro SCBD', status: 'Posted', items: [
+                    { ingredientId: 'ING-01', systemQty: 150000, physicalCount: 148500, variance: -1500, cost: 14.5, varianceVal: -21750, reason: 'Penyusutan alami / susut timbang' }
+                ]}
+            ],
+            shifts: [
+                { id: 'SHF-01', employee: 'Chef Joko Widodo', outlet: 'Mise Bistro SCBD', date: '2026-10-11', startTime: '09:00', endTime: '18:00', breakDuration: '60 mins', position: 'Kitchen Staff', notes: 'Shift Pagi' },
+                { id: 'SHF-02', employee: 'Agus Warehouse', outlet: 'Mise Bistro SCBD', date: '2026-10-11', startTime: '08:00', endTime: '17:00', breakDuration: '60 mins', position: 'Warehouse Staff', notes: 'Gudang Utama' },
+            ],
+            attendanceRecords: [
+                { id: 'ATT-01', employee: 'Chef Joko Widodo', outlet: 'Mise Bistro SCBD', date: '2026-10-11', clockIn: '08:55', clockOut: '-', status: 'On Duty', totalHours: '-' },
+                { id: 'ATT-02', employee: 'Agus Warehouse', outlet: 'Mise Bistro SCBD', date: '2026-10-11', clockIn: '07:50', clockOut: '17:05', status: 'Completed', totalHours: '8h 15m' },
+            ],
+            auditLogs: [
+                { id: 'AUD-001', user: 'Marcus Executive', action: 'CREATE', entity: 'Master Outlet', refId: 'OUT-03', timestamp: '2026-10-01 09:30:12', summary: 'Menambahkan outlet baru Mise Kitchen & Bar PIK', outlet: 'All Outlets', reason: 'Ekspansi cabang baru' },
+                { id: 'AUD-002', user: 'Siti Purchasing', action: 'APPROVE', entity: 'Purchase Order', refId: 'PO-2026-002', timestamp: '2026-10-10 11:20:00', summary: 'Menyetujui PO bahan baku protein CV Sumber Protein', outlet: 'Mise Bistro SCBD', reason: 'Stok menipis' }
+            ]
+        };
+
+        function formatIDR(num) {
+            return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(num || 0);
+        }
+
+        function showToast(msg) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'bg-[#292824] text-[#FFFDF9] px-4 py-3 rounded-xl shadow-xl flex items-center space-x-3 border border-[#C65D3A]/40 animate-fade-in pointer-events-auto';
+            toast.innerHTML = `<i data-lucide="check-circle" class="w-5 h-5 text-[#E7AD55]"></i><span class="text-sm font-medium">${msg}</span>`;
+            container.appendChild(toast);
+            lucide.createIcons();
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
+        function logAudit(action, entity, refId, summary, reason = '-') {
+            const newLog = {
+                id: `AUD-${Date.now().toString().slice(-4)}`,
+                user: APP_STATE.currentUser.name,
+                action,
+                entity,
+                refId,
+                timestamp: new Date().toISOString().replace('T', ' ').substring(0, 19),
+                summary,
+                outlet: APP_STATE.activeOutlet,
+                reason
+            };
+            APP_STATE.auditLogs.unshift(newLog);
+        }
+
+        function checkPermission(moduleName) {
+            const user = APP_STATE.currentUser;
+            if (!user) return false;
+            if (user.role === 'Owner' || user.role === 'Admin') return true;
+            if (user.role === 'Restaurant Manager' && ['Dashboard', 'Inventory', 'Stock Opname', 'Transfers', 'Waste & Adjustments', 'Menu', 'Recipe & Ingredients', 'Shift Schedule', 'Attendance', 'Sales Reports', 'Inventory Reports'].includes(moduleName)) return true;
+            if (user.role === 'Purchasing' && ['Suppliers', 'Purchase Orders', 'Goods Receiving', 'Inventory'].includes(moduleName)) return true;
+            if (user.role === 'Warehouse Staff' && ['Inventory', 'Stock Opname', 'Transfers', 'Waste & Adjustments', 'Goods Receiving'].includes(moduleName)) return true;
+            if (user.role === 'Kitchen Staff' && ['Recipe & Ingredients', 'Waste & Adjustments', 'Inventory'].includes(moduleName)) return true;
+            return false;
+        }
+
+        function calculateMenuHPP(menu) {
+            let totalCost = 0;
+            menu.recipe.forEach(item => {
+                const ing = APP_STATE.ingredients.find(i => i.id === item.ingredientId);
+                if (ing) {
+                    const costPerBaseUnit = ing.avgCost / ing.conversionFactor;
+                    totalCost += costPerBaseUnit * item.qty;
+                }
+            });
+            const foodCostPct = menu.price > 0 ? (totalCost / menu.price) * 100 : 0;
+            const grossProfit = menu.price - totalCost;
+            return { totalCost: Math.round(totalCost), foodCostPct: foodCostPct.toFixed(1), grossProfit: Math.round(grossProfit) };
+        }
+
+        function initApp() {
+            APP_STATE.currentUser = APP_STATE.employees[4]; // Default Owner: Marcus Executive
+            populateRoleSwitcher();
+            populateOutletSelector();
+            renderSidebar();
+            renderNavigation();
+            lucide.createIcons();
+        }
+
+        function populateRoleSwitcher() {
+            const select = document.getElementById('role-switcher');
+            select.innerHTML = APP_STATE.employees.map(emp => `<option value="${emp.id}" ${emp.id === APP_STATE.currentUser.id ? 'selected' : ''}>${emp.role.split(' ')[0]}</option>`).join('');
+            document.getElementById('sidebar-user-name').innerText = APP_STATE.currentUser.name;
+            document.getElementById('sidebar-user-role').innerText = APP_STATE.currentUser.role;
+            document.getElementById('user-avatar-initial').innerText = APP_STATE.currentUser.name.charAt(0);
+            document.getElementById('top-user-name').innerText = APP_STATE.currentUser.name;
+            document.getElementById('top-user-role').innerText = APP_STATE.currentUser.role;
+            document.getElementById('top-user-avatar').innerText = APP_STATE.currentUser.name.charAt(0);
+        }
+
+        function switchUserRole(empId) {
+            const emp = APP_STATE.employees.find(e => e.id === empId);
+            if (emp) {
+                APP_STATE.currentUser = emp;
+                populateRoleSwitcher();
+                renderSidebar();
+                renderNavigation();
+                showToast(`Role beralih ke: ${emp.name} (${emp.role})`);
+            }
+        }
+
+        function populateOutletSelector() {
+            const select = document.getElementById('outlet-selector');
+            let html = `<option value="All Outlets">🌐 All Outlets (Group View)</option>`;
+            APP_STATE.outlets.forEach(out => {
+                html += `<option value="${out.name}">${out.name}</option>`;
+            });
+            select.innerHTML = html;
+        }
+
+        function switchActiveOutlet(outletName) {
+            APP_STATE.activeOutlet = outletName;
+            showToast(`Outlet aktif: ${outletName}`);
+            renderNavigation();
+        }
+
+        function toggleSidebar() {
+            APP_STATE.sidebarCollapsed = !APP_STATE.sidebarCollapsed;
+            const sidebar = document.getElementById('sidebar');
+            const brandText = document.getElementById('brand-text');
+            if (APP_STATE.sidebarCollapsed) {
+                sidebar.classList.remove('w-64');
+                sidebar.classList.add('w-20');
+                brandText.classList.add('hidden');
+            } else {
+                sidebar.classList.remove('w-20');
+                sidebar.classList.add('w-64');
+                brandText.classList.remove('hidden');
+            }
+            renderSidebar();
+        }
+
+        function toggleNotificationDropdown() {
+            const drop = document.getElementById('notification-dropdown');
+            drop.classList.toggle('hidden');
+        }
+
+        const NAV_SECTIONS = [
+            { title: 'Overview', items: [{ name: 'Dashboard', icon: 'layout-dashboard' }] },
+            { title: 'Operations', items: [{ name: 'Inventory', icon: 'package' }, { name: 'Stock Opname', icon: 'check-square' }, { name: 'Transfers', icon: 'arrow-left-right' }, { name: 'Waste & Adjustments', icon: 'trash-2' }] },
+            { title: 'Menu & Costing', items: [{ name: 'Menu', icon: 'book-open' }, { name: 'Recipe & Ingredients', icon: 'utensils-crossed' }, { name: 'Food Cost Analysis', icon: 'calculator' }] },
+            { title: 'Procurement', items: [{ name: 'Suppliers', icon: 'truck' }, { name: 'Purchase Orders', icon: 'shopping-cart' }, { name: 'Goods Receiving', icon: 'check-circle' }] },
+            { title: 'People', items: [{ name: 'Employees', icon: 'users' }, { name: 'Shift Schedule', icon: 'calendar' }, { name: 'Attendance', icon: 'clock' }] },
+            { title: 'Reports', items: [{ name: 'Sales Reports', icon: 'bar-chart-3' }, { name: 'Inventory Reports', icon: 'package' }, { name: 'Food Cost Reports', icon: 'pie-chart' }, { name: 'Outlet Comparison', icon: 'building-2' }] },
+            { title: 'System', items: [{ name: 'User Management', icon: 'user-cog' }, { name: 'Roles & Permissions', icon: 'shield-check' }, { name: 'Settings', icon: 'settings' }, { name: 'Audit Log', icon: 'file-text' }] },
+        ];
+
+        function renderSidebar() {
+            const container = document.getElementById('nav-container');
+            let html = '';
+            NAV_SECTIONS.forEach(sec => {
+                const allowedItems = sec.items.filter(item => checkPermission(item.name));
+                if (allowedItems.length === 0) return;
+
+                if (!APP_STATE.sidebarCollapsed) {
+                    html += `<p class="px-3 text-[11px] font-semibold tracking-wider text-[#77736C] uppercase mb-2">${sec.title}</p>`;
+                }
+                html += `<div class="space-y-1 mb-4">`;
+                allowedItems.forEach(item => {
+                    const isActive = APP_STATE.activeNav === item.name;
+                    html += `
+                        <button onclick="navigateTo('${item.name}')" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-xs font-medium transition-colors ${isActive ? 'bg-[#F4E3DA] text-[#C65D3A] font-semibold' : 'text-[#77736C] hover:bg-[#F0EDE7] hover:text-[#292824]'}" title="${APP_STATE.sidebarCollapsed ? item.name : ''}">
+                            <i data-lucide="${item.icon}" class="w-4 h-4 shrink-0 ${isActive ? 'text-[#C65D3A]' : 'text-[#77736C]'}"></i>
+                            ${!APP_STATE.sidebarCollapsed ? `<span class="truncate">${item.name}</span>` : ''}
+                        </button>
+                    `;
+                });
+                html += `</div>`;
+            });
+            container.innerHTML = html;
+            lucide.createIcons();
+        }
+
+        function navigateTo(navName) {
+            APP_STATE.activeNav = navName;
+            document.getElementById('top-breadcrumb').innerText = navName;
+            renderSidebar();
+            renderNavigation();
+        }
+
+        function renderNavigation() {
+            const main = document.getElementById('main-content');
+            main.innerHTML = '';
+            switch (APP_STATE.activeNav) {
+                case 'Dashboard': renderDashboard(main); break;
+                case 'Inventory': renderInventory(main); break;
+                case 'Stock Opname': renderStockOpname(main); break;
+                case 'Transfers': renderTransfers(main); break;
+                case 'Waste & Adjustments': renderWaste(main); break;
+                case 'Menu': renderMenu(main); break;
+                case 'Recipe & Ingredients': renderRecipe(main); break;
+                case 'Food Cost Analysis': renderFoodCostAnalysis(main); break;
+                case 'Suppliers': renderSuppliers(main); break;
+                case 'Purchase Orders': renderPurchaseOrders(main); break;
+                case 'Goods Receiving': renderGoodsReceiving(main); break;
+                case 'Employees': renderEmployees(main); break;
+                case 'Shift Schedule': renderShifts(main); break;
+                case 'Attendance': renderAttendance(main); break;
+                case 'Sales Reports': renderSalesReports(main); break;
+                case 'Inventory Reports': renderInventoryReports(main); break;
+                case 'Food Cost Reports': renderFoodCostReports(main); break;
+                case 'Outlet Comparison': renderOutletComparison(main); break;
+                case 'User Management': renderUserManagement(main); break;
+                case 'Roles & Permissions': renderRolesPermissions(main); break;
+                case 'Settings': renderSettings(main); break;
+                case 'Audit Log': renderAuditLog(main); break;
+                default: main.innerHTML = `<div class="p-6">Modul sedang dimuat...</div>`;
+            }
+            lucide.createIcons();
+        }
+
+        function renderDashboard(container) {
+            const totalInventoryVal = APP_STATE.ingredients.reduce((acc, ing) => acc + (ing.stock * (ing.avgCost / ing.conversionFactor)), 0);
+            const lowStockCount = APP_STATE.ingredients.filter(ing => ing.stock <= ing.minStock).length;
+            const totalWasteVal = APP_STATE.wasteRecords.reduce((acc, w) => acc + w.totalValue, 0);
+
+            container.innerHTML = `
+                <div class="space-y-6">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between bg-[#FFFDF9] p-6 rounded-xl border border-[#E8E0D6] shadow-sm">
+                        <div>
+                            <h2 class="text-xl font-bold text-[#292824]">Halo, ${APP_STATE.currentUser.name}</h2>
+                            <p class="text-xs text-[#77736C] mt-0.5">Dashboard operasional untuk outlet <span class="font-semibold text-[#292824]">${APP_STATE.activeOutlet}</span> (Role: ${APP_STATE.currentUser.role})</p>
+                        </div>
+                        <div class="mt-4 md:mt-0 flex items-center space-x-3">
+                            <span class="text-xs bg-[#F0EDE7] text-[#77736C] px-3 py-1.5 rounded-lg font-medium border border-[#E8E0D6]">Periode: Oktober 2026</span>
+                            <button onclick="showToast('Laporan ekspor sedang disiapkan dalam format PDF/Excel.')" class="bg-[#C65D3A] text-[#FFFDF9] px-4 py-2 rounded-lg text-xs font-semibold hover:bg-[#98452D] transition-colors flex items-center space-x-2 shadow-sm">
+                                <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                                <span>Export Report</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                        <div class="bg-[#FFFDF9] p-4 rounded-xl border border-[#E8E0D6] shadow-sm space-y-2">
+                            <div class="flex items-center justify-between"><span class="text-xs font-medium text-[#77736C]">Total Sales</span><div class="p-2 bg-[#F0EDE7] rounded-lg"><i data-lucide="dollar-sign" class="w-4 h-4 text-[#C65D3A]"></i></div></div>
+                            <div class="flex items-baseline justify-between"><h4 class="text-lg font-bold text-[#292824]">Rp 148.500.000</h4><span class="text-xs font-semibold px-1.5 py-0.5 rounded text-[#C65D3A] bg-[#F4E3DA]">+12.4%</span></div>
+                        </div>
+                        <div class="bg-[#FFFDF9] p-4 rounded-xl border border-[#E8E0D6] shadow-sm space-y-2">
+                            <div class="flex items-center justify-between"><span class="text-xs font-medium text-[#77736C]">Food Cost %</span><div class="p-2 bg-[#F0EDE7] rounded-lg"><i data-lucide="calculator" class="w-4 h-4 text-[#E7AD55]"></i></div></div>
+                            <div class="flex items-baseline justify-between"><h4 class="text-lg font-bold text-[#292824]">31.4%</h4><span class="text-xs font-semibold px-1.5 py-0.5 rounded text-[#292824] bg-[#F0EDE7]">-1.2%</span></div>
+                        </div>
+                        <div class="bg-[#FFFDF9] p-4 rounded-xl border border-[#E8E0D6] shadow-sm space-y-2">
+                            <div class="flex items-center justify-between"><span class="text-xs font-medium text-[#77736C]">Total Inventory</span><div class="p-2 bg-[#F0EDE7] rounded-lg"><i data-lucide="package" class="w-4 h-4 text-[#C65D3A]"></i></div></div>
+                            <div class="flex items-baseline justify-between"><h4 class="text-lg font-bold text-[#292824]">${formatIDR(totalInventoryVal)}</h4><span class="text-xs font-semibold px-1.5 py-0.5 rounded text-[#E7AD55] bg-[#E7AD55]/10">Stabil</span></div>
+                        </div>
+                        <div class="bg-[#FFFDF9] p-4 rounded-xl border border-[#E8E0D6] shadow-sm space-y-2">
+                            <div class="flex items-center justify-between"><span class="text-xs font-medium text-[#77736C]">Waste Value</span><div class="p-2 bg-[#F0EDE7] rounded-lg"><i data-lucide="trash-2" class="w-4 h-4 text-[#B85C5C]"></i></div></div>
+                            <div class="flex items-baseline justify-between"><h4 class="text-lg font-bold text-[#292824]">${formatIDR(totalWasteVal)}</h4><span class="text-xs font-semibold px-1.5 py-0.5 rounded text-[#B85C5C] bg-[#B85C5C]/10">+2.1%</span></div>
+                        </div>
+                        <div class="bg-[#FFFDF9] p-4 rounded-xl border border-[#E8E0D6] shadow-sm space-y-2">
+                            <div class="flex items-center justify-between"><span class="text-xs font-medium text-[#77736C]">Low Stock Items</span><div class="p-2 bg-[#F0EDE7] rounded-lg"><i data-lucide="alert-triangle" class="w-4 h-4 text-[#E7AD55]"></i></div></div>
+                            <div class="flex items-baseline justify-between"><h4 class="text-lg font-bold text-[#292824]">${lowStockCount} Bahan</h4><span class="text-xs font-semibold px-1.5 py-0.5 rounded text-[#E7AD55] bg-[#E7AD55]/10">Perlu PO</span></div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div class="bg-[#FFFDF9] p-5 rounded-xl border border-[#E8E0D6] shadow-sm space-y-4">
+                            <div class="flex items-center justify-between"><h3 class="font-bold text-sm text-[#292824]">Peringatan Stok Kritis</h3><span class="text-xs bg-[#F4E3DA] text-[#C65D3A] px-2 py-0.5 rounded font-medium">${lowStockCount} Item</span></div>
+                            <div class="space-y-3">
+                                ${APP_STATE.ingredients.filter(ing => ing.stock <= ing.minStock).map(ing => `
+                                    <div class="flex items-center justify-between p-3 bg-[#F0EDE7]/60 rounded-lg border border-[#E8E0D6]">
+                                        <div><p class="text-xs font-bold text-[#292824]">${ing.name}</p><p class="text-[11px] text-[#77736C]">Stok: ${ing.stock.toLocaleString()} ${ing.baseUnit} (Min: ${ing.minStock})</p></div>
+                                        <span class="text-[10px] bg-[#B85C5C]/10 text-[#B85C5C] font-semibold px-2 py-1 rounded">Kritis</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+
+                        <div class="bg-[#FFFDF9] p-5 rounded-xl border border-[#E8E0D6] shadow-sm space-y-4">
+                            <div class="flex items-center justify-between"><h3 class="font-bold text-sm text-[#292824]">Purchase Order Aktif</h3><span class="text-xs bg-[#F0EDE7] text-[#77736C] px-2 py-0.5 rounded font-medium">${APP_STATE.purchaseOrders.length} PO</span></div>
+                            <div class="space-y-3">
+                                ${APP_STATE.purchaseOrders.map(po => `
+                                    <div class="p-3 bg-[#F0EDE7]/60 rounded-lg border border-[#E8E0D6] space-y-1">
+                                        <div class="flex justify-between items-center"><span class="text-xs font-bold text-[#292824]">${po.poNumber}</span><span class="text-[10px] bg-[#E7AD55]/20 text-[#292824] font-semibold px-2 py-0.5 rounded">${po.status}</span></div>
+                                        <p class="text-[11px] text-[#77736C]">Supplier: ${po.supplier}</p>
+                                        <div class="flex justify-between items-center pt-1"><span class="text-xs font-bold text-[#C65D3A]">${formatIDR(po.totalAmount)}</span><span class="text-[10px] text-[#77736C]">ETD: ${po.expectedDelivery}</span></div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+
+                        <div class="bg-[#FFFDF9] p-5 rounded-xl border border-[#E8E0D6] shadow-sm space-y-4">
+                            <div class="flex items-center justify-between"><h3 class="font-bold text-sm text-[#292824]">Jadwal & Absensi Hari Ini</h3><span class="text-xs bg-[#F4E3DA] text-[#C65D3A] px-2 py-0.5 rounded font-medium">${APP_STATE.shifts.length} Staf</span></div>
+                            <div class="space-y-3">
+                                ${APP_STATE.shifts.map(sh => `
+                                    <div class="p-3 bg-[#F0EDE7]/60 rounded-lg border border-[#E8E0D6] flex items-center justify-between">
+                                        <div><p class="text-xs font-bold text-[#292824]">${sh.employee}</p><p class="text-[11px] text-[#77736C]">${sh.position} • ${sh.startTime} - ${sh.endTime}</p></div>
+                                        <span class="text-[10px] bg-[#292824] text-[#FFFDF9] px-2 py-1 rounded font-medium">Hadir</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderInventory(container) {
+            container.innerHTML = `
+                <div class="space-y-6">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#FFFDF9] p-5 rounded-xl border border-[#E8E0D6] shadow-sm">
+                        <div>
+                            <h2 class="text-xl font-bold text-[#292824]">Manajemen Inventory Bahan Baku</h2>
+                            <p class="text-xs text-[#77736C] mt-0.5">Kelola stok real-time, satuan konversi, harga rata-rata tertimbang, dan batas minimum.</p>
+                        </div>
+                        <button onclick="openAddIngredientModal()" class="bg-[#C65D3A] text-[#FFFDF9] px-4 py-2 rounded-lg text-xs font-semibold hover:bg-[#98452D] transition-colors flex items-center space-x-2 shadow-sm shrink-0">
+                            <i data-lucide="plus" class="w-4 h-4"></i>
+                            <span>Tambah Bahan Baku</span>
+                        </button>
+                    </div>
+
+                    <div class="bg-[#FFFDF9] rounded-xl border border-[#E8E0D6] overflow-hidden shadow-sm">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-[#F0EDE7]/70 border-b border-[#E8E0D6] text-[11px] font-semibold text-[#77736C] uppercase tracking-wider">
+                                        <th class="p-4">Kode & Nama Bahan</th>
+                                        <th class="p-4">Kategori</th>
+                                        <th class="p-4 text-right">Stok On-Hand</th>
+                                        <th class="p-4 text-right">Harga Rata²</th>
+                                        <th class="p-4 text-right">Nilai Stok</th>
+                                        <th class="p-4">Supplier Utama</th>
+                                        <th class="p-4 text-center">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-[#E8E0D6] text-xs">
+                                    ${APP_STATE.ingredients.map(ing => {
+                                        const stockVal = ing.stock * (ing.avgCost / ing.conversionFactor);
+                                        const isLow = ing.stock <= ing.minStock;
+                                        return `
+                                            <tr class="hover:bg-[#F7F3ED]/60 transition-colors">
+                                                <td class="p-4"><p class="font-bold text-[#292824]">${ing.name}</p><p class="text-[11px] text-[#77736C]">${ing.code} • Lokasi: ${ing.location}</p></td>
+                                                <td class="p-4"><span class="px-2 py-1 bg-[#F0EDE7] rounded text-[11px] font-medium text-[#292824]">${ing.category}</span></td>
+                                                <td class="p-4 text-right font-semibold text-[#292824]">${ing.stock.toLocaleString('id-ID')} <span class="text-[10px] text-[#77736C]">${ing.baseUnit}</span></td>
+                                                <td class="p-4 text-right text-[#292824]">${formatIDR(ing.avgCost / ing.conversionFactor)} / ${ing.baseUnit}</td>
+                                                <td class="p-4 text-right font-bold text-[#C65D3A]">${formatIDR(stockVal)}</td>
+                                                <td class="p-4 text-[#77736C]">${ing.supplier}</td>
+                                                <td class="p-4 text-center"><span class="px-2 py-1 rounded text-[10px] font-semibold ${isLow ? 'bg-[#B85C5C]/10 text-[#B85C5C]' : 'bg-[#E7AD55]/10 text-[#E7AD55]'}">${isLow ? 'Low Stock' : 'In Stock'}</span></td>
+                                            </tr>
+                                        `;
+                                    }).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function openAddIngredientModal() {
+            const modal = document.getElementById('modal-backdrop');
+            const content = document.getElementById('modal-content');
+            content.innerHTML = `
+                <div class="flex items-center justify-between border-b border-[#E8E0D6] pb-3">
+                    <h3 class="font-bold text-base text-[#292824]">Tambah Bahan Baku Baru</h3>
+                    <button onclick="closeModal()" class="text-[#77736C] hover:text-[#292824]"><i data-lucide="x" class="w-5 h-5"></i></button>
+                </div>
+                <form onsubmit="handleSaveIngredient(event)" class="space-y-4 text-xs">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div><label class="block font-semibold text-[#77736C] mb-1">Kode Bahan</label><input type="text" id="ing-code" value="ING-09" class="w-full p-2 bg-[#F0EDE7]/50 border border-[#E8E0D6] rounded-lg" required></div>
+                        <div><label class="block font-semibold text-[#77736C] mb-1">Nama Bahan Baku</label><input type="text" id="ing-name" placeholder="Contoh: Keju Cheddar" class="w-full p-2 bg-[#F0EDE7]/50 border border-[#E8E0D6] rounded-lg" required></div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block font-semibold text-[#77736C] mb-1">Kategori</label>
+                            <select id="ing-cat" class="w-full p-2 bg-[#F0EDE7]/50 border border-[#E8E0D6] rounded-lg">
+                                <option value="Protein">Protein</option><option value="Dry Goods">Dry Goods</option><option value="Bumbu">Bumbu</option><option value="Dairy">Dairy</option><option value="Minuman">Minuman</option>
+                            </select>
+                        </div>
+                        <div><label class="block font-semibold text-[#77736C] mb-1">Supplier Utama</label><input type="text" id="ing-sup" value="PT Sembako Nusantara" class="w-full p-2 bg-[#F0EDE7]/50 border border-[#E8E0D6] rounded-lg"></div>
+                    </div>
+                    <div class="grid grid-cols-3 gap-4">
+                        <div><label class="block font-semibold text-[#77736C] mb-1">Satuan Dasar</label><input type="text" id="ing-base" value="gram" class="w-full p-2 bg-[#F0EDE7]/50 border border-[#E8E0D6] rounded-lg"></div>
+                        <div><label class="block font-semibold text-[#77736C] mb-1">Satuan Beli</label><input type="text" id="ing-purch" value="kg" class="w-full p-2 bg-[#F0EDE7]/50 border border-[#E8E0D6] rounded-lg"></div>
+                        <div><label class="block font-semibold text-[#77736C] mb-1">Konversi</label><input type="number" id="ing-conv" value="1000" class="w-full p-2 bg-[#F0EDE7]/50 border border-[#E8E0D6] rounded-lg"></div>
+                    </div>
+                    <div class="flex justify-end space-x-3 pt-3 border-t border-[#E8E0D6]">
+                        <button type="button" onclick="closeModal()" class="px-4 py-2 border border-[#E8E0D6] rounded-lg font-semibold text-[#77736C]">Batal</button>
+                        <button type="submit" class="px-4 py-2 bg-[#C65D3A] text-[#FFFDF9] rounded-lg font-semibold hover:bg-[#98452D]">Simpan Bahan</button>
+                    </div>
+                </form>
+            `;
+            modal.classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        function closeModal() {
+            document.getElementById('modal-backdrop').classList.add('hidden');
+        }
+
+        function handleSaveIngredient(e) {
+            e.preventDefault();
+            const newIng = {
+                id: `ING-0${APP_STATE.ingredients.length + 1}`,
+                code: document.getElementById('ing-code').value,
+                name: document.getElementById('ing-name').value,
+                category: document.getElementById('ing-cat').value,
+                baseUnit: document.getElementById('ing-base').value,
+                purchaseUnit: document.getElementById('ing-purch').value,
+                conversionFactor: Number(document.getElementById('ing-conv').value),
+                latestCost: 15000, avgCost: 14500, stock: 10000, minStock: 2000,
+                supplier: document.getElementById('ing-sup').value,
+                location: 'Gudang Utama', status: 'In Stock'
+            };
+            APP_STATE.ingredients.push(newIng);
+            logAudit('CREATE', 'Master Ingredient', newIng.code, `Menambahkan bahan baku baru: ${newIng.name}`);
+            showToast(`Bahan baku ${newIng.name} berhasil ditambahkan.`);
+            closeModal();
+            renderNavigation();
+        }
+
+        function renderStockOpname(container) {
+            container.innerHTML = `
+                <div class="space-y-6">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#FFFDF9] p-5 rounded-xl border border-[#E8E0D6] shadow-sm">
+                        <div>
+                            <h2 class="text-xl font-bold text-[#292824]">Stock Opname & Rekonsiliasi</h2>
+                            <p class="text-xs text-[#77736C] mt-0.5">Hitung fisik inventaris harian/mingguan dan rekam selisih secara akurat.</p>
+                        </div>
+                        <button onclick="showToast('Sesi stock opname baru diinisiasi.')" class="bg-[#C65D3A] text-[#FFFDF9] px-4 py-2 rounded-lg text-xs font-semibold hover:bg-[#98452D] transition-colors flex items-center space-x-2 shadow-sm shrink-0">
+                            <i data-lucide="plus" class="w-4 h-4"></i>
+                            <span>Sesi Stock Opname Baru</span>
+                        </button>
+                    </div>
+
+                    <div class="bg-[#FFFDF9] rounded-xl border border-[#E8E0D6] overflow-hidden shadow-sm">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-[#F0EDE7]/70 border-b border-[#E8E0D6] text-[11px] font-semibold text-[#77736C] uppercase tracking-wider">
+                                    <th class="p-4">ID Sesi & Tanggal</th>
+                                    <th class="p-4">Outlet</th>
+                                    <th class="p-4">Bahan Baku</th>
+                                    <th class="p-4 text-right">Stok Buku</th>
+                                    <th class="p-4 text-right">Hitung Fisik</th>
+                                    <th class="p-4 text-right">Selisih (Variance)</th>
+                                    <th class="p-4 text-right">Nilai Selisih</th>
+                                    <th class="p-4">Catatan / Alasan</th>
+                                    <th class="p-4 text-center">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-[#E8E0D6] text-xs">
+                                ${APP_STATE.stockOpnameList.map(so => {
+                                    const ing = APP_STATE.ingredients.find(i => i.id === so.items[0]?.ingredientId);
+                                    const item = so.items[0];
+                                    return `
+                                        <tr class="hover:bg-[#F7F3ED]/60 transition-colors">
+                                            <td class="p-4 font-bold text-[#292824]">${so.id}<p class="text-[11px] text-[#77736C] font-normal">${so.date}</p></td>
+                                            <td class="p-4 text-[#77736C]">${so.outlet}</td>
+                                            <td class="p-4 font-semibold text-[#292824]">${ing ? ing.name : 'Bahan'}</td>
+                                            <td class="p-4 text-right font-medium text-[#292824]">${item?.systemQty.toLocaleString()} ${ing?.baseUnit}</td>
+                                            <td class="p-4 text-right font-bold text-[#292824]">${item?.physicalCount.toLocaleString()} ${ing?.baseUnit}</td>
+                                            <td class="p-4 text-right font-bold ${item?.variance < 0 ? 'text-[#B85C5C]' : 'text-[#C65D3A]'}">${item?.variance} ${ing?.baseUnit}</td>
+                                            <td class="p-4 text-right font-bold text-[#292824]">${formatIDR(item?.varianceVal || 0)}</td>
+                                            <td class="p-4 text-[#77736C]">${item?.reason}</td>
+                                            <td class="p-4 text-center"><span class="px-2 py-1 bg-[#F0EDE7] text-[#292824] font-semibold rounded text-[10px]">${so.status}</span></td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderTransfers(container) {
+            container.innerHTML = `
+                <div class="space-y-6">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#FFFDF9] p-5 rounded-xl border border-[#E8E0D6] shadow-sm">
+                        <div>
+                            <h2 class="text-xl font-bold text-[#292824]">Transfer Antar Outlet & Central Kitchen</h2>
+                            <p class="text-xs text-[#77736C] mt-0.5">Pindahkan bahan baku antar cabang dengan validasi stok otomatis dan audit trail.</p>
+                        </div>
+                        <button onclick="showToast('Form transfer baru dibuka.')" class="bg-[#C65D3A] text-[#FFFDF9] px-4 py-2 rounded-lg text-xs font-semibold hover:bg-[#98452D] transition-colors flex items-center space-x-2 shadow-sm shrink-0">
+                            <i data-lucide="plus" class="w-4 h-4"></i>
+                            <span>Buat Transfer Baru</span>
+                        </button>
+                    </div>
+
+                    <div class="bg-[#FFFDF9] rounded-xl border border-[#E8E0D6] overflow-hidden shadow-sm">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-[#F0EDE7]/70 border-b border-[#E8E0D6] text-[11px] font-semibold text-[#77736C] uppercase tracking-wider">
+                                    <th class="p-4">No. Referensi & Tanggal</th>
+                                    <th class="p-4">Outlet Asal</th>
+                                    <th class="p-4">Outlet Tujuan</th>
+                                    <th class="p-4">Bahan & Kuantitas</th>
+                                    <th class="p-4">Dibuat Oleh</th>
+                                    <th class="p-4 text-center">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-[#E8E0D6] text-xs">
+                                ${APP_STATE.transfers.map(trf => {
+                                    const ing = APP_STATE.ingredients.find(i => i.id === trf.items[0]?.ingredientId);
+                                    return `
+                                        <tr class="hover:bg-[#F7F3ED]/60 transition-colors">
+                                            <td class="p-4 font-bold text-[#292824]">${trf.refNumber}<p class="text-[11px] text-[#77736C] font-normal">${trf.date}</p></td>
+                                            <td class="p-4 font-medium text-[#292824]">${trf.fromOutlet}</td>
+                                            <td class="p-4 font-medium text-[#292824]">${trf.toOutlet}</td>
+                                            <td class="p-4 text-[#77736C]"><span class="font-bold text-[#292824]">${trf.items[0]?.qty} ${trf.items[0]?.unit}</span> ${ing?.name}</td>
+                                            <td class="p-4 text-[#77736C]">${trf.createdBy}</td>
+                                            <td class="p-4 text-center"><span class="px-2 py-1 bg-[#F0EDE7] text-[#C65D3A] font-semibold rounded text-[10px]">${trf.status}</span></td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderWaste(container) {
+            container.innerHTML = `
+                <div class="space-y-6">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#FFFDF9] p-5 rounded-xl border border-[#E8E0D6] shadow-sm">
+                        <div>
+                            <h2 class="text-xl font-bold text-[#292824]">Waste & Stock Adjustments</h2>
+                            <p class="text-xs text-[#77736C] mt-0.5">Catat bahan rusak, kadaluarsa, atau susut dapur yang otomatis mengurangi inventaris.</p>
+                        </div>
+                        <button onclick="showToast('Pencatatan waste baru dibuka.')" class="bg-[#C65D3A] text-[#FFFDF9] px-4 py-2 rounded-lg text-xs font-semibold hover:bg-[#98452D] transition-colors flex items-center space-x-2 shadow-sm shrink-0">
+                            <i data-lucide="plus" class="w-4 h-4"></i>
+                            <span>Catat Waste Baru</span>
+                        </button>
+                    </div>
+
+                    <div class="bg-[#FFFDF9] rounded-xl border border-[#E8E0D6] overflow-hidden shadow-sm">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-[#F0EDE7]/70 border-b border-[#E8E0D6] text-[11px] font-semibold text-[#77736C] uppercase tracking-wider">
+                                    <th class="p-4">ID & Waktu</th>
+                                    <th class="p-4">Outlet</th>
+                                    <th class="p-4">Bahan Baku</th>
+                                    <th class="p-4 text-right">Kuantitas</th>
+                                    <th class="p-4 text-right">Nilai Waste</th>
+                                    <th class="p-4">Alasan</th>
+                                    <th class="p-4">Catatan & Pelapor</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-[#E8E0D6] text-xs">
+                                ${APP_STATE.wasteRecords.map(wst => {
+                                    const ing = APP_STATE.ingredients.find(i => i.id === wst.ingredientId);
+                                    return `
+                                        <tr class="hover:bg-[#F7F3ED]/60 transition-colors">
+                                            <td class="p-4 font-bold text-[#292824]">${wst.id}<p class="text-[11px] text-[#77736C] font-normal">${wst.date}</p></td>
+                                            <td class="p-4 text-[#77736C]">${wst.outlet}</td>
+                                            <td class="p-4 font-semibold text-[#292824]">${ing ? ing.name : 'Bahan'}</td>
+                                            <td class="p-4 text-right font-bold text-[#B85C5C]">${wst.qty.toLocaleString()} ${wst.unit}</td>
+                                            <td class="p-4 text-right font-bold text-[#C65D3A]">${formatIDR(wst.totalValue)}</td>
+                                            <td class="p-4"><span class="px-2 py-1 bg-[#B85C5C]/10 text-[#B85C5C] font-semibold rounded text-[10px]">${wst.reason}</span></td>
+                                            <td class="p-4"><p class="text-[#292824]">${wst.notes}</p><p class="text-[10px] text-[#77736C]">Oleh: ${wst.recordedBy}</p></td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderMenu(container) {
+            container.innerHTML = `
+                <div class="space-y-6">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#FFFDF9] p-5 rounded-xl border border-[#E8E0D6] shadow-sm">
+                        <div>
+                            <h2 class="text-xl font-bold text-[#292824]">Daftar Menu Restoran</h2>
+                            <p class="text-xs text-[#77736C] mt-0.5">Katalog menu terintegrasi dengan resep bahan baku dan kalkulasi HPP otomatis.</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        ${APP_STATE.menus.map(menu => {
+                            const hpp = calculateMenuHPP(menu);
+                            return `
+                                <div class="bg-[#FFFDF9] p-5 rounded-xl border border-[#E8E0D6] shadow-sm space-y-4">
+                                    <div class="flex justify-between items-start">
+                                        <div><span class="text-[10px] bg-[#F4E3DA] text-[#C65D3A] px-2 py-0.5 rounded font-bold">${menu.category}</span><h3 class="font-bold text-base text-[#292824] mt-1">${menu.name}</h3><p class="text-[11px] text-[#77736C]">${menu.code} • Versi: ${menu.version}</p></div>
+                                        <span class="text-xs bg-[#E7AD55]/10 text-[#292824] font-semibold px-2.5 py-1 rounded-lg">${menu.status}</span>
+                                    </div>
+                                    <div class="p-3 bg-[#F0EDE7]/60 rounded-lg space-y-2 text-xs">
+                                        <div class="flex justify-between"><span class="text-[#77736C]">Harga Jual:</span><span class="font-bold text-[#292824]">${formatIDR(menu.price)}</span></div>
+                                        <div class="flex justify-between"><span class="text-[#77736C]">Kalkulasi HPP:</span><span class="font-bold text-[#C65D3A]">${formatIDR(hpp.totalCost)}</span></div>
+                                        <div class="flex justify-between"><span class="text-[#77736C]">Food Cost %:</span><span class="font-bold text-[#E7AD55]">${hpp.foodCostPct}%</span></div>
+                                        <div class="flex justify-between pt-1 border-t border-[#E8E0D6]"><span class="text-[#77736C]">Est. Gross Profit:</span><span class="font-bold text-[#292824]">${formatIDR(hpp.grossProfit)}</span></div>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderRecipe(container) {
+            const menu = APP_STATE.menus[0];
+            const hpp = calculateMenuHPP(menu);
+            container.innerHTML = `
+                <div class="space-y-6">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#FFFDF9] p-5 rounded-xl border border-[#E8E0D6] shadow-sm">
+                        <div>
+                            <h2 class="text-xl font-bold text-[#292824]">Recipe & Ingredient Costing</h2>
+                            <p class="text-xs text-[#77736C] mt-0.5">Kelola takaran resep, konversi satuan dasar, dan pantau margin gross profit per porsi.</p>
+                        </div>
+                        <select onchange="showToast('Menu resep dipilih.')" class="p-2 bg-[#F0EDE7] border border-[#E8E0D6] rounded-lg text-xs font-bold text-[#292824]">
+                            ${APP_STATE.menus.map(m => `<option value="${m.id}">${m.name} (${m.version})</option>`).join('')}
+                        </select>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div class="lg:col-span-2 bg-[#FFFDF9] p-5 rounded-xl border border-[#E8E0D6] shadow-sm space-y-4">
+                            <div class="flex items-center justify-between border-b border-[#E8E0D6] pb-3">
+                                <h3 class="font-bold text-sm text-[#292824]">Komposisi Bahan Resep: ${menu.name}</h3>
+                                <button onclick="showToast('Bahan resep ditambahkan.')" class="bg-[#C65D3A] text-[#FFFDF9] px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-[#98452D] flex items-center space-x-1.5"><i data-lucide="plus" class="w-3.5 h-3.5"></i><span>Tambah Bahan</span></button>
+                            </div>
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-[#F0EDE7]/70 border-b border-[#E8E0D6] text-[11px] font-semibold text-[#77736C] uppercase tracking-wider">
+                                        <th class="p-3">Bahan Baku</th><th class="p-3 text-right">Takaran</th><th class="p-3 text-right">Biaya per Unit</th><th class="p-3 text-right">Total Biaya</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-[#E8E0D6] text-xs">
+                                    ${menu.recipe.map(item => {
+                                        const ing = APP_STATE.ingredients.find(i => i.id === item.ingredientId);
+                                        const costPerUnit = ing ? ing.avgCost / ing.conversionFactor : 0;
+                                        return `
+                                            <tr class="hover:bg-[#F7F3ED]/60">
+                                                <td class="p-3 font-medium text-[#292824]">${ing ? ing.name : 'Unknown'}</td>
+                                                <td class="p-3 text-right font-bold">${item.qty} ${item.unit}</td>
+                                                <td class="p-3 text-right text-[#77736C]">${formatIDR(costPerUnit)} / ${item.unit}</td>
+                                                <td class="p-3 text-right font-bold text-[#292824]">${formatIDR(costPerUnit * item.qty)}</td>
+                                            </tr>
+                                        `;
+                                    }).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="bg-[#FFFDF9] p-5 rounded-xl border border-[#E8E0D6] shadow-sm space-y-4">
+                            <h3 class="font-bold text-sm text-[#292824] border-b border-[#E8E0D6] pb-3">Ringkasan Kalkulasi HPP</h3>
+                            <div class="space-y-3 text-xs">
+                                <div class="flex justify-between py-1 border-b border-[#E8E0D6]"><span class="text-[#77736C]">Harga Jual Menu:</span><span class="font-bold text-[#292824]">${formatIDR(menu.price)}</span></div>
+                                <div class="flex justify-between py-1 border-b border-[#E8E0D6]"><span class="text-[#77736C]">Total Biaya Resep (HPP):</span><span class="font-bold text-[#C65D3A]">${formatIDR(hpp.totalCost)}</span></div>
+                                <div class="flex justify-between py-1 border-b border-[#E8E0D6]"><span class="text-[#77736C]">Food Cost Percentage:</span><span class="font-bold text-[#E7AD55]">${hpp.foodCostPct}%</span></div>
+                                <div class="flex justify-between py-1 font-bold text-sm"><span class="text-[#292824]">Est. Gross Profit:</span><span class="text-[#C65D3A]">${formatIDR(hpp.grossProfit)}</span></div>
+                            </div>
+                            <button onclick="showToast('Versi resep berhasil disimpan.')" class="w-full py-2.5 bg-[#C65D3A] text-[#FFFDF9] rounded-lg font-semibold text-xs hover:bg-[#98452D] transition-colors">Simpan & Perbarui Versi Resep</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderFoodCostAnalysis(container) {
+            container.innerHTML = `
+                <div class="space-y-6">
+                    <div class="bg-[#FFFDF9] p-5 rounded-xl border border-[#E8E0D6] shadow-sm">
+                        <h2 class="text-xl font-bold text-[#292824]">Food Cost Analysis & Profitabilitas</h2>
+                        <p class="text-xs text-[#77736C] mt-0.5">Analisis mendalam food cost teoritis vs aktual, margin menu tertinggi, dan performa kategori.</p>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-[#FFFDF9] p-5 rounded-xl border border-[#E8E0D6] shadow-sm space-y-2"><p class="text-xs text-[#77736C] font-semibold">Total Penjualan Bruto</p><h3 class="text-xl font-bold text-[#292824]">Rp 749.000</h3><p class="text-[11px] text-[#C65D3A]">+8.4% dari periode lalu</p></div>
+                        <div class="bg-[#FFFDF9] p-5 rounded-xl border border-[#E8E0D6] shadow-sm space-y-2"><p class="text-xs text-[#77736C] font-semibold">Rata-Rata Food Cost %</p><h3 class="text-xl font-bold text-[#E7AD55]">32.6%</h3><p class="text-[11px] text-[#77736C]">Target optimal: 28% - 33%</p></div>
+                        <div class="bg-[#FFFDF9] p-5 rounded-xl border border-[#E8E0D6] shadow-sm space-y-2"><p class="text-xs text-[#77736C] font-semibold">Estimasi Gross Profit</p><h3 class="text-xl font-bold text-[#292824]">Rp 504.800</h3><p class="text-[11px] text-[#C65D3A]">Margin sehat</p></div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderSuppliers(container) {
+            container.innerHTML = `
+                <div class="space-y-6">
+                    <div class="bg-[#FFFDF9] p-5 rounded-xl border border-[#E8E0D6] shadow-sm">
+                        <h2 class="text-xl font-bold text-[#292824]">Manajemen Supplier</h2>
+                        <p class="text-xs text-[#77736C] mt-0.5">Database supplier bahan baku, kontak PIC, terms pembayaran, dan riwayat pesanan.</p>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        ${APP_STATE.suppliers.map(sup => `
+                            <div class="bg-[#FFFDF9] p-5 rounded-xl border border-[#E8E0D6] shadow-sm space-y-3">
+                                <div class="flex justify-between items-start">
+                                    <div><span class="text-[10px] bg-[#F4E3DA] text-[#C65D3A] px-2 py-0.5 rounded font-bold">${sup.code}</span><h3 class="font-bold text-base text-[#292824] mt-1">${sup.name}</h3></div>
+                                    <span class="text-xs bg-[#E7AD55]/10 text-[#292824] font-semibold px-2 py-0.5 rounded">${sup.terms}</span>
+                                </div>
+                                <div class="text-xs space-y-1 text-[#77736C]">
+                                    <p><strong class="text-[#292824]">PIC:</strong> ${sup.contact}</p>
+                                    <p><strong class="text-[#292824]">Telepon:</strong> ${sup.phone}</p>
+                                    <p><strong class="text-[#292824]">Email:</strong> ${sup.email}</p>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderPurchaseOrders(container) {
+            container.innerHTML = `
+                <div class="space-y-6">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#FFFDF9] p-5 rounded-xl border border-[#E8E0D6] shadow-sm">
+                        <div>
+                            <h2 class="text-xl font-bold text-[#292824]">Purchase Orders (PO)</h2>
+                            <p class="text-xs text-[#77736C] mt-0.5">Kelola pesanan pembelian ke supplier dengan persetujuan bertingkat.</p>
+                        </div>
+                        <button onclick="showToast('Form PO baru dibuka.')" class="bg-[#C65D3A] text-[#FFFDF9] px-4 py-2 rounded-lg text-xs font-semibold hover:bg-[#98452D] transition-colors flex items-center space-x-2 shadow-sm shrink-0">
+                            <i data-lucide="plus" class="w-4 h-4"></i>
+                            <span>Buat Purchase Order</span>
+                        </button>
+                    </div>
+
+                    <div class="bg-[#FFFDF9] rounded-xl border border-[#E8E0D6] overflow-hidden shadow-sm">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-[#F0EDE7]/70 border-b border-[#E8E0D6] text-[11px] font-semibold text-[#77736C] uppercase tracking-wider">
+                                    <th class="p-4">No. PO & Tanggal</th>
+                                    <th class="p-4">Supplier</th>
+                                    <th class="p-4">Outlet Tujuan</th>
+                                    <th class="p-4 text-right">Total Nominal</th>
+                                    <th class="p-4">Dibuat Oleh</th>
+                                    <th class="p-4 text-center">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-[#E8E0D6] text-xs">
+                                ${APP_STATE.purchaseOrders.map(po => `
+                                    <tr class="hover:bg-[#F7F3ED]/60 transition-colors">
+                                        <td class="p-4 font-bold text-[#292824]">${po.poNumber}<p class="text-[11px] text-[#77736C] font-normal">Order: ${po.orderDate} • ETD: ${po.expectedDelivery}</p></td>
+                                        <td class="p-4 font-semibold text-[#292824]">${po.supplier}</td>
+                                        <td class="p-4 text-[#77736C]">${po.outlet}</td>
+                                        <td class="p-4 text-right font-bold text-[#C65D3A]">${formatIDR(po.totalAmount)}</td>
+                                        <td class="p-4 text-[#77736C]">${po.createdBy}</td>
+                                        <td class="p-4 text-center"><span class="px-2 py-1 rounded text-[10px] font-semibold ${po.status === 'Received' ? 'bg-[#292824] text-[#FFFDF9]' : 'bg-[#E7AD55]/10 text-[#E7AD55]'}">${po.status}</span></td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderGoodsReceiving(container) {
+            container.innerHTML = `
+                <div class="space-y-6">
+                    <div class="bg-[#FFFDF9] p-5 rounded-xl border border-[#E8E0D6] shadow-sm">
+                        <h2 class="text-xl font-bold text-[#292824]">Goods Receiving (Penerimaan Barang)</h2>
+                        <p class="text-xs text-[#77736C] mt-0.5">Verifikasi surat jalan supplier dan update stok rata-rata tertimbang.</p>
+                    </div>
+
+                    <div class="bg-[#FFFDF9] rounded-xl border border-[#E8E0D6] overflow-hidden shadow-sm">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-[#F0EDE7]/70 border-b border-[#E8E0D6] text-[11px] font-semibold text-[#77736C] uppercase tracking-wider">
+                                    <th class="p-4">No. PO</th>
+                                    <th class="p-4">Supplier</th>
+                                    <th class="p-4">Outlet Tujuan</th>
+                                    <th class="p-4">Tanggal Pengiriman</th>
+                                    <th class="p-4 text-center">Status PO</th>
+                                    <th class="p-4 text-center">Aksi Penerimaan</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-[#E8E0D6] text-xs">
+                                ${APP_STATE.purchaseOrders.map(po => `
+                                    <tr class="hover:bg-[#F7F3ED]/60 transition-colors">
+                                        <td class="p-4 font-bold text-[#292824]">${po.poNumber}</td>
+                                        <td class="p-4 font-semibold text-[#292824]">${po.supplier}</td>
+                                        <td class="p-4 text-[#77736C]">${po.outlet}</td>
+                                        <td class="p-4 text-[#77736C]">${po.expectedDelivery}</td>
+                                        <td class="p-4 text-center"><span class="px-2 py-1 rounded text-[10px] font-semibold ${po.status === 'Received' ? 'bg-[#292824] text-[#FFFDF9]' : 'bg-[#E7AD55]/10 text-[#E7AD55]'}">${po.status}</span></td>
+                                        <td class="p-4 text-center">
+                                            ${po.status !== 'Received' ? `<button onclick="showToast('Barang untuk PO ${po.poNumber} diterima.')" class="px-3 py-1.5 bg-[#C65D3A] text-[#FFFDF9] rounded-lg font-semibold hover:bg-[#98452D] shadow-sm text-xs">Terima Barang</button>` : '<span class="text-[#77736C] font-semibold">Sudah Diterima</span>'}
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderEmployees(container) {
+            container.innerHTML = `
+                <div class="space-y-6">
+                    <div class="bg-[#FFFDF9] p-5 rounded-xl border border-[#E8E0D6] shadow-sm">
+                        <h2 class="text-xl font-bold text-[#292824]">Direktori Karyawan & Peran</h2>
+                        <p class="text-xs text-[#77736C] mt-0.5">Kelola data staf operasional restoran, penugasan outlet, dan akses role.</p>
+                    </div>
+                    <div class="bg-[#FFFDF9] rounded-xl border border-[#E8E0D6] overflow-hidden shadow-sm">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-[#F0EDE7]/70 border-b border-[#E8E0D6] text-[11px] font-semibold text-[#77736C] uppercase tracking-wider">
+                                    <th class="p-4">ID & Nama Lengkap</th><th class="p-4">Posisi / Role</th><th class="p-4">Outlet Penugasan</th><th class="p-4">Kontak</th><th class="p-4 text-center">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-[#E8E0D6] text-xs">
+                                ${APP_STATE.employees.map(emp => `
+                                    <tr class="hover:bg-[#F7F3ED]/60">
+                                        <td class="p-4"><p class="font-bold text-[#292824]">${emp.name}</p><p class="text-[11px] text-[#77736C]">${emp.empId} • Bergabung: ${emp.joinDate}</p></td>
+                                        <td class="p-4 font-semibold text-[#C65D3A]">${emp.role}</td>
+                                        <td class="p-4 text-[#77736C]">${emp.outlet}</td>
+                                        <td class="p-4 text-[#77736C]">${emp.phone} • ${emp.email}</td>
+                                        <td class="p-4 text-center"><span class="px-2 py-1 bg-[#F0EDE7] text-[#292824] font-semibold rounded text-[10px]">${emp.status}</span></td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderShifts(container) {
+            container.innerHTML = `
+                <div class="space-y-6">
+                    <div class="bg-[#FFFDF9] p-5 rounded-xl border border-[#E8E0D6] shadow-sm">
+                        <h2 class="text-xl font-bold text-[#292824]">Jadwal Shift Karyawan</h2>
+                        <p class="text-xs text-[#77736C] mt-0.5">Kelola penugasan shift harian dan mingguan tanpa tumpang tindih waktu.</p>
+                    </div>
+                    <div class="bg-[#FFFDF9] rounded-xl border border-[#E8E0D6] overflow-hidden shadow-sm">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-[#F0EDE7]/70 border-b border-[#E8E0D6] text-[11px] font-semibold text-[#77736C] uppercase tracking-wider">
+                                    <th class="p-4">Karyawan</th><th class="p-4">Outlet</th><th class="p-4">Tanggal</th><th class="p-4">Jam Shift</th><th class="p-4">Posisi</th><th class="p-4">Catatan</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-[#E8E0D6] text-xs">
+                                ${APP_STATE.shifts.map(sh => `
+                                    <tr class="hover:bg-[#F7F3ED]/60">
+                                        <td class="p-4 font-bold text-[#292824]">${sh.employee}</td><td class="p-4 text-[#77736C]">${sh.outlet}</td><td class="p-4 text-[#77736C]">${sh.date}</td>
+                                        <td class="p-4 font-semibold text-[#C65D3A]">${sh.startTime} - ${sh.endTime} (${sh.breakDuration})</td><td class="p-4 text-[#292824]">${sh.position}</td><td class="p-4 text-[#77736C]">${sh.notes}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderAttendance(container) {
+            container.innerHTML = `
+                <div class="space-y-6">
+                    <div class="bg-[#FFFDF9] p-5 rounded-xl border border-[#E8E0D6] shadow-sm">
+                        <h2 class="text-xl font-bold text-[#292824]">Absensi & Jam Kerja</h2>
+                        <p class="text-xs text-[#77736C] mt-0.5">Pantau riwayat Clock In / Clock Out dan total jam kerja bersih karyawan.</p>
+                    </div>
+                    <div class="bg-[#FFFDF9] rounded-xl border border-[#E8E0D6] overflow-hidden shadow-sm">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-[#F0EDE7]/70 border-b border-[#E8E0D6] text-[11px] font-semibold text-[#77736C] uppercase tracking-wider">
+                                    <th class="p-4">Karyawan</th><th class="p-4">Outlet</th><th class="p-4">Tanggal</th><th class="p-4">Clock In</th><th class="p-4">Clock Out</th><th class="p-4 text-right">Total Jam</th><th class="p-4 text-center">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-[#E8E0D6] text-xs">
+                                ${APP_STATE.attendanceRecords.map(att => `
+                                    <tr class="hover:bg-[#F7F3ED]/60">
+                                        <td class="p-4 font-bold text-[#292824]">${att.employee}</td><td class="p-4 text-[#77736C]">${att.outlet}</td><td class="p-4 text-[#77736C]">${att.date}</td>
+                                        <td class="p-4 font-medium text-[#292824]">${att.clockIn}</td><td class="p-4 font-medium text-[#292824]">${att.clockOut}</td>
+                                        <td class="p-4 text-right font-bold text-[#C65D3A]">${att.totalHours}</td><td class="p-4 text-center"><span class="px-2 py-1 bg-[#F0EDE7] text-[#292824] font-semibold rounded text-[10px]">${att.status}</span></td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderSalesReports(container) {
+            container.innerHTML = `
+                <div class="space-y-6">
+                    <div class="bg-[#FFFDF9] p-5 rounded-xl border border-[#E8E0D6] shadow-sm">
+                        <h2 class="text-xl font-bold text-[#292824]">Laporan Penjualan (Sales Report)</h2>
+                        <p class="text-xs text-[#77736C] mt-0.5">Rekapitulasi penjualan kotor dan bersih bersumber dari transaksi POS terintegrasi.</p>
+                    </div>
+                    <div class="bg-[#FFFDF9] rounded-xl border border-[#E8E0D6] overflow-hidden shadow-sm">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-[#F0EDE7]/70 border-b border-[#E8E0D6] text-[11px] font-semibold text-[#77736C] uppercase tracking-wider">
+                                    <th class="p-4">ID Transaksi & Waktu</th><th class="p-4">Outlet</th><th class="p-4 text-right">Total Transaksi</th><th class="p-4 text-center">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-[#E8E0D6] text-xs">
+                                ${APP_STATE.posTransactions.map(trx => `
+                                    <tr class="hover:bg-[#F7F3ED]/60">
+                                        <td class="p-4 font-bold text-[#292824]">${trx.id}<p class="text-[11px] text-[#77736C] font-normal">${trx.date}</p></td>
+                                        <td class="p-4 text-[#77736C]">${trx.outlet}</td><td class="p-4 text-right font-bold text-[#C65D3A]">${formatIDR(trx.total)}</td>
+                                        <td class="p-4 text-center"><span class="px-2 py-1 bg-[#F0EDE7] text-[#292824] font-semibold rounded text-[10px]">${trx.status}</span></td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderInventoryReports(container) {
+            const totalVal = APP_STATE.ingredients.reduce((acc, i) => acc + (i.stock * (i.avgCost / i.conversionFactor)), 0);
+            container.innerHTML = `
+                <div class="space-y-6">
+                    <div class="bg-[#FFFDF9] p-5 rounded-xl border border-[#E8E0D6] shadow-sm">
+                        <h2 class="text-xl font-bold text-[#292824]">Laporan Penilaian Valuasi Inventaris</h2>
+                        <p class="text-xs text-[#77736C] mt-0.5">Valuasi total aset bahan baku berdasarkan metode moving average cost.</p>
+                    </div>
+                    <div class="bg-[#FFFDF9] p-5 rounded-xl border border-[#E8E0D6] shadow-sm flex items-center justify-between">
+                        <div><p class="text-xs text-[#77736C]">Total Valuasi Aset Gudang</p><h3 class="text-2xl font-bold text-[#C65D3A] mt-1">${formatIDR(totalVal)}</h3></div>
+                        <span class="px-3 py-1 bg-[#F0EDE7] text-[#292824] font-semibold rounded-lg text-xs">Total Aktif: ${APP_STATE.ingredients.length} Bahan</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderFoodCostReports(container) {
+            container.innerHTML = `
+                <div class="space-y-6">
+                    <div class="bg-[#FFFDF9] p-5 rounded-xl border border-[#E8E0D6] shadow-sm">
+                        <h2 class="text-xl font-bold text-[#292824]">Laporan Food Cost & Tren Biaya</h2>
+                        <p class="text-xs text-[#77736C] mt-0.5">Perbandingan food cost teoritis dan estimasi konsumsi bahan baku.</p>
+                    </div>
+                    <div class="bg-[#FFFDF9] p-5 rounded-xl border border-[#E8E0D6] shadow-sm space-y-4">
+                        <h3 class="font-bold text-sm text-[#292824]">Ringkasan Efisiensi Bahan</h3>
+                        <p class="text-xs text-[#77736C]">Rata-rata persentase food cost keseluruhan berada di kisaran 31.8%, sangat optimal untuk standar operasional restoran casual dining.</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderOutletComparison(container) {
+            container.innerHTML = `
+                <div class="space-y-6">
+                    <div class="bg-[#FFFDF9] p-5 rounded-xl border border-[#E8E0D6] shadow-sm">
+                        <h2 class="text-xl font-bold text-[#292824]">Perbandingan Performa Multi-Outlet</h2>
+                        <p class="text-xs text-[#77736C] mt-0.5">Tabel komparatif penjualan, food cost %, dan nilai waste antar seluruh cabang.</p>
+                    </div>
+                    <div class="bg-[#FFFDF9] rounded-xl border border-[#E8E0D6] overflow-hidden shadow-sm">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-[#F0EDE7]/70 border-b border-[#E8E0D6] text-[11px] font-semibold text-[#77736C] uppercase tracking-wider">
+                                    <th class="p-4">Outlet</th><th class="p-4">Alamat</th><th class="p-4 text-right">Estimasi Penjualan</th><th class="p-4 text-right">Avg Food Cost %</th><th class="p-4 text-center">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-[#E8E0D6] text-xs">
+                                ${APP_STATE.outlets.map(out => `
+                                    <tr class="hover:bg-[#F7F3ED]/60">
+                                        <td class="p-4 font-bold text-[#292824]">${out.name}</td><td class="p-4 text-[#77736C]">${out.address}</td>
+                                        <td class="p-4 text-right font-bold text-[#C65D3A]">Rp 245.000.000</td><td class="p-4 text-right font-semibold text-[#E7AD55]">31.2%</td>
+                                        <td class="p-4 text-center"><span class="px-2 py-1 bg-[#F0EDE7] text-[#292824] font-semibold rounded text-[10px]">${out.status}</span></td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderUserManagement(container) {
+            container.innerHTML = `
+                <div class="space-y-6">
+                    <div class="bg-[#FFFDF9] p-5 rounded-xl border border-[#E8E0D6] shadow-sm">
+                        <h2 class="text-xl font-bold text-[#292824]">Manajemen Pengguna (User Management)</h2>
+                        <p class="text-xs text-[#77736C] mt-0.5">Kelola akun login staf dan hak akses aplikasi Mise OS.</p>
+                    </div>
+                    <div class="bg-[#FFFDF9] rounded-xl border border-[#E8E0D6] overflow-hidden shadow-sm">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-[#F0EDE7]/70 border-b border-[#E8E0D6] text-[11px] font-semibold text-[#77736C] uppercase tracking-wider">
+                                    <th class="p-4">Nama Pengguna</th><th class="p-4">Role Akses</th><th class="p-4">Email Login</th><th class="p-4 text-center">Status Akun</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-[#E8E0D6] text-xs">
+                                ${APP_STATE.employees.map(emp => `
+                                    <tr class="hover:bg-[#F7F3ED]/60">
+                                        <td class="p-4 font-bold text-[#292824]">${emp.name}</td><td class="p-4 font-semibold text-[#C65D3A]">${emp.role}</td>
+                                        <td class="p-4 text-[#77736C]">${emp.email}</td><td class="p-4 text-center"><span class="px-2 py-1 bg-[#F0EDE7] text-[#292824] font-semibold rounded text-[10px]">${emp.status}</span></td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderRolesPermissions(container) {
+            container.innerHTML = `
+                <div class="space-y-6">
+                    <div class="bg-[#FFFDF9] p-5 rounded-xl border border-[#E8E0D6] shadow-sm">
+                        <h2 class="text-xl font-bold text-[#292824]">Roles & Permissions</h2>
+                        <p class="text-xs text-[#77736C] mt-0.5">Matriks hak akses berdasarkan level jabatan di restoran.</p>
+                    </div>
+                    <div class="bg-[#FFFDF9] p-5 rounded-xl border border-[#E8E0D6] shadow-sm space-y-4">
+                        <h3 class="font-bold text-sm text-[#292824]">Aturan Keamanan Akses</h3>
+                        <p class="text-xs text-[#77736C]">Sistem menerapkan authorization ketat di tingkat modul. Staf dapur hanya dapat melihat resep dan mencatat waste, sementara Owner dan GM memiliki akses penuh lintas outlet.</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderSettings(container) {
+            container.innerHTML = `
+                <div class="space-y-6">
+                    <div class="bg-[#FFFDF9] p-5 rounded-xl border border-[#E8E0D6] shadow-sm">
+                        <h2 class="text-xl font-bold text-[#292824]">Pengaturan Sistem (Settings)</h2>
+                        <p class="text-xs text-[#77736C] mt-0.5">Konfigurasi mata uang Rupiah, zona waktu, metode costing, dan parameter operasional.</p>
+                    </div>
+                    <div class="bg-[#FFFDF9] p-5 rounded-xl border border-[#E8E0D6] shadow-sm space-y-4">
+                        <h3 class="font-bold text-sm text-[#292824]">Parameter Costing</h3>
+                        <p class="text-xs text-[#77736C]">Metode Penilaian Inventaris: <strong class="text-[#292824]">Moving Weighted Average Cost</strong></p>
+                        <button onclick="showToast('Pengaturan berhasil disimpan.')" class="px-4 py-2 bg-[#C65D3A] text-[#FFFDF9] rounded-lg text-xs font-semibold hover:bg-[#98452D]">Simpan Perubahan</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderAuditLog(container) {
+            container.innerHTML = `
+                <div class="space-y-6">
+                    <div class="bg-[#FFFDF9] p-5 rounded-xl border border-[#E8E0D6] shadow-sm">
+                        <h2 class="text-xl font-bold text-[#292824]">Audit Log & Aktivitas Sistem</h2>
+                        <p class="text-xs text-[#77736C] mt-0.5">Jejak audit seluruh perubahan data, persetujuan PO, opname, dan transaksi operasional.</p>
+                    </div>
+                    <div class="bg-[#FFFDF9] rounded-xl border border-[#E8E0D6] overflow-hidden shadow-sm">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-[#F0EDE7]/70 border-b border-[#E8E0D6] text-[11px] font-semibold text-[#77736C] uppercase tracking-wider">
+                                    <th class="p-4">Waktu & User</th><th class="p-4">Aksi</th><th class="p-4">Entitas & Ref ID</th><th class="p-4">Ringkasan Perubahan</th><th class="p-4">Outlet</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-[#E8E0D6] text-xs">
+                                ${APP_STATE.auditLogs.map(log => `
+                                    <tr class="hover:bg-[#F7F3ED]/60">
+                                        <td class="p-4 font-bold text-[#292824]">${log.user}<p class="text-[11px] text-[#77736C] font-normal">${log.timestamp}</p></td>
+                                        <td class="p-4"><span class="px-2 py-1 bg-[#F4E3DA] text-[#C65D3A] font-semibold rounded text-[10px]">${log.action}</span></td>
+                                        <td class="p-4 font-semibold text-[#292824]">${log.entity} (${log.refId})</td>
+                                        <td class="p-4 text-[#77736C]">${log.summary}</td>
+                                        <td class="p-4 text-[#77736C]">${log.outlet}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Initialize application on window load
+        window.onload = function () {
+            initApp();
+        };
+    </script>
+</body>
+</html>

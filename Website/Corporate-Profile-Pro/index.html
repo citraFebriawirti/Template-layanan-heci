@@ -1,0 +1,1356 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sintesa Engineering — Enterprise Software & Systems</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            500: '#E02424',
+                            600: '#E02424',
+                            700: '#9B1C1C',
+                            900: '#771d1d',
+                        },
+                        corporate: {
+                            text: '#111827',
+                            muted: '#626B76',
+                            bgAlt: '#F4F5F6',
+                            border: '#E5E7EB'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Inter Font & FontAwesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; color: #111827; background-color: #FFFFFF; }
+    </style>
+</head>
+<body class="bg-white text-corporate-text antialiased flex flex-col min-h-screen">
+
+    <header id="header" class="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-corporate-border transition-all duration-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchView('home')">
+                <div class="w-9 h-9 rounded-lg bg-brand-600 flex items-center justify-center text-white font-bold text-lg tracking-wider">S</div>
+                <div class="flex flex-col">
+                    <span class="text-base font-bold tracking-tight text-corporate-text">SINTESA <span class="text-brand-600">ENGINEERING</span></span>
+                    <span class="text-[11px] text-corporate-muted font-medium uppercase tracking-wider">Enterprise Systems</span>
+                </div>
+            </div>
+
+            <!-- Desktop Nav -->
+            <nav class="hidden md:flex items-center space-x-8 text-sm font-medium text-corporate-muted">
+                <button onclick="switchView('home')" class="hover:text-brand-600 transition-colors nav-link active text-brand-600 font-semibold" data-target="home">Beranda</button>
+                <button onclick="switchView('about')" class="hover:text-brand-600 transition-colors nav-link" data-target="about">Tentang Kami</button>
+                <button onclick="switchView('services')" class="hover:text-brand-600 transition-colors nav-link" data-target="services">Layanan</button>
+                <button onclick="switchView('team')" class="hover:text-brand-600 transition-colors nav-link" data-target="team">Tim & Klien</button>
+                <button onclick="switchView('articles')" class="hover:text-brand-600 transition-colors nav-link" data-target="articles">Artikel</button>
+                <button onclick="switchView('contact')" class="hover:text-brand-600 transition-colors nav-link" data-target="contact">Kontak</button>
+            </nav>
+
+            <div class="hidden md:flex items-center space-x-4">
+                <button onclick="openCmsModal()" class="px-3.5 py-2 text-xs font-semibold uppercase tracking-wider text-corporate-muted bg-corporate-bgAlt hover:bg-gray-200 rounded-lg transition border border-corporate-border">
+                    <i class="fa-solid fa-lock mr-1.5 text-[10px]"></i> CMS Admin
+                </button>
+                <button onclick="switchView('contact')" class="px-5 py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-semibold text-sm rounded-lg transition shadow-sm">
+                    Konsultasi Gratis
+                </button>
+            </div>
+
+            <!-- Mobile Menu Button -->
+            <button onclick="toggleMobileMenu()" class="md:hidden p-2 text-corporate-muted hover:text-corporate-text focus:outline-none">
+                <i id="mobileMenuIcon" class="fa-solid fa-bars text-xl"></i>
+            </button>
+        </div>
+
+        <!-- Mobile Menu Dropdown -->
+        <div id="mobileMenu" class="hidden md:hidden bg-white border-b border-corporate-border px-4 pt-3 pb-6 space-y-2">
+            <button onclick="switchView('home'); toggleMobileMenu();" class="block w-full text-left py-2.5 px-3 rounded-lg font-medium text-corporate-text hover:bg-corporate-bgAlt">Beranda</button>
+            <button onclick="switchView('about'); toggleMobileMenu();" class="block w-full text-left py-2.5 px-3 rounded-lg font-medium text-corporate-text hover:bg-corporate-bgAlt">Tentang Kami</button>
+            <button onclick="switchView('services'); toggleMobileMenu();" class="block w-full text-left py-2.5 px-3 rounded-lg font-medium text-corporate-text hover:bg-corporate-bgAlt">Layanan</button>
+            <button onclick="switchView('team'); toggleMobileMenu();" class="block w-full text-left py-2.5 px-3 rounded-lg font-medium text-corporate-text hover:bg-corporate-bgAlt">Tim & Klien</button>
+            <button onclick="switchView('articles'); toggleMobileMenu();" class="block w-full text-left py-2.5 px-3 rounded-lg font-medium text-corporate-text hover:bg-corporate-bgAlt">Artikel</button>
+            <button onclick="switchView('contact'); toggleMobileMenu();" class="block w-full text-left py-2.5 px-3 rounded-lg font-medium text-corporate-text hover:bg-corporate-bgAlt">Kontak</button>
+            <div class="pt-3 border-t border-corporate-border flex flex-col space-y-2">
+                <button onclick="openCmsModal(); toggleMobileMenu();" class="w-full py-2.5 text-center text-xs font-semibold uppercase tracking-wider text-corporate-muted bg-corporate-bgAlt rounded-lg border border-corporate-border">
+                    <i class="fa-solid fa-lock mr-1.5"></i> CMS Admin
+                </button>
+                <button onclick="switchView('contact'); toggleMobileMenu();" class="w-full py-2.5 bg-brand-600 text-white font-semibold text-sm rounded-lg text-center shadow-sm">
+                    Konsultasi Gratis
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow">
+
+        <section id="view-home" class="view-section">
+            
+            <!-- SECTION 1: HERO BANNER (Editorial Two-Column Layout) -->
+            <div class="bg-corporate-bgAlt border-b border-corporate-border pt-16 pb-20 lg:py-24">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+                        <div class="lg:col-span-7 space-y-6">
+                            <div class="inline-flex items-center space-x-2 text-xs font-semibold text-brand-600 bg-white px-3 py-1.5 rounded-md border border-corporate-border shadow-xs uppercase tracking-wider">
+                                <span class="w-2 h-2 rounded-full bg-brand-600"></span>
+                                <span>Platform Engineering Terpercaya</span>
+                            </div>
+                            
+                            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold text-corporate-text tracking-tight leading-[1.15]">
+                                Kami membangun sistem yang <span class="text-brand-600">diandalkan bisnis</span> Anda.
+                            </h1>
+                            
+                            <p class="text-base sm:text-lg text-corporate-muted max-w-2xl leading-relaxed">
+                                Solusi software end-to-end berstandar enterprise dengan arsitektur tangguh, performa tinggi, dan skalabilitas masa depan untuk mengakselerasi pertumbuhan operasional perusahaan.
+                            </p>
+                            
+                            <div class="flex flex-col sm:flex-row items-stretch sm:items-center space-y-3 sm:space-y-0 sm:space-x-4 pt-2">
+                                <button onclick="switchView('contact')" class="px-7 py-3.5 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-lg shadow-sm transition text-center text-sm">
+                                    Konsultasi Gratis
+                                </button>
+                                <button onclick="switchView('about')" class="px-7 py-3.5 bg-white hover:bg-gray-50 text-corporate-text border border-corporate-border font-semibold rounded-lg transition text-center text-sm">
+                                    Lihat Profil Kami
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="lg:col-span-5">
+                            <div class="relative rounded-xl overflow-hidden border border-corporate-border shadow-md bg-white">
+                                <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80" alt="Engineering Team Working" class="w-full h-[380px] object-cover">
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end p-6">
+                                    <div class="text-white space-y-1">
+                                        <p class="text-xs uppercase tracking-widest text-gray-300 font-semibold">Workspace Insinyur</p>
+                                        <p class="text-sm font-medium">Kolaborasi teknis berstandar enterprise global.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 2: STATS / ANGKA PENCAPAIAN BAR -->
+            <div class="bg-white py-12 border-b border-corporate-border">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+                        <div class="p-6 rounded-xl bg-corporate-bgAlt border border-corporate-border">
+                            <div id="stat-founded" class="text-3xl lg:text-4xl font-bold text-corporate-text mb-1">2015+</div>
+                            <div class="text-xs font-semibold uppercase text-corporate-muted tracking-wider">Tahun Berdiri</div>
+                        </div>
+                        <div class="p-6 rounded-xl bg-corporate-bgAlt border border-corporate-border">
+                            <div id="stat-clients" class="text-3xl lg:text-4xl font-bold text-corporate-text mb-1">150+</div>
+                            <div class="text-xs font-semibold uppercase text-corporate-muted tracking-wider">Jumlah Klien</div>
+                        </div>
+                        <div class="p-6 rounded-xl bg-corporate-bgAlt border border-corporate-border">
+                            <div id="stat-projects" class="text-3xl lg:text-4xl font-bold text-corporate-text mb-1">300+</div>
+                            <div class="text-xs font-semibold uppercase text-corporate-muted tracking-wider">Proyek Selesai</div>
+                        </div>
+                        <div class="p-6 rounded-xl bg-corporate-bgAlt border border-corporate-border">
+                            <div class="text-3xl lg:text-4xl font-bold text-corporate-text mb-1">99.8%</div>
+                            <div class="text-xs font-semibold uppercase text-corporate-muted tracking-wider">Kepuasan Klien</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 3: CORE ENGINEERING YANG MENGGERAKKAN OPERASIONAL -->
+            <div class="py-20 bg-corporate-bgAlt border-b border-corporate-border">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+                    <div class="max-w-2xl">
+                        <span class="text-xs font-bold uppercase tracking-widest text-brand-600">
+                            ENGINEERING
+                        </span>
+                        <h2 class="text-3xl sm:text-4xl font-bold text-corporate-text mt-2">Engineering yang menggerakkan operasional</h2>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div class="bg-white p-6 rounded-xl border border-corporate-border hover:border-brand-600 transition flex flex-col justify-between space-y-6">
+                            <div>
+                                <div class="w-10 h-10 rounded-lg bg-red-50 text-brand-600 flex items-center justify-center text-lg font-bold mb-4">
+                                    <i class="fa-solid fa-network-wired"></i>
+                                </div>
+                                <h3 class="text-base font-bold text-corporate-text mb-2">Pengembangan Sistem Enterprise</h3>
+                                <p class="text-corporate-muted text-xs leading-relaxed">Membangun arsitektur backend berskala besar yang siap menampung lonjakan jutaan pengguna harian.</p>
+                            </div>
+                            <button onclick="switchView('services')" class="inline-flex items-center text-brand-600 font-semibold text-xs hover:underline pt-2">
+                                Selengkapnya <i class="fa-solid fa-arrow-right ml-1 text-[10px]"></i>
+                            </button>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl border border-corporate-border hover:border-brand-600 transition flex flex-col justify-between space-y-6">
+                            <div>
+                                <div class="w-10 h-10 rounded-lg bg-red-50 text-brand-600 flex items-center justify-center text-lg font-bold mb-4">
+                                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                                </div>
+                                <h3 class="text-base font-bold text-corporate-text mb-2">Cloud DevOps & Modernisasi</h3>
+                                <p class="text-corporate-muted text-xs leading-relaxed">Migrasi infrastruktur legacy ke cloud modern dengan otomatisasi CI/CD dan keamanan berlapis.</p>
+                            </div>
+                            <button onclick="switchView('services')" class="inline-flex items-center text-brand-600 font-semibold text-xs hover:underline pt-2">
+                                Selengkapnya <i class="fa-solid fa-arrow-right ml-1 text-[10px]"></i>
+                            </button>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl border border-corporate-border hover:border-brand-600 transition flex flex-col justify-between space-y-6">
+                            <div>
+                                <div class="w-10 h-10 rounded-lg bg-red-50 text-brand-600 flex items-center justify-center text-lg font-bold mb-4">
+                                    <i class="fa-solid fa-mobile-screen-button"></i>
+                                </div>
+                                <h3 class="text-base font-bold text-corporate-text mb-2">Aplikasi Kustom Skalabel</h3>
+                                <p class="text-corporate-muted text-xs leading-relaxed">Pengembangan aplikasi web & mobile mutakhir dengan antarmuka intuitif dan kecepatan respons optimal.</p>
+                            </div>
+                            <button onclick="switchView('services')" class="inline-flex items-center text-brand-600 font-semibold text-xs hover:underline pt-2">
+                                Selengkapnya <i class="fa-solid fa-arrow-right ml-1 text-[10px]"></i>
+                            </button>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl border border-corporate-border hover:border-brand-600 transition flex flex-col justify-between space-y-6">
+                            <div>
+                                <div class="w-10 h-10 rounded-lg bg-red-50 text-brand-600 flex items-center justify-center text-lg font-bold mb-4">
+                                    <i class="fa-solid fa-shield-halved"></i>
+                                </div>
+                                <h3 class="text-base font-bold text-corporate-text mb-2">Audit Keamanan & Performa</h3>
+                                <p class="text-corporate-muted text-xs leading-relaxed">Pemeriksaan menyeluruh pada celah kerentanan sistem serta optimalisasi query database dan load time.</p>
+                            </div>
+                            <button onclick="switchView('services')" class="inline-flex items-center text-brand-600 font-semibold text-xs hover:underline pt-2">
+                                Selengkapnya <i class="fa-solid fa-arrow-right ml-1 text-[10px]"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 4: PLATFORM TERUJI, SIAP DISESUAIKAN -->
+            <div class="py-20 bg-white border-b border-corporate-border">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+                    <div class="max-w-2xl">
+                        <span class="text-xs font-bold uppercase tracking-widest text-brand-600">
+                            SOLUSI KAMI
+                        </span>
+                        <h2 class="text-3xl sm:text-4xl font-bold text-corporate-text mt-2">Platform teruji. Siap disesuaikan.</h2>
+                        <p class="text-corporate-muted text-sm mt-2">Arsitektur dasar yang telah terbukti di berbagai sektor industri dan siap dikustomisasi sesuai kebutuhan bisnis Anda.</p>
+                    </div>
+
+                    <div class="space-y-6">
+                        <!-- Platform Item 1 -->
+                        <div class="bg-corporate-bgAlt rounded-xl border border-corporate-border p-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                            <div class="lg:col-span-5 space-y-3">
+                                <span class="text-xs font-bold uppercase tracking-wider text-brand-600">CORE BANKING</span>
+                                <h3 class="text-2xl font-bold text-corporate-text">Core Financial & Transaction Engine</h3>
+                                <p class="text-corporate-muted text-xs leading-relaxed">Mesin pencatat transaksi finansial real-time berkecepatan tinggi dengan enkripsi tingkat militer dan sistem audit trail otomatis.</p>
+                                <button onclick="switchView('services')" class="inline-flex items-center text-brand-600 font-semibold text-xs hover:underline pt-2">
+                                    Selengkapnya <i class="fa-solid fa-arrow-right ml-1 text-[10px]"></i>
+                                </button>
+                            </div>
+                            <div class="lg:col-span-7 bg-white rounded-lg p-6 border border-corporate-border space-y-3">
+                                <div class="flex items-center justify-between pb-3 border-b border-corporate-border">
+                                    <span class="text-xs font-mono text-corporate-muted">engine_core.conf</span>
+                                    <span class="px-2 py-0.5 text-[10px] font-bold text-green-700 bg-green-100 rounded">Active 99.99%</span>
+                                </div>
+                                <div class="space-y-1.5 text-xs font-mono text-corporate-muted">
+                                    <p>&gt; Processing 5,200 requests/sec...</p>
+                                    <p>&gt; Ledger synchronization: OK</p>
+                                    <p>&gt; Security handshake: Verified</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Platform Item 2 -->
+                        <div class="bg-corporate-bgAlt rounded-xl border border-corporate-border p-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                            <div class="lg:col-span-5 space-y-3">
+                                <span class="text-xs font-bold uppercase tracking-wider text-brand-600">LOGISTIK & SUPPLY CHAIN</span>
+                                <h3 class="text-2xl font-bold text-corporate-text">Sistem Inventory & Warehouse Gudang</h3>
+                                <p class="text-corporate-muted text-xs leading-relaxed">Otomasi pelacakan inventaris gudang berbasis IoT dan barcode scanner dengan prediksi stok otomatis.</p>
+                                <button onclick="switchView('services')" class="inline-flex items-center text-brand-600 font-semibold text-xs hover:underline pt-2">
+                                    Selengkapnya <i class="fa-solid fa-arrow-right ml-1 text-[10px]"></i>
+                                </button>
+                            </div>
+                            <div class="lg:col-span-7 bg-white rounded-lg p-6 border border-corporate-border space-y-3">
+                                <div class="flex items-center justify-between pb-3 border-b border-corporate-border">
+                                    <span class="text-xs font-mono text-corporate-muted">warehouse_sync.log</span>
+                                    <span class="px-2 py-0.5 text-[10px] font-bold text-brand-700 bg-red-100 rounded">Optimized</span>
+                                </div>
+                                <div class="space-y-1.5 text-xs font-mono text-corporate-muted">
+                                    <p>&gt; SKU scanned: #4920-A (Inbound)</p>
+                                    <p>&gt; Route optimization active...</p>
+                                    <p>&gt; Zero latency cloud dispatch.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Platform Item 3 -->
+                        <div class="bg-corporate-bgAlt rounded-xl border border-corporate-border p-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                            <div class="lg:col-span-5 space-y-3">
+                                <span class="text-xs font-bold uppercase tracking-wider text-brand-600">KESEHATAN & MEDIS</span>
+                                <h3 class="text-2xl font-bold text-corporate-text">Platform Rekam Medis & Rumah Sakit</h3>
+                                <p class="text-corporate-muted text-xs leading-relaxed">Manajemen rekam medis pasien terintegrasi dengan standar BPJS & SATUSEHAT Kemenkes RI.</p>
+                                <button onclick="switchView('services')" class="inline-flex items-center text-brand-600 font-semibold text-xs hover:underline pt-2">
+                                    Selengkapnya <i class="fa-solid fa-arrow-right ml-1 text-[10px]"></i>
+                                </button>
+                            </div>
+                            <div class="lg:col-span-7 bg-white rounded-lg p-6 border border-corporate-border space-y-3">
+                                <div class="flex items-center justify-between pb-3 border-b border-corporate-border">
+                                    <span class="text-xs font-mono text-corporate-muted">satusehat_bridge.conf</span>
+                                    <span class="px-2 py-0.5 text-[10px] font-bold text-green-700 bg-green-100 rounded">Secure API</span>
+                                </div>
+                                <div class="space-y-1.5 text-xs font-mono text-corporate-muted">
+                                    <p>&gt; Encrypted FHIR payload sent.</p>
+                                    <p>&gt; Patient queue synchronized.</p>
+                                    <p>&gt; Backup server status: Standby.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 5: KAMI MEMAHAMI DUNIA ANDA -->
+            <div class="py-20 bg-corporate-bgAlt border-b border-corporate-border">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12 text-center">
+                    <div class="max-w-2xl mx-auto">
+                        <span class="text-xs font-bold uppercase tracking-widest text-brand-600">
+                            SEKTOR INDUSTRI
+                        </span>
+                        <h2 class="text-3xl sm:text-4xl font-bold text-corporate-text mt-2">Kami memahami dunia Anda</h2>
+                        <p class="text-corporate-muted text-sm mt-2">Solusi dirancang spesifik menyesuaikan regulasi dan karakteristik operasional berbagai sektor.</p>
+                    </div>
+
+                    <div class="grid grid-cols-2 md:grid-cols-6 gap-4">
+                        <div class="bg-white p-6 rounded-xl border border-corporate-border flex flex-col items-center justify-center space-y-3 hover:border-brand-600 transition">
+                            <div class="w-10 h-10 rounded-lg bg-red-50 text-brand-600 flex items-center justify-center text-lg font-bold">
+                                <i class="fa-solid fa-building-columns"></i>
+                            </div>
+                            <span class="text-xs font-bold text-corporate-text">Perbankan</span>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl border border-corporate-border flex flex-col items-center justify-center space-y-3 hover:border-brand-600 transition">
+                            <div class="w-10 h-10 rounded-lg bg-red-50 text-brand-600 flex items-center justify-center text-lg font-bold">
+                                <i class="fa-solid fa-bolt"></i>
+                            </div>
+                            <span class="text-xs font-bold text-corporate-text">Energi & Migas</span>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl border border-corporate-border flex flex-col items-center justify-center space-y-3 hover:border-brand-600 transition">
+                            <div class="w-10 h-10 rounded-lg bg-red-50 text-brand-600 flex items-center justify-center text-lg font-bold">
+                                <i class="fa-solid fa-truck-fast"></i>
+                            </div>
+                            <span class="text-xs font-bold text-corporate-text">Logistik</span>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl border border-corporate-border flex flex-col items-center justify-center space-y-3 hover:border-brand-600 transition">
+                            <div class="w-10 h-10 rounded-lg bg-red-50 text-brand-600 flex items-center justify-center text-lg font-bold">
+                                <i class="fa-solid fa-hospital"></i>
+                            </div>
+                            <span class="text-xs font-bold text-corporate-text">Kesehatan</span>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl border border-corporate-border flex flex-col items-center justify-center space-y-3 hover:border-brand-600 transition">
+                            <div class="w-10 h-10 rounded-lg bg-red-50 text-brand-600 flex items-center justify-center text-lg font-bold">
+                                <i class="fa-solid fa-cart-shopping"></i>
+                            </div>
+                            <span class="text-xs font-bold text-corporate-text">E-Commerce</span>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl border border-corporate-border flex flex-col items-center justify-center space-y-3 hover:border-brand-600 transition">
+                            <div class="w-10 h-10 rounded-lg bg-red-50 text-brand-600 flex items-center justify-center text-lg font-bold">
+                                <i class="fa-solid fa-graduation-cap"></i>
+                            </div>
+                            <span class="text-xs font-bold text-corporate-text">Pendidikan</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 6: PELACAKAN MATERIAL END-TO-END -->
+            <div class="py-20 bg-white border-b border-corporate-border">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                        <div class="lg:col-span-6 space-y-6">
+                            <span class="text-xs font-bold uppercase tracking-widest text-brand-600">
+                                STUDI KASUS UNGGULAN
+                            </span>
+                            <h2 class="text-3xl sm:text-4xl font-bold text-corporate-text">Pelacakan material end-to-end untuk PT Logistik Express</h2>
+                            <p class="text-corporate-muted text-sm leading-relaxed">
+                                Transformasi digital proses rantai pasok nasional dengan visibilitas penuh barang logistik dari pelabuhan hingga tangan konsumen akhir.
+                            </p>
+                            <ul class="space-y-3 text-sm text-corporate-text">
+                                <li class="flex items-center"><i class="fa-solid fa-check text-green-600 mr-3"></i> Pemantauan armada kendaraan secara real-time</li>
+                                <li class="flex items-center"><i class="fa-solid fa-check text-green-600 mr-3"></i> Reduksi waktu tunggu bongkar muat hingga 45%</li>
+                                <li class="flex items-center"><i class="fa-solid fa-check text-green-600 mr-3"></i> Laporan audit otomatis berbasis cloud terenkripsi</li>
+                            </ul>
+                            <button onclick="switchView('services')" class="inline-flex items-center text-brand-600 font-semibold text-sm hover:underline pt-2">
+                                Baca Studi Kasus Lengkap <i class="fa-solid fa-arrow-right ml-1 text-xs"></i>
+                            </button>
+                        </div>
+                        <div class="lg:col-span-6">
+                            <div class="bg-corporate-bgAlt border border-corporate-border rounded-xl p-8 space-y-4">
+                                <div class="flex items-center justify-between pb-4 border-b border-corporate-border">
+                                    <span class="text-xs font-mono text-corporate-muted">client_dashboard_stream.log</span>
+                                    <span class="w-2.5 h-2.5 rounded-full bg-green-500"></span>
+                                </div>
+                                <div class="py-8 text-center space-y-3">
+                                    <div class="w-14 h-14 rounded-xl bg-white text-brand-600 flex items-center justify-center text-xl font-bold mx-auto border border-corporate-border">
+                                        <i class="fa-solid fa-cubes"></i>
+                                    </div>
+                                    <h4 class="font-bold text-corporate-text text-base">PT Logistik Express Indonesia</h4>
+                                    <p class="text-xs text-corporate-muted">"Sistem bekerja tanpa cela meski menghadapi lonjakan 3 juta paket saat hari raya."</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 7: CATATAN DARI TIM ENGINEERING (DARK THEME) -->
+            <div class="py-20 bg-gray-950 text-white">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+                    <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+                        <div>
+                            <span class="text-xs font-bold uppercase tracking-widest text-brand-500">
+                                WAWASAN TEKNIS
+                            </span>
+                            <h2 class="text-3xl sm:text-4xl font-bold text-white mt-2">Catatan dari tim engineering</h2>
+                        </div>
+                        <button onclick="switchView('articles')" class="text-xs font-bold text-brand-400 hover:underline">
+                            Lihat Semua Artikel <i class="fa-solid fa-arrow-right ml-1"></i>
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-gray-900 rounded-xl border border-gray-800 p-6 space-y-4 flex flex-col justify-between">
+                            <div class="space-y-3">
+                                <span class="text-[10px] uppercase font-bold tracking-wider text-brand-400 bg-gray-950 px-2.5 py-1 rounded border border-gray-800">Arsitektur</span>
+                                <h3 class="text-base font-bold text-white">Strategi Migrasi Monolitik ke Mikroservis Tanpa Downtime</h3>
+                                <p class="text-xs text-gray-400 leading-relaxed">Panduan langkah demi langkah memecah sistem lama yang kompleks menjadi layanan mandiri yang tangguh...</p>
+                            </div>
+                            <button onclick="switchView('articles')" class="text-xs font-bold text-brand-400 hover:underline inline-flex items-center pt-2">
+                                Baca Artikel <i class="fa-solid fa-arrow-right ml-1 text-[10px]"></i>
+                            </button>
+                        </div>
+                        <div class="bg-gray-900 rounded-xl border border-gray-800 p-6 space-y-4 flex flex-col justify-between">
+                            <div class="space-y-3">
+                                <span class="text-[10px] uppercase font-bold tracking-wider text-brand-400 bg-gray-950 px-2.5 py-1 rounded border border-gray-800">Keamanan</span>
+                                <h3 class="text-base font-bold text-white">Menanggulangi Serangan DDoS pada Infrastruktur Cloud Enterprise</h3>
+                                <p class="text-xs text-gray-400 leading-relaxed">Implementasi WAF dan rate limiting tingkat lanjut untuk mengamankan aplikasi dari lonjakan traffic anomali...</p>
+                            </div>
+                            <button onclick="switchView('articles')" class="text-xs font-bold text-brand-400 hover:underline inline-flex items-center pt-2">
+                                Baca Artikel <i class="fa-solid fa-arrow-right ml-1 text-[10px]"></i>
+                            </button>
+                        </div>
+                        <div class="bg-gray-900 rounded-xl border border-gray-800 p-6 space-y-4 flex flex-col justify-between">
+                            <div class="space-y-3">
+                                <span class="text-[10px] uppercase font-bold tracking-wider text-brand-400 bg-gray-950 px-2.5 py-1 rounded border border-gray-800">Database</span>
+                                <h3 class="text-base font-bold text-white">Optimasi Query PostgreSQL untuk 10 Juta Baris Data Transaksi</h3>
+                                <p class="text-xs text-gray-400 leading-relaxed">Teknik indexing lanjutan, partitioning, dan caching strategy guna mempercepat performa report harian...</p>
+                            </div>
+                            <button onclick="switchView('articles')" class="text-xs font-bold text-brand-400 hover:underline inline-flex items-center pt-2">
+                                Baca Artikel <i class="fa-solid fa-arrow-right ml-1 text-[10px]"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 8: CTA BANNER -->
+            <div class="py-16 bg-corporate-bgAlt border-b border-corporate-border">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="bg-brand-600 rounded-2xl p-8 lg:p-12 text-white shadow-md flex flex-col md:flex-row items-center justify-between gap-8">
+                        <div class="space-y-2 text-center md:text-left">
+                            <h2 class="text-2xl sm:text-3xl font-bold tracking-tight">Punya sistem yang ingin dibangun?</h2>
+                            <p class="text-red-100 text-sm max-w-xl">Konsultasikan kebutuhan teknis Anda bersama arsitek senior kami tanpa dipungut biaya.</p>
+                        </div>
+                        <button onclick="switchView('contact')" class="px-7 py-3.5 bg-white text-brand-600 hover:bg-gray-100 font-bold rounded-lg transition text-sm whitespace-nowrap shadow-xs">
+                            Mulai Konsultasi
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW: ABOUT -->
+        <section id="view-about" class="view-section hidden py-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
+                <div class="text-center max-w-3xl mx-auto space-y-3">
+                    <span class="text-xs font-bold uppercase tracking-widest text-brand-600 bg-red-50 px-3 py-1 rounded-md border border-red-100">Tentang Kami</span>
+                    <h1 class="text-3xl sm:text-4xl font-bold text-corporate-text">Membangun Masa Depan Teknologi Perusahaan</h1>
+                    <p class="text-corporate-muted text-base">Sintesa Engineering berdiri dengan komitmen memberikan solusi engineering kelas dunia yang mengutamakan keandalan, keamanan, dan efisiensi jangka panjang.</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                    <div class="space-y-6">
+                        <div class="p-8 bg-corporate-bgAlt rounded-xl border border-corporate-border space-y-3">
+                            <h3 class="text-xl font-bold text-corporate-text flex items-center">
+                                <i class="fa-solid fa-book-open text-brand-600 mr-3"></i> Sejarah Perusahaan
+                            </h3>
+                            <p class="text-corporate-muted leading-relaxed text-sm">
+                                Didirikan pada tahun 2015 oleh sekelompok insinyur perangkat lunak senior dari institusi terkemuka, Sintesa berawal dari sebuah konsultan kecil yang fokus pada optimasi database finansial. Seiring berjalannya waktu, kami bertransformasi menjadi mitra strategis utama bagi berbagai perusahaan multinasional dan BUMN dalam pembangunan infrastruktur digital end-to-end.
+                            </p>
+                        </div>
+                        <div class="p-8 bg-corporate-bgAlt rounded-xl border border-corporate-border space-y-3">
+                            <h3 class="text-xl font-bold text-corporate-text flex items-center">
+                                <i class="fa-solid fa-eye text-brand-600 mr-3"></i> Visi & Misi
+                            </h3>
+                            <div class="space-y-2 text-sm text-corporate-muted">
+                                <p><strong>Visi:</strong> Menjadi pilar utama transformasi digital industri di Asia Tenggara melalui rekayasa sistem yang superior dan berkelanjutan.</p>
+                                <p><strong>Misi:</strong> Menghadirkan solusi teknologi yang tangguh, memberdayakan talenta insinyur lokal berstandar global, dan memberikan nilai tambah maksimal bagi klien.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="space-y-6">
+                        <div class="p-8 bg-corporate-bgAlt rounded-xl border border-corporate-border space-y-3">
+                            <h3 class="text-xl font-bold text-corporate-text flex items-center">
+                                <i class="fa-solid fa-gem text-brand-600 mr-3"></i> Nilai Perusahaan
+                            </h3>
+                            <div class="grid grid-cols-2 gap-4 pt-2">
+                                <div class="p-4 bg-white rounded-lg border border-corporate-border">
+                                    <h4 class="font-bold text-corporate-text mb-1 text-sm">1. Keandalan Mutlak</h4>
+                                    <p class="text-xs text-corporate-muted">Sistem yang dirancang tahan uji dan minim kesalahan.</p>
+                                </div>
+                                <div class="p-4 bg-white rounded-lg border border-corporate-border">
+                                    <h4 class="font-bold text-corporate-text mb-1 text-sm">2. Inovasi Berkelanjutan</h4>
+                                    <p class="text-xs text-corporate-muted">Selalu mengadopsi teknologi paling efisien di industri.</p>
+                                </div>
+                                <div class="p-4 bg-white rounded-lg border border-corporate-border">
+                                    <h4 class="font-bold text-corporate-text mb-1 text-sm">3. Transparansi Penuh</h4>
+                                    <p class="text-xs text-corporate-muted">Komunikasi terbuka dan laporan progres secara real-time.</p>
+                                </div>
+                                <div class="p-4 bg-white rounded-lg border border-corporate-border">
+                                    <h4 class="font-bold text-corporate-text mb-1 text-sm">4. Fokus Klien</h4>
+                                    <p class="text-xs text-corporate-muted">Kesuksesan operasional klien adalah metrik utama kami.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-8 bg-corporate-bgAlt rounded-xl border border-corporate-border space-y-3">
+                            <h3 class="text-xl font-bold text-corporate-text flex items-center">
+                                <i class="fa-solid fa-award text-brand-600 mr-3"></i> Legalitas & Sertifikasi
+                            </h3>
+                            <p class="text-corporate-muted text-sm leading-relaxed">
+                                PT Sintesa Solusi Engineering telah berbadan hukum resmi terdaftar di Kemenkumham RI dengan NIB & Sertifikasi ISO 27001 (Information Security Management) serta partner resmi cloud penyedia layanan global utama.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW: SERVICES -->
+        <section id="view-services" class="view-section hidden py-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
+                <div class="text-center max-w-3xl mx-auto space-y-3">
+                    <span class="text-xs font-bold uppercase tracking-widest text-brand-600 bg-red-50 px-3 py-1 rounded-md border border-red-100">Layanan Profesional</span>
+                    <h1 class="text-3xl sm:text-4xl font-bold text-corporate-text">Solusi Komprehensif untuk Kebutuhan Korporat</h1>
+                    <p class="text-corporate-muted text-base">Pilih layanan di bawah untuk melihat detail masalah yang diselesaikan, manfaat, proses kerja, dan studi kasus nyata.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div onclick="selectService(0)" id="serv-card-0" class="service-card cursor-pointer p-6 rounded-xl border-2 border-brand-600 bg-white shadow-sm transition space-y-3">
+                        <div class="w-10 h-10 rounded-lg bg-red-50 text-brand-600 flex items-center justify-center text-lg font-bold">
+                            <i class="fa-solid fa-network-wired"></i>
+                        </div>
+                        <h3 class="text-base font-bold text-corporate-text">Enterprise System Development</h3>
+                        <p class="text-xs text-corporate-muted">Membangun backend & arsitektur mikroservis tangguh.</p>
+                    </div>
+                    <div onclick="selectService(1)" id="serv-card-1" class="service-card cursor-pointer p-6 rounded-xl border-2 border-corporate-border bg-white hover:border-corporate-muted transition space-y-3">
+                        <div class="w-10 h-10 rounded-lg bg-red-50 text-brand-600 flex items-center justify-center text-lg font-bold">
+                            <i class="fa-solid fa-cloud-arrow-up"></i>
+                        </div>
+                        <h3 class="text-base font-bold text-corporate-text">Cloud DevOps & Modernization</h3>
+                        <p class="text-xs text-corporate-muted">Migrasi dan otomasi infrastruktur cloud modern.</p>
+                    </div>
+                    <div onclick="selectService(2)" id="serv-card-2" class="service-card cursor-pointer p-6 rounded-xl border-2 border-corporate-border bg-white hover:border-corporate-muted transition space-y-3">
+                        <div class="w-10 h-10 rounded-lg bg-red-50 text-brand-600 flex items-center justify-center text-lg font-bold">
+                            <i class="fa-solid fa-shield-halved"></i>
+                        </div>
+                        <h3 class="text-base font-bold text-corporate-text">Security Audit & Performance</h3>
+                        <p class="text-xs text-corporate-muted">Pengujian kerentanan dan optimalisasi load time.</p>
+                    </div>
+                </div>
+
+                <div id="service-detail-container" class="bg-white rounded-2xl border border-corporate-border p-8 lg:p-12 shadow-sm space-y-8">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between pb-6 border-b border-corporate-border gap-4">
+                        <div>
+                            <span class="text-xs font-bold text-brand-600 uppercase tracking-wider">Detail Layanan</span>
+                            <h2 id="sd-title" class="text-2xl sm:text-3xl font-bold text-corporate-text mt-1">Enterprise System Development</h2>
+                        </div>
+                        <button onclick="switchView('contact')" class="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white font-semibold text-sm rounded-lg shadow-sm transition">
+                            Konsultasikan Layanan Ini
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                        <div class="space-y-6">
+                            <div>
+                                <h4 class="text-xs font-bold uppercase tracking-wider text-corporate-muted mb-2">Masalah yang Diselesaikan</h4>
+                                <p id="sd-problem" class="text-corporate-text text-sm leading-relaxed bg-corporate-bgAlt p-4 rounded-xl border border-corporate-border">
+                                    Sistem legacy yang sering *down* saat traffic tinggi, kesulitan integrasi antar modul departemen, dan lambatnya pemrosesan data transaksional harian.
+                                </p>
+                            </div>
+                            <div>
+                                <h4 class="text-xs font-bold uppercase tracking-wider text-corporate-muted mb-2">Manfaat Utama</h4>
+                                <ul id="sd-benefits" class="space-y-2 text-corporate-text text-sm">
+                                    <li class="flex items-center"><i class="fa-solid fa-check text-green-600 mr-2.5"></i> Skalabilitas otomatis menyesuaikan jumlah pengguna</li>
+                                    <li class="flex items-center"><i class="fa-solid fa-check text-green-600 mr-2.5"></i> Peningkatan kecepatan respons sistem hingga 300%</li>
+                                    <li class="flex items-center"><i class="fa-solid fa-check text-green-600 mr-2.5"></i> Keamanan data berstandar perbankan & enkripsi end-to-end</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="space-y-6">
+                            <div>
+                                <h4 class="text-xs font-bold uppercase tracking-wider text-corporate-muted mb-2">Proses Kerja</h4>
+                                <div id="sd-process" class="space-y-3">
+                                    <div class="flex items-start space-x-3 text-sm text-corporate-text bg-corporate-bgAlt p-3 rounded-xl border border-corporate-border">
+                                        <span class="w-6 h-6 rounded-full bg-brand-600 text-white flex items-center justify-center text-xs font-bold flex-shrink-0">1</span>
+                                        <p><strong>Analisis Arsitektur:</strong> Evaluasi mendalam sistem lama dan perumusan desain blueprint baru.</p>
+                                    </div>
+                                    <div class="flex items-start space-x-3 text-sm text-corporate-text bg-corporate-bgAlt p-3 rounded-xl border border-corporate-border">
+                                        <span class="w-6 h-6 rounded-full bg-brand-600 text-white flex items-center justify-center text-xs font-bold flex-shrink-0">2</span>
+                                        <p><strong>Pengembangan Iteratif:</strong> Koding dengan praktik clean code dan automated unit testing ketat.</p>
+                                    </div>
+                                    <div class="flex items-start space-x-3 text-sm text-corporate-text bg-corporate-bgAlt p-3 rounded-xl border border-corporate-border">
+                                        <span class="w-6 h-6 rounded-full bg-brand-600 text-white flex items-center justify-center text-xs font-bold flex-shrink-0">3</span>
+                                        <p><strong>Deployment & Monitoring:</strong> Peluncuran bertahap dengan pengawasan 24/7 post-launch.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <h4 class="text-xs font-bold uppercase tracking-wider text-corporate-muted mb-2">Studi Kasus Singkat</h4>
+                                <div id="sd-casestudy" class="p-4 bg-red-50 border border-red-100 rounded-xl text-xs text-corporate-text leading-relaxed font-medium">
+                                    Berhasil merestrukturisasi core banking system PT Finansial Mandiri, memangkas waktu latensi query dari 4.2 detik menjadi 180 milidetik dan menangani 5 juta transaksi harian tanpa gangguan.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW: TEAM & CLIENTS -->
+        <section id="view-team" class="view-section hidden py-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-20">
+                <div class="space-y-12">
+                    <div class="text-center max-w-3xl mx-auto space-y-3">
+                        <span class="text-xs font-bold uppercase tracking-widest text-brand-600 bg-red-50 px-3 py-1 rounded-md border border-red-100">Tim Ahli Kami</span>
+                        <h1 class="text-3xl sm:text-4xl font-bold text-corporate-text">Di Balik Sistem yang Handal</h1>
+                        <p class="text-corporate-muted text-base">Para insinyur dan arsitek senior bersertifikasi global yang berdedikasi menghasilkan karya bermutu tinggi.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div class="bg-white rounded-xl border border-corporate-border overflow-hidden shadow-xs hover:shadow-md transition text-center p-6 space-y-4">
+                            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80" alt="Alex Pratama" class="w-28 h-28 rounded-full mx-auto object-cover border-2 border-corporate-border">
+                            <div>
+                                <h3 class="text-lg font-bold text-corporate-text">Alex Pratama, M.Sc</h3>
+                                <p class="text-xs font-semibold text-brand-600 uppercase tracking-wider mt-1">Chief Executive Officer & Founder</p>
+                            </div>
+                            <p class="text-xs text-corporate-muted px-4">Eks Principal Engineer di Silicon Valley dengan pengalaman 15+ tahun merancang arsitektur sistem skala masif.</p>
+                            <a href="https://linkedin.com" target="_blank" class="inline-flex items-center justify-center w-9 h-9 rounded-full bg-corporate-bgAlt text-corporate-text hover:bg-gray-200 transition">
+                                <i class="fa-brands fa-linkedin-in text-xs"></i>
+                            </a>
+                        </div>
+                        <div class="bg-white rounded-xl border border-corporate-border overflow-hidden shadow-xs hover:shadow-md transition text-center p-6 space-y-4">
+                            <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80" alt="Diana Wijaya" class="w-28 h-28 rounded-full mx-auto object-cover border-2 border-corporate-border">
+                            <div>
+                                <h3 class="text-lg font-bold text-corporate-text">Diana Wijaya, Ph.D</h3>
+                                <p class="text-xs font-semibold text-brand-600 uppercase tracking-wider mt-1">Chief Technology Officer</p>
+                            </div>
+                            <p class="text-xs text-corporate-muted px-4">Spesialis Cloud Infrastructure dan Distributed Systems, mantan lead architect di berbagai unicorn teknologi Asia.</p>
+                            <a href="https://linkedin.com" target="_blank" class="inline-flex items-center justify-center w-9 h-9 rounded-full bg-corporate-bgAlt text-corporate-text hover:bg-gray-200 transition">
+                                <i class="fa-brands fa-linkedin-in text-xs"></i>
+                            </a>
+                        </div>
+                        <div class="bg-white rounded-xl border border-corporate-border overflow-hidden shadow-xs hover:shadow-md transition text-center p-6 space-y-4">
+                            <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80" alt="Rizky Hidayat" class="w-28 h-28 rounded-full mx-auto object-cover border-2 border-corporate-border">
+                            <div>
+                                <h3 class="text-lg font-bold text-corporate-text">Rizky Hidayat, S.T.</h3>
+                                <p class="text-xs font-semibold text-brand-600 uppercase tracking-wider mt-1">Head of Engineering Security</p>
+                            </div>
+                            <p class="text-xs text-corporate-muted px-4">Certified Ethical Hacker dan pakar keamanan siber yang telah mengamankan infrastruktur perbankan nasional.</p>
+                            <a href="https://linkedin.com" target="_blank" class="inline-flex items-center justify-center w-9 h-9 rounded-full bg-corporate-bgAlt text-corporate-text hover:bg-gray-200 transition">
+                                <i class="fa-brands fa-linkedin-in text-xs"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-12">
+                    <div class="text-center space-y-3">
+                        <span class="text-xs font-bold uppercase tracking-widest text-brand-600 bg-red-50 px-3 py-1 rounded-md border border-red-100">Kepercayaan Industri</span>
+                        <h2 class="text-3xl font-bold text-corporate-text">Klien yang Telah Bertransformasi Bersama Kami</h2>
+                    </div>
+
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 items-center">
+                        <div class="p-6 bg-corporate-bgAlt rounded-xl border border-corporate-border text-center font-bold text-corporate-muted text-sm tracking-wider">
+                            <i class="fa-solid fa-building-columns mr-2 text-brand-600"></i> BANK NUSANTARA
+                        </div>
+                        <div class="p-6 bg-corporate-bgAlt rounded-xl border border-corporate-border text-center font-bold text-corporate-muted text-sm tracking-wider">
+                            <i class="fa-solid fa-bolt mr-2 text-brand-600"></i> ENERGI PRIMA TBK
+                        </div>
+                        <div class="p-6 bg-corporate-bgAlt rounded-xl border border-corporate-border text-center font-bold text-corporate-muted text-sm tracking-wider">
+                            <i class="fa-solid fa-cart-shopping mr-2 text-brand-600"></i> LOGISTIK EXPRESS
+                        </div>
+                        <div class="p-6 bg-corporate-bgAlt rounded-xl border border-corporate-border text-center font-bold text-corporate-muted text-sm tracking-wider">
+                            <i class="fa-solid fa-hospital mr-2 text-brand-600"></i> MEDIKA UTAMA
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 pt-6">
+                        <div class="bg-corporate-bgAlt p-8 rounded-xl border border-corporate-border space-y-4">
+                            <div class="flex text-yellow-500 space-x-1 text-sm">
+                                <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                            </div>
+                            <p class="text-corporate-text text-sm leading-relaxed">
+                                "Sintesa Engineering menyelamatkan sistem inti kami sebelum musim kampanye belanja akhir tahun. Latensi turun drastis dan uptime 100%. Luar biasa profesional!"
+                            </p>
+                            <div class="flex items-center space-x-3 pt-2">
+                                <div class="w-9 h-9 rounded-full bg-red-100 text-brand-600 font-bold flex items-center justify-center text-xs">BS</div>
+                                <div>
+                                    <h4 class="text-sm font-bold text-corporate-text">Bambang Setiawan</h4>
+                                    <p class="text-xs text-corporate-muted">VP of Technology, Logistik Express Indonesia</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-corporate-bgAlt p-8 rounded-xl border border-corporate-border space-y-4">
+                            <div class="flex text-yellow-500 space-x-1 text-sm">
+                                <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                            </div>
+                            <p class="text-corporate-text text-sm leading-relaxed">
+                                "Standar dokumentasi dan keamanan dari tim Sintesa adalah yang terbaik di industri ini. Proses migrasi cloud tanpa ada downtime sedikitpun pada operasional harian."
+                            </p>
+                            <div class="flex items-center space-x-3 pt-2">
+                                <div class="w-9 h-9 rounded-full bg-red-100 text-brand-600 font-bold flex items-center justify-center text-xs">SM</div>
+                                <div>
+                                    <h4 class="text-sm font-bold text-corporate-text">Siti Mardiah</h4>
+                                    <p class="text-xs text-corporate-muted">Chief Information Officer, Bank Nusantara</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW: ARTICLES -->
+        <section id="view-articles" class="view-section hidden py-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+                <div class="text-center max-w-3xl mx-auto space-y-3">
+                    <span class="text-xs font-bold uppercase tracking-widest text-brand-600 bg-red-50 px-3 py-1 rounded-md border border-red-100">Wawasan & Berita</span>
+                    <h1 class="text-3xl sm:text-4xl font-bold text-corporate-text">Catatan dari Tim Engineering</h1>
+                    <p class="text-corporate-muted text-base">Artikel teknis dan wawasan mendalam seputar arsitektur modern, skalabilitas, dan tren software engineering terkini.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="bg-white rounded-xl border border-corporate-border overflow-hidden shadow-xs hover:shadow-md transition flex flex-col">
+                        <div class="h-48 bg-gradient-to-r from-red-600 to-red-900 p-6 flex items-end">
+                            <span class="px-3 py-1 bg-white/20 backdrop-blur-xs text-white text-xs font-semibold rounded-md">Arsitektur</span>
+                        </div>
+                        <div class="p-6 flex-grow flex flex-col justify-between space-y-4">
+                            <div class="space-y-2">
+                                <span class="text-xs text-corporate-muted font-mono">12 Oktober 2026 • 5 min read</span>
+                                <h3 class="text-base font-bold text-corporate-text leading-snug">Strategi Migrasi Monolitik ke Mikroservis Tanpa Downtime</h3>
+                                <p class="text-xs text-corporate-muted leading-relaxed">Panduan langkah demi langkah memecah sistem lama yang kompleks menjadi layanan mandiri yang tangguh...</p>
+                            </div>
+                            <button onclick="alertBox('Membuka artikel lengkap...')" class="text-xs font-bold text-brand-600 hover:underline inline-flex items-center">
+                                Baca Selengkapnya <i class="fa-solid fa-arrow-right ml-1 text-[10px]"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl border border-corporate-border overflow-hidden shadow-xs hover:shadow-md transition flex flex-col">
+                        <div class="h-48 bg-gradient-to-r from-gray-800 to-gray-950 p-6 flex items-end">
+                            <span class="px-3 py-1 bg-white/20 backdrop-blur-xs text-white text-xs font-semibold rounded-md">Keamanan</span>
+                        </div>
+                        <div class="p-6 flex-grow flex flex-col justify-between space-y-4">
+                            <div class="space-y-2">
+                                <span class="text-xs text-corporate-muted font-mono">04 Oktober 2026 • 8 min read</span>
+                                <h3 class="text-base font-bold text-corporate-text leading-snug">Menanggulangi Serangan DDoS pada Infrastruktur Cloud Enterprise</h3>
+                                <p class="text-xs text-corporate-muted leading-relaxed">Implementasi WAF dan rate limiting tingkat lanjut untuk mengamankan aplikasi dari lonjakan traffic anomali...</p>
+                            </div>
+                            <button onclick="alertBox('Membuka artikel lengkap...')" class="text-xs font-bold text-brand-600 hover:underline inline-flex items-center">
+                                Baca Selengkapnya <i class="fa-solid fa-arrow-right ml-1 text-[10px]"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl border border-corporate-border overflow-hidden shadow-xs hover:shadow-md transition flex flex-col">
+                        <div class="h-48 bg-gradient-to-r from-blue-700 to-indigo-900 p-6 flex items-end">
+                            <span class="px-3 py-1 bg-white/20 backdrop-blur-xs text-white text-xs font-semibold rounded-md">Database</span>
+                        </div>
+                        <div class="p-6 flex-grow flex flex-col justify-between space-y-4">
+                            <div class="space-y-2">
+                                <span class="text-xs text-corporate-muted font-mono">28 September 2026 • 6 min read</span>
+                                <h3 class="text-base font-bold text-corporate-text leading-snug">Optimasi Query PostgreSQL untuk 10 Juta Baris Data Transaksi</h3>
+                                <p class="text-xs text-corporate-muted leading-relaxed">Teknik indexing lanjutan, partitioning, dan caching strategy guna mempercepat performa report harian...</p>
+                            </div>
+                            <button onclick="alertBox('Membuka artikel lengkap...')" class="text-xs font-bold text-brand-600 hover:underline inline-flex items-center">
+                                Baca Selengkapnya <i class="fa-solid fa-arrow-right ml-1 text-[10px]"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW: CONTACT -->
+        <section id="view-contact" class="view-section hidden py-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+                    <div class="lg:col-span-5 space-y-6">
+                        <span class="text-xs font-bold uppercase tracking-widest text-brand-600 bg-red-50 px-3 py-1 rounded-md border border-red-100">Hubungi Kami</span>
+                        <h1 class="text-3xl sm:text-4xl font-bold text-corporate-text">Mulai Kolaborasi untuk Sistem Anda</h1>
+                        <p class="text-corporate-muted text-sm leading-relaxed">
+                            Punya pertanyaan seputar arsitektur sistem atau ingin menjadwalkan konsultasi dengan principal engineer kami? Isi formulir di samping atau hubungi langsung via WhatsApp.
+                        </p>
+                        <div class="space-y-4 pt-2">
+                            <div class="flex items-center space-x-4 p-4 bg-corporate-bgAlt rounded-xl border border-corporate-border">
+                                <div class="w-10 h-10 rounded-lg bg-white text-brand-600 flex items-center justify-center font-bold text-base border border-corporate-border">
+                                    <i class="fa-solid fa-location-dot"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-xs font-bold text-corporate-text uppercase">Kantor Pusat</h4>
+                                    <p class="text-xs text-corporate-muted">Gedung Cyber 2 Tower Lt. 18, Jakarta Selatan</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-4 p-4 bg-corporate-bgAlt rounded-xl border border-corporate-border">
+                                <div class="w-10 h-10 rounded-lg bg-white text-brand-600 flex items-center justify-center font-bold text-base border border-corporate-border">
+                                    <i class="fa-solid fa-envelope"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-xs font-bold text-corporate-text uppercase">Email Resmi</h4>
+                                    <p class="text-xs text-corporate-muted">contact@sintesa-engineering.co.id</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-4 p-4 bg-corporate-bgAlt rounded-xl border border-corporate-border">
+                                <div class="w-10 h-10 rounded-lg bg-white text-brand-600 flex items-center justify-center font-bold text-base border border-corporate-border">
+                                    <i class="fa-solid fa-phone"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-xs font-bold text-corporate-text uppercase">Telepon / WhatsApp</h4>
+                                    <p class="text-xs text-corporate-muted">+62 811-9988-2233</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-7">
+                        <div class="bg-white rounded-2xl border border-corporate-border p-8 lg:p-10 shadow-sm space-y-6">
+                            <h3 class="text-xl font-bold text-corporate-text">Formulir Konsultasi Proyek</h3>
+                            <form id="contactForm" onsubmit="handleContactSubmit(event)" class="space-y-4">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-corporate-text uppercase mb-1">Nama Lengkap *</label>
+                                        <input type="text" id="form-name" required class="w-full px-4 py-3 rounded-lg border border-corporate-border focus:border-brand-600 focus:ring-1 focus:ring-brand-600 outline-none text-sm transition" placeholder="Cth: Budi Santoso">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-corporate-text uppercase mb-1">Perusahaan *</label>
+                                        <input type="text" id="form-company" required class="w-full px-4 py-3 rounded-lg border border-corporate-border focus:border-brand-600 focus:ring-1 focus:ring-brand-600 outline-none text-sm transition" placeholder="Cth: PT Maju Jaya">
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-corporate-text uppercase mb-1">Email Korporat *</label>
+                                        <input type="email" id="form-email" required class="w-full px-4 py-3 rounded-lg border border-corporate-border focus:border-brand-600 focus:ring-1 focus:ring-brand-600 outline-none text-sm transition" placeholder="budi@company.co.id">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-corporate-text uppercase mb-1">Nomor Telepon / WhatsApp *</label>
+                                        <input type="tel" id="form-phone" required class="w-full px-4 py-3 rounded-lg border border-corporate-border focus:border-brand-600 focus:ring-1 focus:ring-brand-600 outline-none text-sm transition" placeholder="08123456789">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-bold text-corporate-text uppercase mb-1">Layanan yang Diminati *</label>
+                                    <select id="form-service" class="w-full px-4 py-3 rounded-lg border border-corporate-border focus:border-brand-600 focus:ring-1 focus:ring-brand-600 outline-none text-sm bg-white transition">
+                                        <option value="Enterprise System Development">Enterprise System Development</option>
+                                        <option value="Cloud DevOps & Modernization">Cloud DevOps & Modernization</option>
+                                        <option value="Security Audit & Performance">Security Audit & Performance</option>
+                                        <option value="Aplikasi Kustom Skalabel">Aplikasi Kustom Skalabel</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-bold text-corporate-text uppercase mb-1">Pesan / Detail Kebutuhan *</label>
+                                    <textarea id="form-message" rows="4" required class="w-full px-4 py-3 rounded-lg border border-corporate-border focus:border-brand-600 focus:ring-1 focus:ring-brand-600 outline-none text-sm transition" placeholder="Jelaskan ringkas sistem atau tantangan yang ingin diselesaikan..."></textarea>
+                                </div>
+                                <div class="flex items-center space-x-3 p-3 bg-corporate-bgAlt rounded-lg border border-corporate-border">
+                                    <input type="checkbox" id="recaptchaCheck" required class="w-4 h-4 text-brand-600 rounded focus:ring-brand-500">
+                                    <label for="recaptchaCheck" class="text-xs text-corporate-muted font-medium">Saya bukan robot (Proteksi Spam reCAPTCHA aktif)</label>
+                                </div>
+                                <button type="submit" class="w-full py-3.5 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-lg shadow-sm transition text-sm">
+                                    Kirim Pesan Konsultasi
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Floating WhatsApp Button -->
+    <div class="fixed bottom-6 right-6 z-40">
+        <button onclick="openWhatsAppChat()" class="flex items-center space-x-2 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-3 rounded-full shadow-lg transition transform hover:scale-105 font-bold text-sm">
+            <i class="fa-brands fa-whatsapp text-xl"></i>
+            <span class="hidden sm:inline">WhatsApp</span>
+        </button>
+    </div>
+
+    <footer class="bg-gray-950 text-gray-400 pt-16 pb-12 border-t border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="space-y-4 md:col-span-1">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 rounded-lg bg-brand-600 flex items-center justify-center text-white font-bold text-base">S</div>
+                        <span class="text-sm font-bold text-white tracking-tight">SINTESA ENGINEERING</span>
+                    </div>
+                    <p class="text-xs text-gray-400 leading-relaxed">
+                        Mitra strategis rekayasa perangkat lunak dan arsitektur sistem enterprise berstandar global.
+                    </p>
+                </div>
+                <div>
+                    <h4 class="text-white font-semibold text-xs uppercase tracking-wider mb-4">Navigasi Utama</h4>
+                    <ul class="space-y-2 text-xs">
+                        <li><button onclick="switchView('home')" class="hover:text-white transition">Beranda</button></li>
+                        <li><button onclick="switchView('about')" class="hover:text-white transition">Tentang Kami</button></li>
+                        <li><button onclick="switchView('services')" class="hover:text-white transition">Layanan</button></li>
+                        <li><button onclick="switchView('team')" class="hover:text-white transition">Tim & Klien</button></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white font-semibold text-xs uppercase tracking-wider mb-4">Layanan Unggulan</h4>
+                    <ul class="space-y-2 text-xs">
+                        <li><button onclick="switchView('services')" class="hover:text-white transition">Enterprise System</button></li>
+                        <li><button onclick="switchView('services')" class="hover:text-white transition">Cloud & DevOps</button></li>
+                        <li><button onclick="switchView('services')" class="hover:text-white transition">Security Audit</button></li>
+                        <li><button onclick="switchView('services')" class="hover:text-white transition">Custom App</button></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white font-semibold text-xs uppercase tracking-wider mb-4">Legalitas</h4>
+                    <p class="text-xs text-gray-400 leading-relaxed">
+                        PT Sintesa Solusi Engineering<br>
+                        Terdaftar Kemenkumham RI<br>
+                        ISO 27001 Certified Enterprise
+                    </p>
+                </div>
+            </div>
+            <div class="pt-8 border-t border-gray-900 flex flex-col sm:flex-row items-center justify-between text-xs text-gray-500">
+                <p>&copy; 2026 PT Sintesa Solusi Engineering. All rights reserved.</p>
+                <div class="flex space-x-6 mt-4 sm:mt-0">
+                    <span class="cursor-pointer hover:text-gray-400">Privacy Policy</span>
+                    <span class="cursor-pointer hover:text-gray-400">Terms of Service</span>
+                    <span onclick="openCmsModal()" class="cursor-pointer text-brand-400 hover:underline">Admin Portal</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Custom Alert / Message Box -->
+    <div id="customModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs hidden">
+        <div class="bg-white rounded-xl max-w-md w-full mx-4 p-6 shadow-xl space-y-4 text-center border border-corporate-border">
+            <div id="modalIcon" class="w-14 h-14 rounded-full bg-red-50 text-brand-600 flex items-center justify-center text-2xl mx-auto">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <h3 id="modalTitle" class="text-lg font-bold text-corporate-text">Pemberitahuan</h3>
+            <p id="modalMessage" class="text-xs text-corporate-muted leading-relaxed">Pesan sistem...</p>
+            <button onclick="closeModal()" class="w-full py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-lg text-xs transition">
+                Mengerti / Tutup
+            </button>
+        </div>
+    </div>
+
+    <!-- CMS Admin Modal -->
+    <div id="cmsModal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs hidden overflow-y-auto p-4 sm:p-6">
+        <div class="bg-white rounded-2xl max-w-6xl mx-auto shadow-2xl overflow-hidden min-h-[85vh] flex flex-col border border-corporate-border">
+            <div class="bg-gray-950 text-white px-6 py-4 flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-7 h-7 rounded-md bg-brand-600 flex items-center justify-center font-bold text-xs">CMS</div>
+                    <div>
+                        <h2 class="font-bold text-sm">Sintesa Admin Portal</h2>
+                        <p class="text-[11px] text-gray-400">Manajemen Konten, Inbox Leads & Statistik</p>
+                    </div>
+                </div>
+                <button onclick="closeCmsModal()" class="text-gray-400 hover:text-white text-lg">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="flex-grow flex flex-col md:flex-row">
+                <div class="w-full md:w-64 bg-corporate-bgAlt border-r border-corporate-border p-4 space-y-1.5">
+                    <button onclick="switchCmsTab('dashboard')" id="cms-tab-dashboard" class="cms-nav-btn w-full text-left px-3.5 py-2.5 rounded-lg text-xs font-semibold text-brand-600 bg-white shadow-xs flex items-center space-x-3 border border-corporate-border">
+                        <i class="fa-solid fa-chart-pie w-4"></i> <span>Dashboard Ringkas</span>
+                    </button>
+                    <button onclick="switchCmsTab('inbox')" id="cms-tab-inbox" class="cms-nav-btn w-full text-left px-3.5 py-2.5 rounded-lg text-xs font-semibold text-corporate-muted hover:bg-gray-200 flex items-center space-x-3">
+                        <i class="fa-solid fa-inbox w-4"></i> <span>Inbox Leads</span>
+                    </button>
+                    <button onclick="switchCmsTab('content')" id="cms-tab-content" class="cms-nav-btn w-full text-left px-3.5 py-2.5 rounded-lg text-xs font-semibold text-corporate-muted hover:bg-gray-200 flex items-center space-x-3">
+                        <i class="fa-solid fa-pen-to-square w-4"></i> <span>Kelola Konten</span>
+                    </button>
+                </div>
+
+                <div class="flex-grow p-6 lg:p-8 bg-white overflow-y-auto">
+                    
+                    <!-- TAB 1: DASHBOARD -->
+                    <div id="cms-view-dashboard" class="cms-content-section space-y-6">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-lg font-bold text-corporate-text">Ringkasan Statistik Performa</h3>
+                            <span class="text-xs text-corporate-muted bg-corporate-bgAlt px-3 py-1 rounded-md border border-corporate-border font-mono">Realtime</span>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div class="bg-corporate-bgAlt p-6 rounded-xl border border-corporate-border space-y-2">
+                                <span class="text-[11px] font-bold text-corporate-muted uppercase">Total Pesan / Leads Bulan Ini</span>
+                                <div id="stat-total-leads" class="text-3xl font-bold text-corporate-text">14 Leads</div>
+                                <p class="text-xs text-green-700 font-medium"><i class="fa-solid fa-arrow-up mr-1"></i> +18% dari bulan lalu</p>
+                            </div>
+                            <div class="bg-corporate-bgAlt p-6 rounded-xl border border-corporate-border space-y-2">
+                                <span class="text-[11px] font-bold text-corporate-muted uppercase">Layanan Paling Diminati</span>
+                                <div class="text-sm font-bold text-corporate-text truncate">Enterprise System Development</div>
+                                <p class="text-xs text-corporate-muted">45% dari total seluruh peminat</p>
+                            </div>
+                            <div class="bg-corporate-bgAlt p-6 rounded-xl border border-corporate-border space-y-2">
+                                <span class="text-[11px] font-bold text-corporate-muted uppercase">Status Sistem</span>
+                                <div class="text-sm font-bold text-green-700 flex items-center">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-green-500 inline-block mr-2"></span> Operasional Normal
+                                </div>
+                                <p class="text-xs text-corporate-muted">Google Analytics connected</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 2: INBOX LEADS -->
+                    <div id="cms-view-inbox" class="cms-content-section hidden space-y-6">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div>
+                                <h3 class="text-lg font-bold text-corporate-text">Inbox Pesan Masuk (Leads)</h3>
+                                <p class="text-xs text-corporate-muted">Kelola prospek dari formulir kontak dan WhatsApp</p>
+                            </div>
+                            <button onclick="exportLeadsExcel()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs rounded-lg shadow-xs transition flex items-center space-x-2">
+                                <i class="fa-solid fa-file-excel text-xs"></i>
+                                <span>Ekspor Data ke Excel</span>
+                            </button>
+                        </div>
+
+                        <div class="bg-white rounded-xl border border-corporate-border shadow-xs overflow-x-auto">
+                            <table class="w-full text-left border-collapse text-xs">
+                                <thead>
+                                    <tr class="bg-corporate-bgAlt border-b border-corporate-border font-bold text-corporate-muted uppercase text-[10px]">
+                                        <th class="p-3.5">Tanggal</th>
+                                        <th class="p-3.5">Nama & Perusahaan</th>
+                                        <th class="p-3.5">Kontak</th>
+                                        <th class="p-3.5">Layanan</th>
+                                        <th class="p-3.5">Sumber</th>
+                                        <th class="p-3.5">Status</th>
+                                        <th class="p-3.5">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="leadsTableBody" class="divide-y divide-corporate-border text-xs">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- TAB 3: CONTENT MANAGEMENT -->
+                    <div id="cms-view-content" class="cms-content-section hidden space-y-6">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-lg font-bold text-corporate-text">Kelola Konten Website</h3>
+                            <button onclick="saveCmsContent()" class="px-5 py-2 bg-brand-600 hover:bg-brand-700 text-white font-semibold text-xs rounded-lg shadow-xs transition">
+                                Simpan Perubahan
+                            </button>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="bg-corporate-bgAlt p-6 rounded-xl border border-corporate-border space-y-4">
+                                <h4 class="font-bold text-corporate-text text-xs uppercase">Statistik Beranda (Angka Pencapaian)</h4>
+                                <div>
+                                    <label class="block text-[11px] font-semibold text-corporate-muted mb-1">Tahun Berdiri</label>
+                                    <input type="text" id="edit-founded" value="2015+" class="w-full px-3 py-2 border rounded-lg text-xs bg-white border-corporate-border">
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-semibold text-corporate-muted mb-1">Jumlah Klien</label>
+                                    <input type="text" id="edit-clients" value="150+" class="w-full px-3 py-2 border rounded-lg text-xs bg-white border-corporate-border">
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-semibold text-corporate-muted mb-1">Jumlah Proyek</label>
+                                    <input type="text" id="edit-projects" value="300+" class="w-full px-3 py-2 border rounded-lg text-xs bg-white border-corporate-border">
+                                </div>
+                            </div>
+                            <div class="bg-corporate-bgAlt p-6 rounded-xl border border-corporate-border space-y-4">
+                                <h4 class="font-bold text-corporate-text text-xs uppercase">Informasi Kontak Perusahaan</h4>
+                                <div>
+                                    <label class="block text-[11px] font-semibold text-corporate-muted mb-1">Nomor WhatsApp Resmi</label>
+                                    <input type="text" id="edit-wa" value="6281199882233" class="w-full px-3 py-2 border rounded-lg text-xs bg-white border-corporate-border">
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-semibold text-corporate-muted mb-1">Email Kontak</label>
+                                    <input type="text" id="edit-email" value="contact@sintesa-engineering.co.id" class="w-full px-3 py-2 border rounded-lg text-xs bg-white border-corporate-border">
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-semibold text-corporate-muted mb-1">Alamat Kantor</label>
+                                    <input type="text" id="edit-address" value="Gedung Cyber 2 Tower Lt. 18, Jakarta Selatan" class="w-full px-3 py-2 border rounded-lg text-xs bg-white border-corporate-border">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let leadsData = [
+            { id: 1, date: '2026-10-11 08:30', name: 'Bambang Setiawan', company: 'Logistik Express', email: 'bambang@logistik.co.id', phone: '08123456789', service: 'Enterprise System Development', source: 'Form', status: 'Baru' },
+            { id: 2, date: '2026-10-10 14:15', name: 'Siti Mardiah', company: 'Bank Nusantara', email: 'siti@banknusantara.co.id', phone: '08187654321', service: 'Cloud DevOps & Modernization', source: 'WhatsApp', status: 'Dibalas' },
+            { id: 3, date: '2026-10-09 11:00', name: 'Ahmad Fauzi', company: 'Energi Prima Tbk', email: 'ahmad@energiprima.com', phone: '081122334455', service: 'Security Audit & Performance', source: 'Form', status: 'Selesai' }
+        ];
+
+        const servicesList = [
+            {
+                title: "Enterprise System Development",
+                problem: "Sistem legacy yang sering *down* saat traffic tinggi, kesulitan integrasi antar modul departemen, dan lambatnya pemrosesan data transaksional harian.",
+                benefits: [
+                    "Skalabilitas otomatis menyesuaikan jumlah pengguna",
+                    "Peningkatan kecepatan respons sistem hingga 300%",
+                    "Keamanan data berstandar perbankan & enkripsi end-to-end"
+                ],
+                process: [
+                    { step: "1", title: "Analisis Arsitektur", desc: "Evaluasi mendalam sistem lama dan perumusan desain blueprint baru." },
+                    { step: "2", title: "Pengembangan Iteratif", desc: "Koding dengan praktik clean code dan automated unit testing ketat." },
+                    { step: "3", title: "Deployment & Monitoring", desc: "Peluncuran bertahap dengan pengawasan 24/7 post-launch." }
+                ],
+                caseStudy: "Berhasil merestrukturisasi core banking system PT Finansial Mandiri, memangkas waktu latensi query dari 4.2 detik menjadi 180 milidetik dan menangani 5 juta transaksi harian tanpa gangguan."
+            },
+            {
+                title: "Cloud DevOps & Modernization",
+                problem: "Infrastruktur server fisik yang mahal perawatannya, proses deploy manual yang rentan human error, serta lambatnya pemulihan saat terjadi gangguan server.",
+                benefits: [
+                    "Otomasi CI/CD membuat deployment rilis dalam hitungan menit",
+                    "Efisiensi biaya operasional server cloud hingga 40%",
+                    "High availability dengan auto-failover lintas zone"
+                ],
+                process: [
+                    { step: "1", title: "Cloud Assessment", desc: "Audit infrastruktur eksklusif dan perencanaan strategi migrasi aman." },
+                    { step: "2", title: "Containerization", desc: "Penerapan Docker & Kubernetes untuk standardisasi lingkungan." },
+                    { step: "3", title: "Pipeline Automation", desc: "Pengaturan pipeline CI/CD otomatis dengan monitoring Prometheus." }
+                ],
+                caseStudy: "Migrasi sistem e-commerce ritel nasional ke AWS dengan zero downtime, menghemat biaya server 35% dan mempercepat rilis fitur baru dari mingguan menjadi harian."
+            },
+            {
+                title: "Security Audit & Performance",
+                problem: "Kekhawatiran celah keamanan siber, potensi kebocoran data sensitif perusahaan, serta performa aplikasi yang lambat saat diakses bersamaan.",
+                benefits: [
+                    "Identifikasi dini celah kerentanan sebelum dieksploitasi pihak luar",
+                    "Sertifikasi kelayakan keamanan dan peningkatan kecepatan load page",
+                    "Kepatuhan terhadap standar ISO 27001 dan regulasi privasi data"
+                ],
+                process: [
+                    { step: "1", title: "Vulnerability Scanning", desc: "Pemeriksaan otomatis dan manual menggunakan penetration testing." },
+                    { step: "2", title: "Performance Profiling", desc: "Analisis bottleneck pada database query dan network bandwidth." },
+                    { step: "3", title: "Remediation & Hardening", desc: "Perbaikan celah keamanan dan optimalisasi konfigurasi server." }
+                ],
+                caseStudy: "Melakukan audit keamanan komprehensif pada platform fintech pembayaran digital, menemukan dan menutup 14 potensi kerentanan kritis sebelum audit OJK."
+            }
+        ];
+
+        function switchView(viewId) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
+            const target = document.getElementById('view-' + viewId);
+            if (target) {
+                target.classList.remove('hidden');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            document.querySelectorAll('.nav-link').forEach(btn => {
+                if (btn.getAttribute('data-target') === viewId) {
+                    btn.classList.add('text-brand-600', 'font-semibold');
+                } else {
+                    btn.classList.remove('text-brand-600', 'font-semibold');
+                }
+            });
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('hidden');
+        }
+
+        function selectService(index) {
+            for (let i = 0; i < 3; i++) {
+                const card = document.getElementById('serv-card-' + i);
+                if (i === index) {
+                    card.classList.add('border-brand-600', 'shadow-xs');
+                    card.classList.remove('border-corporate-border');
+                } else {
+                    card.classList.remove('border-brand-600', 'shadow-xs');
+                    card.classList.add('border-corporate-border');
+                }
+            }
+
+            const data = servicesList[index];
+            document.getElementById('sd-title').innerText = data.title;
+            document.getElementById('sd-problem').innerText = data.problem;
+            
+            const benefitsList = document.getElementById('sd-benefits');
+            benefitsList.innerHTML = data.benefits.map(b => `<li class="flex items-center"><i class="fa-solid fa-check text-green-600 mr-2.5"></i> ${b}</li>`).join('');
+
+            const processContainer = document.getElementById('sd-process');
+            processContainer.innerHTML = data.process.map(p => `
+                <div class="flex items-start space-x-3 text-sm text-corporate-text bg-corporate-bgAlt p-3 rounded-xl border border-corporate-border">
+                    <span class="w-6 h-6 rounded-full bg-brand-600 text-white flex items-center justify-center text-xs font-bold flex-shrink-0">${p.step}</span>
+                    <p><strong>${p.title}:</strong> ${p.desc}</p>
+                </div>
+            `).join('');
+
+            document.getElementById('sd-casestudy').innerText = data.caseStudy;
+        }
+
+        function alertBox(message, title = "Pemberitahuan Sistem") {
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalMessage').innerText = message;
+            document.getElementById('customModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('customModal').classList.add('hidden');
+        }
+
+        function handleContactSubmit(event) {
+            event.preventDefault();
+            const name = document.getElementById('form-name').value;
+            const company = document.getElementById('form-company').value;
+            const email = document.getElementById('form-email').value;
+            const phone = document.getElementById('form-phone').value;
+            const service = document.getElementById('form-service').value;
+            const message = document.getElementById('form-message').value;
+
+            const newLead = {
+                id: leadsData.length + 1,
+                date: new Date().toISOString().replace('T', ' ').substring(0, 16),
+                name, company, email, phone, service, source: 'Form', status: 'Baru'
+            };
+            leadsData.unshift(newLead);
+            renderLeadsTable();
+
+            document.getElementById('contactForm').reset();
+
+            alertBox(
+                `Terima kasih, ${name}! Pesan dan data konsultasi Anda telah kami terima.\n\nSistem otomatis kami telah mengirimkan email konfirmasi ke ${email}. Tim sales & engineering kami akan segera menghubungi Anda dalam waktu maksimal 1x24 jam.`,
+                "Pesan Konsultasi Berhasil Dikirim"
+            );
+        }
+
+        function openWhatsAppChat() {
+            const phoneNumber = "6281199882233";
+            const defaultMessage = encodeURIComponent("Halo Tim Sintesa Engineering, saya ingin berkonsultasi mengenai pengembangan sistem dan layanan digital perusahaan kami.");
+            
+            const newLead = {
+                id: leadsData.length + 1,
+                date: new Date().toISOString().replace('T', ' ').substring(0, 16),
+                name: 'Pengunjung WhatsApp', company: 'Belum diisi', email: '-', phone: '+62...', service: 'Konsultasi Umum', source: 'WhatsApp', status: 'Baru'
+            };
+            leadsData.unshift(newLead);
+            renderLeadsTable();
+
+            window.open(`https://wa.me/${phoneNumber}?text=${defaultMessage}`, '_blank');
+        }
+
+        function openCmsModal() {
+            document.getElementById('cmsModal').classList.remove('hidden');
+            renderLeadsTable();
+        }
+
+        function closeCmsModal() {
+            document.getElementById('cmsModal').classList.add('hidden');
+        }
+
+        function switchCmsTab(tabId) {
+            document.querySelectorAll('.cms-content-section').forEach(el => el.classList.add('hidden'));
+            document.getElementById('cms-view-' + tabId).classList.remove('hidden');
+
+            document.querySelectorAll('.cms-nav-btn').forEach(btn => {
+                btn.classList.remove('text-brand-600', 'bg-white', 'shadow-xs', 'border', 'border-corporate-border');
+                btn.classList.add('text-corporate-muted');
+            });
+            const activeBtn = document.getElementById('cms-tab-' + tabId);
+            activeBtn.classList.add('text-brand-600', 'bg-white', 'shadow-xs', 'border', 'border-corporate-border');
+            activeBtn.classList.remove('text-corporate-muted');
+        }
+
+        function renderLeadsTable() {
+            const tbody = document.getElementById('leadsTableBody');
+            document.getElementById('stat-total-leads').innerText = leadsData.length + ' Leads';
+            
+            tbody.innerHTML = leadsData.map(lead => `
+                <tr class="hover:bg-corporate-bgAlt transition">
+                    <td class="p-3.5 text-corporate-muted font-mono text-[11px]">${lead.date}</td>
+                    <td class="p-3.5">
+                        <div class="font-bold text-corporate-text">${lead.name}</div>
+                        <div class="text-corporate-muted text-[11px]">${lead.company}</div>
+                    </td>
+                    <td class="p-3.5">
+                        <div>${lead.email}</div>
+                        <div class="text-corporate-muted text-[11px]">${lead.phone}</div>
+                    </td>
+                    <td class="p-3.5 font-medium text-corporate-text">${lead.service}</td>
+                    <td class="p-3.5">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold ${lead.source === 'Form' ? 'bg-blue-100 text-blue-700' : 'bg-emerald-100 text-emerald-700'}">${lead.source}</span>
+                    </td>
+                    <td class="p-3.5">
+                        <select onchange="updateLeadStatus(${lead.id}, this.value)" class="px-2 py-1 rounded text-xs font-semibold border ${lead.status === 'Baru' ? 'bg-red-50 text-red-700 border-red-200' : lead.status === 'Dibalas' ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200'}">
+                            <option value="Baru" ${lead.status === 'Baru' ? 'selected' : ''}>Baru</option>
+                            <option value="Dibalas" ${lead.status === 'Dibalas' ? 'selected' : ''}>Dibalas</option>
+                            <option value="Selesai" ${lead.status === 'Selesai' ? 'selected' : ''}>Selesai</option>
+                        </select>
+                    </td>
+                    <td class="p-3.5">
+                        <button onclick="deleteLead(${lead.id})" class="text-red-500 hover:text-red-700 p-1"><i class="fa-solid fa-trash text-xs"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function updateLeadStatus(id, newStatus) {
+            const lead = leadsData.find(l => l.id === id);
+            if (lead) {
+                lead.status = newStatus;
+                renderLeadsTable();
+            }
+        }
+
+        function deleteLead(id) {
+            leadsData = leadsData.filter(l => l.id !== id);
+            renderLeadsTable();
+        }
+
+        function exportLeadsExcel() {
+            let csvContent = "data:text/csv;charset=utf-8,ID,Tanggal,Nama,Perusahaan,Email,Telepon,Layanan,Sumber,Status\n";
+            leadsData.forEach(l => {
+                csvContent += `"${l.id}","${l.date}","${l.name}","${l.company}","${l.email}","${l.phone}","${l.service}","${l.source}","${l.status}"\n`;
+            });
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "sintesa_leads_sales.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            alertBox("Data leads berhasil diekspor ke format Excel (CSV) untuk tim sales.", "Ekspor Sukses");
+        }
+
+        function saveCmsContent() {
+            const founded = document.getElementById('edit-founded').value;
+            const clients = document.getElementById('edit-clients').value;
+            const projects = document.getElementById('edit-projects').value;
+
+            document.getElementById('stat-founded').innerText = founded;
+            document.getElementById('stat-clients').innerText = clients;
+            document.getElementById('stat-projects').innerText = projects;
+
+            alertBox("Konten beranda dan pengaturan sistem berhasil diperbarui secara real-time.", "CMS Berhasil Disimpan");
+            closeCmsModal();
+        }
+
+        window.onload = function() {
+            renderLeadsTable();
+        };
+    </script>
+</body>
+</html>

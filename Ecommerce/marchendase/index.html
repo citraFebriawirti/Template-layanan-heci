@@ -1,0 +1,1943 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bumi Lestari — Merchandise & Donasi Sosial</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        ivory: { DEFAULT: '#FAF8F3', dark: '#F3EFE6' },
+                        forest: { DEFAULT: '#23483B', dark: '#183329', light: '#2C5A49' },
+                        terracotta: { DEFAULT: '#C96F4A', hover: '#B55E3A' },
+                        charcoal: { DEFAULT: '#292D29', light: '#5A615C' },
+                        olive: { DEFAULT: '#8B9678', light: '#A4B091' },
+                        stone: { DEFAULT: '#E8E4DB', light: '#F4F1EC' }
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'Manrope', 'sans-serif'],
+                        serif: ['Lora', 'Georgia', 'serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+    <!-- React & Babel -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #FAF8F3; color: #292D29; }
+        .font-editorial { font-family: 'Lora', Georgia, serif; }
+        /* Custom scrollbar for clean editorial look */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #F3EFE6; }
+        ::-webkit-scrollbar-thumb { background: #8B9678; border-radius: 3px; }
+        .transition-smooth { transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
+    </style>
+</head>
+<body class="h-full antialiased selection:bg-terracotta selection:text-white">
+    <div id="root" class="h-full"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useMemo } = React;
+
+        // --- MOCK INITIAL DATA ---
+        const INITIAL_PRODUCTS = [
+            {
+                id: 'p1',
+                name: 'Kaos Organik "Jaga Hutan"',
+                category: 'Pakaian',
+                price: 185000,
+                stock: 45,
+                sku: 'MCH-KOS-01',
+                image: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=800&q=80',
+                description: 'Kaos 100% katun organik dengan pewarna ramah lingkungan berbasis tumbuhan. Dibuat oleh perajin lokal binaan komunitas.',
+                sizes: ['S', 'M', 'L', 'XL', 'XXL'],
+                colors: ['Forest Green', 'Warm Ivory', 'Charcoal'],
+                featured: true
+            },
+            {
+                id: 'p2',
+                name: 'Tote Bag Kanvas Ekspedisi Rimba',
+                category: 'Aksesoris',
+                price: 125000,
+                stock: 30,
+                sku: 'MCH-TTB-02',
+                image: 'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=800&q=80',
+                description: 'Tas kanvas tebal tahan lama untuk membawa perlengkapan harian sekaligus mengurangi penggunaan kantong plastik.',
+                sizes: ['Standard (40x35cm)'],
+                colors: ['Natural Stone', 'Olive Green'],
+                featured: true
+            },
+            {
+                id: 'p3',
+                name: 'Tumbler Baja Tahan Karat 600ml',
+                category: 'Gaya Hidup',
+                price: 210000,
+                stock: 15,
+                sku: 'MCH-TMB-03',
+                image: 'https://images.unsplash.com/photo-1602143407151-7111542de6e8?auto=format&fit=crop&w=800&q=80',
+                description: 'Tumbler insulasi ganda menjaga suhu air dingin hingga 24 jam atau panas hingga 12 jam. Desain cetak laser logo konservasi.',
+                sizes: ['600 ml'],
+                colors: ['Forest Matte', 'Stainless Silver'],
+                featured: true
+            },
+            {
+                id: 'p4',
+                name: 'Buku Panduan "Menjaga Bumi dari Rumah"',
+                category: 'Edukasi',
+                price: 95000,
+                stock: 50,
+                sku: 'MCH-BUK-04',
+                image: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=800&q=80',
+                description: 'Panduan praktis langkah demi langkah untuk hidup minim sampah, kompos mandiri, dan efisiensi energi rumahan.',
+                sizes: ['A5 Softcover'],
+                colors: ['Ivory Paper'],
+                featured: false
+            },
+            {
+                id: 'p5',
+                name: 'Pin Enamel Koleksi Satwa Endemik',
+                category: 'Aksesoris',
+                price: 45000,
+                stock: 120,
+                sku: 'MCH-PIN-05',
+                image: 'https://images.unsplash.com/photo-1611085583191-a3b181a88501?auto=format&fit=crop&w=800&q=80',
+                description: 'Set pin enamel berkualitas tinggi menampilkan ilustrasi satwa terlindungi nusantara.',
+                sizes: ['3cm'],
+                colors: ['Multi-color'],
+                featured: false
+            }
+        ];
+
+        const INITIAL_PROGRAMS = [
+            {
+                id: 'prog-1',
+                title: 'Restorasi 10.000 Pohon Hutan Mangrove pesisir Sumatera',
+                category: 'Konservasi Alam',
+                target: 150000000,
+                collected: 112500000,
+                deadline: '2026-08-30',
+                status: 'Aktif',
+                image: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=800&q=80',
+                organizer: 'Tim Restorasi Pesisir Bumi Lestari',
+                description: 'Program penanaman kembali hutan mangrove untuk mencegah abrasi pantai, memulihkan ekosistem pesisir, serta memberdayakan nelayan lokal dalam pembibitan.',
+                updates: [
+                    { date: '10 Maret 2026', title: 'Penyemaian 3.000 Bibit Mangrove Tahap Pertama', content: 'Bibit Rhizophora mangle telah siap disemai bersama 45 warga lokal di Desa Pantai Bahagia.' },
+                    { date: '25 Februari 2026', title: 'Survei Lokasi Titik Tanam', content: 'Tim peneliti bersama tetua adat menetapkan 5 hektar lahan pesisir kritis sebagai area prioritas.' }
+                ],
+                allocations: [
+                    { item: 'Bibit dan Media Semai', cost: 45000000, percentage: 40 },
+                    { item: 'Upah Kerja Warga Lokal', cost: 40000000, percentage: 35 },
+                    { item: 'Pemeliharaan & Monitoring 1 Tahun', cost: 27500000, percentage: 25 }
+                ]
+            },
+            {
+                id: 'prog-2',
+                title: 'Energi Surya Mandiri untuk Sekolah Pelosok Negeri',
+                category: 'Pendidikan & Energi',
+                target: 85000000,
+                collected: 68000000,
+                deadline: '2026-07-15',
+                status: 'Aktif',
+                image: 'https://images.unsplash.com/photo-1509391365360-b184f42013f4?auto=format&fit=crop&w=800&q=80',
+                organizer: 'Divisi Energi Terbarukan Bumi Lestari',
+                description: 'Pemasangan panel surya mini di Sekolah Dasar Negeri 04 pedalaman agar anak-anak dapat mengakses penerangan dan komputer belajar di malam hari.',
+                updates: [
+                    { date: '2 Maret 2026', title: 'Pengiriman Inverter & Panel Surya Tiba di Dermaga', content: 'Logistik utama telah mendarat dan siap dibawa ke lokasi sekolah.' }
+                ],
+                allocations: [
+                    { item: 'Unit Panel Surya & Inverter', cost: 42000000, percentage: 60 },
+                    { item: 'Instalasi & Pelatihan Teknisi Lokal', cost: 18000000, percentage: 25 },
+                    { item: 'Cadangan Perawatan', cost: 10500000, percentage: 15 }
+                ]
+            },
+            {
+                id: 'prog-3',
+                title: 'Pusat Penyelamatan & Edukasi Satwa Liar Sumatera',
+                category: 'Kesejahteraan Satwa',
+                target: 200000000,
+                collected: 195000000,
+                deadline: '2026-05-01',
+                status: 'Hampir Tercapai',
+                image: 'https://images.unsplash.com/photo-1534567153574-2b12153a87f0?auto=format&fit=crop&w=800&q=80',
+                organizer: 'Aliansi Satwa Nusantara',
+                description: 'Pembangunan kandang transit medis dan penyediaan pakan darurat untuk satwa korban konflik habitat dan perburuan ilegal sebelum dilepasliarkan.',
+                updates: [
+                    { date: '1 April 2026', title: 'Penyelesaian Ruang Medis Utama', content: 'Fasilitas sterilisasi dan ruang observasi satwa kini telah beroperasi.' }
+                ],
+                allocations: [
+                    { item: 'Pembangunan Fasilitas Medis', cost: 100000000, percentage: 50 },
+                    { item: 'Pakan & Suplemen 6 Bulan', cost: 65000000, percentage: 35 },
+                    { item: 'Obat-obatan & Vaksin', cost: 30000000, percentage: 15 }
+                ]
+            }
+        ];
+
+        const INITIAL_TRANSACTIONS = [
+            {
+                id: 'TRX-2026-8941',
+                date: '2026-04-10 14:32',
+                customerName: 'Dian Sastrowardoyo',
+                customerEmail: 'dian.sastro@example.com',
+                customerPhone: '081234567890',
+                shippingAddress: 'Jl. Melati No. 12, Kebayoran Baru, Jakarta Selatan, 12180',
+                items: [
+                    { type: 'merch', name: 'Kaos Organik "Jaga Hutan"', variant: 'M / Forest Green', price: 185000, qty: 1 }
+                ],
+                donation: { programId: 'prog-1', programTitle: 'Restorasi 10.000 Pohon Hutan Mangrove', amount: 50000 },
+                shippingCost: 20000,
+                paymentMethod: 'QRIS',
+                paymentStatus: 'Sukses Terverifikasi',
+                fulfillmentStatus: 'Dikemas',
+                receiptNumber: 'JNE-REG-98127391',
+                total: 255000
+            },
+            {
+                id: 'TRX-2026-8942',
+                date: '2026-04-10 16:15',
+                customerName: 'Reza Rahadian',
+                customerEmail: 'reza.rahadian@example.com',
+                customerPhone: '089876543210',
+                shippingAddress: 'Jl. Dipati Ukur No. 45, Bandung, 40132',
+                items: [
+                    { type: 'merch', name: 'Tumbler Baja Tahan Karat 600ml', variant: '600 ml / Forest Matte', price: 210000, qty: 2 }
+                ],
+                donation: { programId: 'prog-2', programTitle: 'Energi Surya Mandiri untuk Sekolah', amount: 100000 },
+                shippingCost: 18000,
+                paymentMethod: 'Virtual Account BCA',
+                paymentStatus: 'Sukses Terverifikasi',
+                fulfillmentStatus: 'Terkirim',
+                receiptNumber: 'SICEPAT-881293',
+                total: 538000
+            }
+        ];
+
+        // --- MAIN APP COMPONENT ---
+        function App() {
+            const [currentView, setCurrentView] = useState('home'); // home, shop, product-detail, programs, program-detail, cart, checkout, success, tracking, transparency, about, admin
+            const [selectedProduct, setSelectedProduct] = useState(null);
+            const [selectedProgram, setSelectedProgram] = useState(null);
+            const [cart, setCart] = useState([]);
+            const [activeDonationItem, setActiveDonationItem] = useState(null); // { programId, programTitle, amount }
+            const [orders, setOrders] = useState(INITIAL_TRANSACTIONS);
+            const [products, setProducts] = useState(INITIAL_PRODUCTS);
+            const [programs, setPrograms] = useState(INITIAL_PROGRAMS);
+            const [lastCompletedOrder, setLastCompletedOrder] = useState(null);
+            const [toastMessage, setToastMessage] = useState('');
+
+            // Initialize Lucide icons on render/view change
+            useEffect(() => {
+                setTimeout(() => {
+                    if (window.lucide) {
+                        window.lucide.createIcons();
+                    }
+                }, 50);
+            }, [currentView, cart, selectedProduct, selectedProgram]);
+
+            const showToast = (msg) => {
+                setToastMessage(msg);
+                setTimeout(() => setToastMessage(''), 3500);
+            };
+
+            const addToCart = (product, variant, qty = 1) => {
+                setCart(prev => {
+                    const existingIndex = prev.findIndex(item => item.id === product.id && item.variant === variant);
+                    if (existingIndex > -1) {
+                        const updated = [...prev];
+                        updated[existingIndex].qty += qty;
+                        return updated;
+                    }
+                    return [...prev, { ...product, variant, qty, type: 'merch' }];
+                });
+                showToast(`Berhasil menambahkan "${product.name}" (${variant}) ke keranjang.`);
+            };
+
+            const removeFromCart = (index) => {
+                setCart(prev => prev.filter((_, i) => i !== index));
+            };
+
+            const updateCartQty = (index, delta) => {
+                setCart(prev => {
+                    const updated = [...prev];
+                    const newQty = updated[index].qty + delta;
+                    if (newQty <= 0) {
+                        return prev.filter((_, i) => i !== index);
+                    }
+                    updated[index].qty = newQty;
+                    return updated;
+                });
+            };
+
+            const cartMerchSubtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            const cartDonationAmount = activeDonationItem ? activeDonationItem.amount : 0;
+            const cartTotalItems = cart.reduce((sum, item) => sum + item.qty, 0);
+
+            return (
+                <div className="min-h-full flex flex-col bg-ivory text-charcoal">
+                    {/* Toast Notification */}
+                    {toastMessage && (
+                        <div className="fixed bottom-6 right-6 z-50 bg-forest text-ivory px-5 py-3 rounded-lg shadow-xl flex items-center space-x-3 border border-olive/30 animate-bounce">
+                            <i data-lucide="check-circle" className="w-5 h-5 text-olive-light"></i>
+                            <span className="text-sm font-medium">{toastMessage}</span>
+                        </div>
+                    )}
+
+                    {/* TOP NAVBAR */}
+                    <header className="sticky top-0 z-40 bg-ivory/95 backdrop-blur-md border-b border-stone shadow-sm">
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+                            {/* Logo */}
+                            <div className="flex items-center space-x-3 cursor-pointer" onClick={() => setCurrentView('home')}>
+                                <div className="w-10 h-10 rounded-full bg-forest flex items-center justify-center text-ivory font-editorial font-bold text-lg shadow-inner">
+                                    BL
+                                </div>
+                                <div>
+                                    <span className="font-editorial font-bold text-xl tracking-tight text-forest block">Bumi Lestari</span>
+                                    <span className="text-[10px] tracking-widest uppercase text-olive font-semibold block">Merchandise & Konservasi</span>
+                                </div>
+                            </div>
+
+                            {/* Navigation Links */}
+                            <nav className="hidden md:flex items-center space-x-8 text-sm font-medium text-charcoal">
+                                <button onClick={() => setCurrentView('home')} className={`hover:text-forest transition-colors ${currentView === 'home' ? 'text-forest font-semibold border-b-2 border-forest pb-1' : ''}`}>Beranda</button>
+                                <button onClick={() => setCurrentView('shop')} className={`hover:text-forest transition-colors ${currentView === 'shop' || currentView === 'product-detail' ? 'text-forest font-semibold border-b-2 border-forest pb-1' : ''}`}>Merchandise</button>
+                                <button onClick={() => setCurrentView('programs')} className={`hover:text-forest transition-colors ${currentView === 'programs' || currentView === 'program-detail' ? 'text-forest font-semibold border-b-2 border-forest pb-1' : ''}`}>Program Donasi</button>
+                                <button onClick={() => setCurrentView('transparency')} className={`hover:text-forest transition-colors ${currentView === 'transparency' ? 'text-forest font-semibold border-b-2 border-forest pb-1' : ''}`}>Transparansi</button>
+                                <button onClick={() => setCurrentView('tracking')} className={`hover:text-forest transition-colors ${currentView === 'tracking' ? 'text-forest font-semibold border-b-2 border-forest pb-1' : ''}`}>Lacak Pesanan</button>
+                                <button onClick={() => setCurrentView('about')} className={`hover:text-forest transition-colors ${currentView === 'about' ? 'text-forest font-semibold border-b-2 border-forest pb-1' : ''}`}>Tentang Kami</button>
+                            </nav>
+
+                            {/* Actions */}
+                            <div className="flex items-center space-x-4">
+                                <button 
+                                    onClick={() => setCurrentView('cart')} 
+                                    className="relative p-2.5 rounded-full bg-stone hover:bg-stone-light text-forest transition-smooth flex items-center space-x-2"
+                                    title="Keranjang Belanja & Donasi"
+                                >
+                                    <i data-lucide="shopping-bag" className="w-5 h-5"></i>
+                                    {(cartTotalItems > 0 || activeDonationItem) && (
+                                        <span className="absolute -top-1 -right-1 bg-terracotta text-white text-[11px] font-bold w-5 h-5 rounded-full flex items-center justify-center shadow">
+                                            {cartTotalItems + (activeDonationItem ? 1 : 0)}
+                                        </span>
+                                    )}
+                                </button>
+                                
+                                <button 
+                                    onClick={() => setCurrentView('admin')} 
+                                    className="hidden lg:flex items-center space-x-2 px-4 py-2 rounded-lg bg-forest text-ivory text-xs font-semibold hover:bg-forest-light transition-smooth shadow-sm"
+                                >
+                                    <i data-lucide="shield-check" className="w-4 h-4"></i>
+                                    <span>Panel Admin</span>
+                                </button>
+                            </div>
+                        </div>
+                    </header>
+
+                    {/* MAIN VIEW SWITCHER */}
+                    <main className="flex-grow">
+                        {currentView === 'home' && (
+                            <HomeView 
+                                setCurrentView={setCurrentView} 
+                                products={products} 
+                                programs={programs} 
+                                setSelectedProduct={setSelectedProduct} 
+                                setSelectedProgram={setSelectedProgram}
+                                setActiveDonationItem={setActiveDonationItem}
+                            />
+                        )}
+                        {currentView === 'shop' && (
+                            <ShopView 
+                                products={products} 
+                                setSelectedProduct={(p) => { setSelectedProduct(p); setCurrentView('product-detail'); }}
+                                addToCart={addToCart}
+                            />
+                        )}
+                        {currentView === 'product-detail' && selectedProduct && (
+                            <ProductDetailView 
+                                product={selectedProduct} 
+                                addToCart={addToCart} 
+                                setCurrentView={setCurrentView} 
+                            />
+                        )}
+                        {currentView === 'programs' && (
+                            <ProgramsView 
+                                programs={programs} 
+                                setSelectedProgram={(prog) => { setSelectedProgram(prog); setCurrentView('program-detail'); }}
+                                setActiveDonationItem={setActiveDonationItem}
+                                setCurrentView={setCurrentView}
+                            />
+                        )}
+                        {currentView === 'program-detail' && selectedProgram && (
+                            <ProgramDetailView 
+                                program={selectedProgram} 
+                                setActiveDonationItem={setActiveDonationItem}
+                                setCurrentView={setCurrentView}
+                            />
+                        )}
+                        {currentView === 'cart' && (
+                            <CartView 
+                                cart={cart} 
+                                updateCartQty={updateCartQty} 
+                                removeFromCart={removeFromCart} 
+                                activeDonationItem={activeDonationItem}
+                                setActiveDonationItem={setActiveDonationItem}
+                                programs={programs}
+                                setCurrentView={setCurrentView}
+                            />
+                        )}
+                        {currentView === 'checkout' && (
+                            <CheckoutView 
+                                cart={cart}
+                                activeDonationItem={activeDonationItem}
+                                setCurrentView={setCurrentView}
+                                setOrders={setOrders}
+                                setLastCompletedOrder={setLastCompletedOrder}
+                                setCart={setCart}
+                                setActiveDonationItem={setActiveDonationItem}
+                            />
+                        )}
+                        {currentView === 'success' && (
+                            <SuccessView order={lastCompletedOrder} setCurrentView={setCurrentView} />
+                        )}
+                        {currentView === 'tracking' && (
+                            <TrackingView orders={orders} />
+                        )}
+                        {currentView === 'transparency' && (
+                            <TransparencyView programs={programs} orders={orders} />
+                        )}
+                        {currentView === 'about' && (
+                            <AboutView />
+                        )}
+                        {currentView === 'admin' && (
+                            <AdminDashboard 
+                                products={products} 
+                                setProducts={setProducts} 
+                                programs={programs} 
+                                setPrograms={setPrograms} 
+                                orders={orders} 
+                                setOrders={setOrders}
+                            />
+                        )}
+                    </main>
+
+                    {/* FOOTER */}
+                    <footer className="bg-forest-dark text-ivory/90 border-t border-forest-light/30 pt-16 pb-12">
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
+                            <div className="space-y-4">
+                                <div className="flex items-center space-x-3">
+                                    <div className="w-8 h-8 rounded-full bg-terracotta flex items-center justify-center text-ivory font-editorial font-bold text-sm">
+                                        BL
+                                    </div>
+                                    <span className="font-editorial font-bold text-lg text-white">Bumi Lestari</span>
+                                </div>
+                                <p className="text-xs text-ivory/70 leading-relaxed">
+                                    Platform kolaborasi sosial resmi untuk gerakan konservasi lingkungan, pemberdayaan komunitas pesisir, dan transisi energi terbarukan di Indonesia. Setiap pembelian merchandise mendanai misi nyata.
+                                </p>
+                            </div>
+                            <div>
+                                <h4 className="text-xs font-semibold uppercase tracking-widest text-olive-light mb-4">Navigasi Utama</h4>
+                                <ul className="space-y-2.5 text-xs text-ivory/80">
+                                    <li><button onClick={() => setCurrentView('shop')} className="hover:text-white transition-colors">Katalog Merchandise</button></li>
+                                    <li><button onClick={() => setCurrentView('programs')} className="hover:text-white transition-colors">Program Donasi Aktif</button></li>
+                                    <li><button onClick={() => setCurrentView('transparency')} className="hover:text-white transition-colors">Laporan Transparansi Dana</button></li>
+                                    <li><button onClick={() => setCurrentView('tracking')} className="hover:text-white transition-colors">Pelacakan Pengiriman Pesanan</button></li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 className="text-xs font-semibold uppercase tracking-widest text-olive-light mb-4">Legal & Kebijakan</h4>
+                                <ul className="space-y-2.5 text-xs text-ivory/80">
+                                    <li><a href="#" className="hover:text-white transition-colors">Syarat & Ketentuan Donasi</a></li>
+                                    <li><a href="#" className="hover:text-white transition-colors">Kebijakan Privasi Data</a></li>
+                                    <li><a href="#" className="hover:text-white transition-colors">Audit & Pertanggungjawaban Keuangan</a></li>
+                                    <li><a href="#" className="hover:text-white transition-colors">Panduan Ukuran & Pengembalian</a></li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 className="text-xs font-semibold uppercase tracking-widest text-olive-light mb-4">Kantor & Sekretariat</h4>
+                                <p className="text-xs text-ivory/80 leading-relaxed mb-3">
+                                    Gedung Grha Lestari Lt. 3, Jl. Margasatwa Raya No. 45, Ragunan, Pasar Minggu, Jakarta Selatan 12550
+                                </p>
+                                <p className="text-xs text-ivory/80">
+                                    Email: <span className="text-white font-medium">halo@bumilestari.or.id</span><br/>
+                                    WhatsApp: <span className="text-white font-medium">+62 811-9922-8800</span>
+                                </p>
+                            </div>
+                        </div>
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 border-t border-forest-light/20 flex flex-col sm:flex-row items-center justify-between text-xs text-ivory/60">
+                            <p>&copy; 2026 Yayasan Bumi Lestari Nusantara. Hak Cipta Dilindungi Undang-Undang.</p>
+                            <p className="mt-2 sm:mt-0">Sistem Pencatatan Finansial Terverifikasi & Transparan</p>
+                        </div>
+                    </footer>
+                </div>
+            );
+        }
+
+        // --- 1. HOMEPAGE VIEW ---
+        function HomeView({ setCurrentView, products, programs, setSelectedProduct, setSelectedProgram, setActiveDonationItem }) {
+            const featuredProducts = products.filter(p => p.featured).slice(0, 3);
+            const activePrograms = programs.slice(0, 2);
+
+            return (
+                <div className="space-y-20 pb-20">
+                    {/* HERO SECTION */}
+                    <section className="relative bg-forest text-ivory py-20 lg:py-28 overflow-hidden">
+                        <div className="absolute inset-0 opacity-20 mix-blend-overlay bg-cover bg-center" style={{ backgroundImage: `url('https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=1600&q=80')` }}></div>
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                            <div className="lg:col-span-7 space-y-6">
+                                <div className="inline-flex items-center space-x-2 bg-olive/20 border border-olive/40 px-3 py-1.5 rounded-full text-xs font-semibold text-olive-light">
+                                    <i data-lucide="sprout" className="w-3.5 h-3.5"></i>
+                                    <span>Gerakan Sosial & Konservasi Terverifikasi</span>
+                                </div>
+                                <h1 className="font-editorial text-4xl sm:text-5xl lg:text-6xl font-normal leading-[1.15] text-ivory">
+                                    Setiap Karya Mendukung <span className="italic text-olive-light">Kelestarian</span> Bumi.
+                                </h1>
+                                <p className="text-base sm:text-lg text-ivory/80 leading-relaxed max-w-xl">
+                                    Belanja merchandise etikal buatan perajin lokal atau dukung langsung program restorasi lingkungan dan energi terbarukan kami. Transparan, akuntabel, dan berdampak nyata.
+                                </p>
+                                <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-3 sm:space-y-0 sm:space-x-4 pt-2">
+                                    <button 
+                                        onClick={() => setCurrentView('shop')}
+                                        className="px-8 py-4 bg-terracotta hover:bg-terracotta-hover text-white font-semibold rounded-lg shadow-lg transition-smooth flex items-center justify-center space-x-2 text-sm"
+                                    >
+                                        <span>Belanja Merchandise</span>
+                                        <i data-lucide="arrow-right" className="w-4 h-4"></i>
+                                    </button>
+                                    <button 
+                                        onClick={() => setCurrentView('programs')}
+                                        className="px-8 py-4 bg-ivory/10 hover:bg-ivory/20 text-ivory border border-ivory/30 font-semibold rounded-lg transition-smooth flex items-center justify-center space-x-2 text-sm"
+                                    >
+                                        <span>Dukung Program Donasi</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div className="lg:col-span-5 hidden lg:block">
+                                <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-ivory/20 group">
+                                    <img 
+                                        src="https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=800&q=80" 
+                                        alt="Merchandise & Conservation" 
+                                        className="w-full h-[400px] object-cover group-hover:scale-105 transition-transform duration-700"
+                                    />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-forest-dark/80 via-transparent to-transparent flex flex-col justify-end p-6">
+                                        <span className="text-xs uppercase tracking-widest text-olive-light font-bold">Produk Unggulan</span>
+                                        <p className="font-editorial text-xl text-white">Tote Bag Kanvas Ekspedisi Rimba</p>
+                                        <span className="text-sm font-semibold text-terracotta mt-1">Rp 125.000</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* STATS / TRUST BAR */}
+                    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-10 relative z-20">
+                        <div className="bg-white rounded-2xl shadow-xl border border-stone p-8 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+                            <div className="border-r border-stone last:border-none">
+                                <span className="font-editorial text-3xl font-bold text-forest block">14.280+</span>
+                                <span className="text-xs text-charcoal-light font-medium uppercase tracking-wider">Pohon Ditanam</span>
+                            </div>
+                            <div className="border-r border-stone last:border-none">
+                                <span className="font-editorial text-3xl font-bold text-forest block">Rp 385 Juta</span>
+                                <span className="text-xs text-charcoal-light font-medium uppercase tracking-wider">Dana Tersalurkan</span>
+                            </div>
+                            <div className="border-r border-stone last:border-none">
+                                <span className="font-editorial text-3xl font-bold text-forest block">1.850+</span>
+                                <span className="text-xs text-charcoal-light font-medium uppercase tracking-wider">Pendukung Aktif</span>
+                            </div>
+                            <div>
+                                <span className="font-editorial text-3xl font-bold text-forest block">100%</span>
+                                <span className="text-xs text-charcoal-light font-medium uppercase tracking-wider">Audit Terbuka</span>
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* FEATURED PROGRAMS */}
+                    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+                        <div className="flex flex-col md:flex-row md:items-end justify-between mb-10">
+                            <div>
+                                <span className="text-xs uppercase tracking-widest text-olive font-bold">Aksi Nyata</span>
+                                <h2 className="font-editorial text-3xl text-forest mt-1">Program Donasi Berjalan</h2>
+                            </div>
+                            <button onClick={() => setCurrentView('programs')} className="mt-4 md:mt-0 text-sm font-semibold text-terracotta hover:underline flex items-center space-x-1">
+                                <span>Lihat Semua Program ({programs.length})</span>
+                                <i data-lucide="arrow-right" className="w-4 h-4"></i>
+                            </button>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            {activePrograms.map(prog => {
+                                const percent = Math.min(Math.round((prog.collected / prog.target) * 100), 100);
+                                return (
+                                    <div key={prog.id} className="bg-white rounded-2xl overflow-hidden border border-stone shadow-sm hover:shadow-md transition-smooth flex flex-col">
+                                        <div className="relative h-60 overflow-hidden">
+                                            <img src={prog.image} alt={prog.title} className="w-full h-full object-cover" />
+                                            <span className="absolute top-4 left-4 bg-forest text-ivory text-xs font-semibold px-3 py-1 rounded-full shadow">
+                                                {prog.category}
+                                            </span>
+                                        </div>
+                                        <div className="p-6 flex-grow flex flex-col justify-between">
+                                            <div>
+                                                <h3 className="font-editorial text-xl font-bold text-forest mb-2">{prog.title}</h3>
+                                                <p className="text-xs text-charcoal-light line-clamp-2 leading-relaxed mb-6">{prog.description}</p>
+                                            </div>
+                                            <div className="space-y-4">
+                                                <div>
+                                                    <div className="flex justify-between text-xs font-semibold mb-1.5">
+                                                        <span className="text-forest">Terkumpul: Rp {prog.collected.toLocaleString('id-ID')}</span>
+                                                        <span className="text-charcoal-light">Target: Rp {prog.target.toLocaleString('id-ID')}</span>
+                                                    </div>
+                                                    <div className="w-full bg-stone h-2.5 rounded-full overflow-hidden">
+                                                        <div className="bg-forest h-full rounded-full" style={{ width: `${percent}%` }}></div>
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-center justify-between pt-2 border-t border-stone">
+                                                    <button 
+                                                        onClick={() => { setSelectedProgram(prog); setCurrentView('program-detail'); }}
+                                                        className="text-xs font-semibold text-forest hover:text-forest-light"
+                                                    >
+                                                        Pelajari Detail &rarr;
+                                                    </button>
+                                                    <button 
+                                                        onClick={() => {
+                                                            setSelectedProgram(prog);
+                                                            setActiveDonationItem({ programId: prog.id, programTitle: prog.title, amount: 50000 });
+                                                            setCurrentView('cart');
+                                                        }}
+                                                        className="px-4 py-2 bg-terracotta hover:bg-terracotta-hover text-white text-xs font-semibold rounded-lg shadow-sm transition-smooth"
+                                                    >
+                                                        Donasi Sekarang
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </section>
+
+                    {/* FEATURED MERCHANDISE */}
+                    <section className="bg-ivory-dark py-16 border-y border-stone">
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                            <div className="flex flex-col md:flex-row md:items-end justify-between mb-10">
+                                <div>
+                                    <span className="text-xs uppercase tracking-widest text-olive font-bold">Koleksi Etikal</span>
+                                    <h2 className="font-editorial text-3xl text-forest mt-1">Merchandise Pilihan</h2>
+                                </div>
+                                <button onClick={() => setCurrentView('shop')} className="mt-4 md:mt-0 text-sm font-semibold text-terracotta hover:underline flex items-center space-x-1">
+                                    <span>Jelajahi Katalog Lengkap</span>
+                                    <i data-lucide="arrow-right" className="w-4 h-4"></i>
+                                </button>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                                {featuredProducts.map(prod => (
+                                    <div 
+                                        key={prod.id} 
+                                        onClick={() => { setSelectedProduct(prod); setCurrentView('product-detail'); }}
+                                        className="bg-white rounded-2xl overflow-hidden border border-stone shadow-sm hover:shadow-md transition-smooth cursor-pointer group"
+                                    >
+                                        <div className="relative h-72 overflow-hidden bg-stone">
+                                            <img src={prod.image} alt={prod.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                                            <span className="absolute top-4 right-4 bg-ivory text-forest text-xs font-semibold px-2.5 py-1 rounded-md shadow-sm">
+                                                {prod.category}
+                                            </span>
+                                        </div>
+                                        <div className="p-6">
+                                            <h3 className="font-editorial text-lg font-bold text-forest group-hover:text-terracotta transition-colors mb-1">{prod.name}</h3>
+                                            <p className="text-sm font-semibold text-charcoal mb-4">Rp {prod.price.toLocaleString('id-ID')}</p>
+                                            <div className="flex items-center justify-between text-xs text-charcoal-light pt-4 border-t border-stone">
+                                                <span>Stok: {prod.stock} unit</span>
+                                                <span className="text-forest font-semibold">Lihat Detail &rarr;</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* TRANSPARENCY PROMISE BANNER */}
+                    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="bg-forest text-ivory rounded-3xl p-8 sm:p-12 relative overflow-hidden flex flex-col lg:flex-row items-center justify-between">
+                            <div className="space-y-4 max-w-2xl relative z-10 mb-8 lg:mb-0">
+                                <span className="text-xs uppercase tracking-widest text-olive-light font-bold">Komitmen Publik</span>
+                                <h3 className="font-editorial text-3xl sm:text-4xl text-white">Transparansi Finansial Tanpa Kompromi</h3>
+                                <p className="text-sm text-ivory/80 leading-relaxed">
+                                    Setiap rupiah dari pembelian merchandise dan donasi dicatat secara terpisah dan transparan. Anda dapat melihat laporan alokasi dana secara berkala pada halaman transparansi kami.
+                                </p>
+                            </div>
+                            <div className="relative z-10">
+                                <button 
+                                    onClick={() => setCurrentView('transparency')}
+                                    className="px-8 py-4 bg-ivory text-forest hover:bg-stone font-semibold rounded-xl transition-smooth shadow-lg text-sm"
+                                >
+                                    Lihat Laporan Transparansi
+                                </button>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            );
+        }
+
+        // --- 2. SHOP VIEW (MERCHANDISE CATALOG) ---
+        function ShopView({ products, setSelectedProduct, addToCart }) {
+            const [search, setSearch] = useState('');
+            const [category, setCategory] = useState('Semua');
+
+            const categories = ['Semua', 'Pakaian', 'Aksesoris', 'Gaya Hidup', 'Edukasi'];
+
+            const filteredProducts = useMemo(() => {
+                return products.filter(p => {
+                    const matchCat = category === 'Semua' || p.category === category;
+                    const matchSearch = p.name.toLowerCase().includes(search.toLowerCase()) || p.description.toLowerCase().includes(search.toLowerCase());
+                    return matchCat && matchSearch;
+                });
+            }, [products, category, search]);
+
+            return (
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8">
+                    {/* Header */}
+                    <div className="border-b border-stone pb-6">
+                        <span className="text-xs uppercase tracking-widest text-olive font-bold">Katalog Resmi</span>
+                        <h1 className="font-editorial text-3xl sm:text-4xl text-forest mt-1">Merchandise Konservasi</h1>
+                        <p className="text-sm text-charcoal-light mt-2 max-w-xl">
+                            Seluruh produk dibuat dari bahan berkelanjutan. Laba penjualan didedikasikan untuk operasional program konservasi lingkungan.
+                        </p>
+                    </div>
+
+                    {/* Filter & Search Bar */}
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div className="flex flex-wrap items-center gap-2">
+                            {categories.map(cat => (
+                                <button
+                                    key={cat}
+                                    onClick={() => setCategory(cat)}
+                                    className={`px-4 py-2 rounded-lg text-xs font-semibold transition-smooth ${category === cat ? 'bg-forest text-ivory' : 'bg-white border border-stone text-charcoal hover:bg-stone'}`}
+                                >
+                                    {cat}
+                                </button>
+                            ))}
+                        </div>
+                        <div className="relative w-full md:w-72">
+                            <i data-lucide="search" className="absolute left-3.5 top-3 w-4 h-4 text-charcoal-light"></i>
+                            <input 
+                                type="text"
+                                placeholder="Cari produk merchandise..."
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                                className="w-full bg-white border border-stone rounded-lg pl-10 pr-4 py-2 text-xs text-charcoal focus:outline-none focus:border-forest"
+                            />
+                        </div>
+                    </div>
+
+                    {/* Grid */}
+                    {filteredProducts.length === 0 ? (
+                        <div className="bg-white rounded-2xl border border-stone p-12 text-center">
+                            <i data-lucide="package-x" className="w-12 h-12 text-charcoal-light mx-auto mb-4"></i>
+                            <h3 className="font-editorial text-xl font-bold text-forest">Produk Tidak Ditemukan</h3>
+                            <p className="text-xs text-charcoal-light mt-1">Coba kata kunci lain atau pilih kategori yang berbeda.</p>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                            {filteredProducts.map(prod => (
+                                <div 
+                                    key={prod.id} 
+                                    onClick={() => setSelectedProduct(prod)}
+                                    className="bg-white rounded-2xl overflow-hidden border border-stone shadow-sm hover:shadow-md transition-smooth cursor-pointer group flex flex-col justify-between"
+                                >
+                                    <div className="relative h-72 overflow-hidden bg-stone">
+                                        <img src={prod.image} alt={prod.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                                        <span className="absolute top-4 right-4 bg-ivory text-forest text-xs font-semibold px-2.5 py-1 rounded-md shadow-sm">
+                                            {prod.category}
+                                        </span>
+                                    </div>
+                                    <div className="p-6 flex-grow flex flex-col justify-between">
+                                        <div>
+                                            <h3 className="font-editorial text-lg font-bold text-forest group-hover:text-terracotta transition-colors mb-1">{prod.name}</h3>
+                                            <p className="text-xs text-charcoal-light line-clamp-2 mb-4">{prod.description}</p>
+                                        </div>
+                                        <div>
+                                            <div className="flex items-center justify-between mb-4">
+                                                <span className="text-base font-bold text-charcoal">Rp {prod.price.toLocaleString('id-ID')}</span>
+                                                <span className="text-xs text-charcoal-light font-medium">Stok: {prod.stock}</span>
+                                            </div>
+                                            <button 
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setSelectedProduct(prod);
+                                                }}
+                                                className="w-full py-2.5 bg-forest hover:bg-forest-light text-ivory text-xs font-semibold rounded-lg transition-smooth flex items-center justify-center space-x-2"
+                                            >
+                                                <i data-lucide="eye" className="w-4 h-4"></i>
+                                                <span>Pilih Varian & Beli</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        // --- 3. PRODUCT DETAIL VIEW ---
+        function ProductDetailView({ product, addToCart, setCurrentView }) {
+            const [selectedSize, setSelectedSize] = useState(product.sizes ? product.sizes[0] : 'Standard');
+            const [selectedColor, setSelectedColor] = useState(product.colors ? product.colors[0] : 'Default');
+            const [qty, setQty] = useState(1);
+
+            return (
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                    <button onClick={() => setCurrentView('shop')} className="inline-flex items-center space-x-2 text-xs font-semibold text-charcoal hover:text-forest mb-8">
+                        <i data-lucide="arrow-left" className="w-4 h-4"></i>
+                        <span>Kembali ke Katalog Merchandise</span>
+                    </button>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 bg-white rounded-3xl border border-stone p-8 sm:p-12 shadow-sm">
+                        {/* Image Gallery */}
+                        <div className="lg:col-span-6 space-y-4">
+                            <div className="rounded-2xl overflow-hidden bg-stone h-[450px]">
+                                <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
+                            </div>
+                        </div>
+
+                        {/* Product Info & Actions */}
+                        <div className="lg:col-span-6 space-y-6 flex flex-col justify-between">
+                            <div className="space-y-4">
+                                <span className="bg-stone text-forest text-xs font-semibold px-3 py-1 rounded-full">
+                                    {product.category}
+                                </span>
+                                <h1 className="font-editorial text-3xl sm:text-4xl text-forest">{product.name}</h1>
+                                <p className="text-2xl font-bold text-charcoal">Rp {product.price.toLocaleString('id-ID')}</p>
+                                <p className="text-sm text-charcoal-light leading-relaxed">{product.description}</p>
+
+                                <div className="pt-4 border-t border-stone space-y-4">
+                                    {/* Size selection */}
+                                    {product.sizes && product.sizes.length > 0 && (
+                                        <div>
+                                            <label className="block text-xs font-semibold uppercase tracking-wider text-charcoal mb-2">Pilih Ukuran / Varian</label>
+                                            <div className="flex flex-wrap gap-2">
+                                                {product.sizes.map(s => (
+                                                    <button
+                                                        key={s}
+                                                        onClick={() => setSelectedSize(s)}
+                                                        className={`px-4 py-2 rounded-lg text-xs font-semibold border transition-smooth ${selectedSize === s ? 'bg-forest text-ivory border-forest' : 'bg-white text-charcoal border-stone hover:border-forest'}`}
+                                                    >
+                                                        {s}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Color selection */}
+                                    {product.colors && product.colors.length > 0 && (
+                                        <div>
+                                            <label className="block text-xs font-semibold uppercase tracking-wider text-charcoal mb-2">Pilih Warna / Edisi</label>
+                                            <div className="flex flex-wrap gap-2">
+                                                {product.colors.map(c => (
+                                                    <button
+                                                        key={c}
+                                                        onClick={() => setSelectedColor(c)}
+                                                        className={`px-4 py-2 rounded-lg text-xs font-semibold border transition-smooth ${selectedColor === c ? 'bg-forest text-ivory border-forest' : 'bg-white text-charcoal border-stone hover:border-forest'}`}
+                                                    >
+                                                        {c}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Qty */}
+                                    <div>
+                                        <label className="block text-xs font-semibold uppercase tracking-wider text-charcoal mb-2">Jumlah Pembelian</label>
+                                        <div className="flex items-center space-x-3">
+                                            <button 
+                                                onClick={() => setQty(Math.max(1, qty - 1))}
+                                                className="w-10 h-10 rounded-lg bg-stone text-charcoal font-bold hover:bg-stone-light flex items-center justify-center"
+                                            >-</button>
+                                            <span className="text-base font-bold w-8 text-center">{qty}</span>
+                                            <button 
+                                                onClick={() => setQty(Math.min(product.stock, qty + 1))}
+                                                className="w-10 h-10 rounded-lg bg-stone text-charcoal font-bold hover:bg-stone-light flex items-center justify-center"
+                                            >+</button>
+                                            <span className="text-xs text-charcoal-light ml-2">Stok tersedia: {product.stock}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="pt-6 border-t border-stone flex flex-col sm:flex-row items-center space-y-3 sm:space-y-0 sm:space-x-4">
+                                <button 
+                                    onClick={() => {
+                                        const variantStr = `${selectedSize} / ${selectedColor}`;
+                                        addToCart(product, variantStr, qty);
+                                    }}
+                                    className="w-full py-4 bg-terracotta hover:bg-terracotta-hover text-white font-semibold rounded-xl transition-smooth shadow-lg flex items-center justify-center space-x-2 text-sm"
+                                >
+                                    <i data-lucide="shopping-bag" className="w-5 h-5"></i>
+                                    <span>Tambah ke Keranjang</span>
+                                </button>
+                                <button 
+                                    onClick={() => {
+                                        const variantStr = `${selectedSize} / ${selectedColor}`;
+                                        addToCart(product, variantStr, qty);
+                                        setCurrentView('cart');
+                                    }}
+                                    className="w-full py-4 bg-forest hover:bg-forest-light text-ivory font-semibold rounded-xl transition-smooth shadow-sm flex items-center justify-center space-x-2 text-sm"
+                                >
+                                    <span>Beli Sekarang</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // --- 4. PROGRAMS VIEW (DONATION LISTING) ---
+        function ProgramsView({ programs, setSelectedProgram, setActiveDonationItem, setCurrentView }) {
+            return (
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8">
+                    <div className="border-b border-stone pb-6">
+                        <span className="text-xs uppercase tracking-widest text-olive font-bold">Daftar Aksi & Misi</span>
+                        <h1 className="font-editorial text-3xl sm:text-4xl text-forest mt-1">Program Donasi & Konservasi</h1>
+                        <p className="text-sm text-charcoal-light mt-2 max-w-xl">
+                            Pilih program sosial yang ingin Anda dukung. Transparansi penggunaan dana dilaporkan berkala langsung oleh pengelola program.
+                        </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        {programs.map(prog => {
+                            const percent = Math.min(Math.round((prog.collected / prog.target) * 100), 100);
+                            return (
+                                <div key={prog.id} className="bg-white rounded-2xl overflow-hidden border border-stone shadow-sm hover:shadow-md transition-smooth flex flex-col justify-between">
+                                    <div>
+                                        <div className="relative h-60 overflow-hidden">
+                                            <img src={prog.image} alt={prog.title} className="w-full h-full object-cover" />
+                                            <span className="absolute top-4 left-4 bg-forest text-ivory text-xs font-semibold px-3 py-1 rounded-full shadow">
+                                                {prog.category}
+                                            </span>
+                                        </div>
+                                        <div className="p-6">
+                                            <h3 className="font-editorial text-xl font-bold text-forest mb-2">{prog.title}</h3>
+                                            <p className="text-xs text-charcoal-light line-clamp-3 leading-relaxed mb-6">{prog.description}</p>
+                                        </div>
+                                    </div>
+                                    <div className="p-6 pt-0 space-y-4">
+                                        <div>
+                                            <div className="flex justify-between text-xs font-semibold mb-1.5">
+                                                <span className="text-forest">Rp {prog.collected.toLocaleString('id-ID')}</span>
+                                                <span className="text-charcoal-light">{percent}% (Target: Rp {prog.target.toLocaleString('id-ID')})</span>
+                                            </div>
+                                            <div className="w-full bg-stone h-2.5 rounded-full overflow-hidden">
+                                                <div className="bg-forest h-full rounded-full" style={{ width: `${percent}%` }}></div>
+                                            </div>
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-3 pt-2 border-t border-stone">
+                                            <button 
+                                                onClick={() => { setSelectedProgram(prog); setCurrentView('program-detail'); }}
+                                                className="py-2.5 bg-stone hover:bg-stone-light text-forest text-xs font-semibold rounded-lg transition-smooth text-center"
+                                            >
+                                                Detail Program
+                                            </button>
+                                            <button 
+                                                onClick={() => {
+                                                    setSelectedProgram(prog);
+                                                    setActiveDonationItem({ programId: prog.id, programTitle: prog.title, amount: 50000 });
+                                                    setCurrentView('cart');
+                                                }}
+                                                className="py-2.5 bg-terracotta hover:bg-terracotta-hover text-white text-xs font-semibold rounded-lg transition-smooth text-center"
+                                            >
+                                                Donasi
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+            );
+        }
+
+        // --- 5. PROGRAM DETAIL VIEW ---
+        function ProgramDetailView({ program, setActiveDonationItem, setCurrentView }) {
+            const [customAmount, setCustomAmount] = useState(50000);
+            const percent = Math.min(Math.round((program.collected / program.target) * 100), 100);
+
+            return (
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
+                    <button onClick={() => setCurrentView('programs')} className="inline-flex items-center space-x-2 text-xs font-semibold text-charcoal hover:text-forest">
+                        <i data-lucide="arrow-left" className="w-4 h-4"></i>
+                        <span>Kembali ke Daftar Program</span>
+                    </button>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+                        {/* Main Program Information */}
+                        <div className="lg:col-span-8 space-y-8">
+                            <div className="rounded-3xl overflow-hidden bg-stone h-[400px] shadow-sm">
+                                <img src={program.image} alt={program.title} className="w-full h-full object-cover" />
+                            </div>
+
+                            <div className="bg-white rounded-3xl border border-stone p-8 sm:p-10 space-y-6 shadow-sm">
+                                <div className="flex items-center justify-between">
+                                    <span className="bg-forest text-ivory text-xs font-semibold px-3 py-1 rounded-full">
+                                        {program.category}
+                                    </span>
+                                    <span className="text-xs text-charcoal-light font-medium">Penyelenggara: {program.organizer}</span>
+                                </div>
+                                <h1 className="font-editorial text-3xl sm:text-4xl text-forest">{program.title}</h1>
+                                <p className="text-sm text-charcoal leading-relaxed">{program.description}</p>
+
+                                {/* Progress */}
+                                <div className="bg-ivory p-6 rounded-2xl border border-stone space-y-3">
+                                    <div className="flex justify-between items-center text-sm font-bold">
+                                        <span className="text-forest">Terkumpul: Rp {program.collected.toLocaleString('id-ID')}</span>
+                                        <span className="text-charcoal-light">Target: Rp {program.target.toLocaleString('id-ID')}</span>
+                                    </div>
+                                    <div className="w-full bg-stone h-3 rounded-full overflow-hidden">
+                                        <div className="bg-forest h-full rounded-full" style={{ width: `${percent}%` }}></div>
+                                    </div>
+                                    <div className="flex justify-between text-xs text-charcoal-light">
+                                        <span>{percent}% Tercapai</span>
+                                        <span>Batas Waktu: {program.deadline}</span>
+                                    </div>
+                                </div>
+
+                                {/* Fund Allocation Plan */}
+                                <div className="space-y-4 pt-4">
+                                    <h3 className="font-editorial text-xl font-bold text-forest">Rencana Alokasi Penggunaan Dana</h3>
+                                    <div className="space-y-3">
+                                        {program.allocations.map((alloc, idx) => (
+                                            <div key={idx} className="bg-stone/50 p-4 rounded-xl flex items-center justify-between text-xs">
+                                                <div>
+                                                    <span className="font-semibold text-charcoal block">{alloc.item}</span>
+                                                    <span className="text-charcoal-light">Alokasi: {alloc.percentage}% dari total anggaran</span>
+                                                </div>
+                                                <span className="font-bold text-forest">Rp {alloc.cost.toLocaleString('id-ID')}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Updates Timeline */}
+                                <div className="space-y-4 pt-4">
+                                    <h3 className="font-editorial text-xl font-bold text-forest">Pembaruan Perkembangan Program</h3>
+                                    <div className="space-y-6 border-l-2 border-olive/40 pl-6 ml-2">
+                                        {program.updates.map((upd, idx) => (
+                                            <div key={idx} className="space-y-1 relative">
+                                                <div className="absolute -left-[31px] top-1.5 w-3.5 h-3.5 rounded-full bg-forest border-2 border-ivory"></div>
+                                                <span className="text-xs text-olive font-semibold">{upd.date}</span>
+                                                <h4 className="font-semibold text-charcoal text-sm">{upd.title}</h4>
+                                                <p className="text-xs text-charcoal-light leading-relaxed">{upd.content}</p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Donation Form Sidebar */}
+                        <div className="lg:col-span-4">
+                            <div className="sticky top-28 bg-white rounded-3xl border border-stone p-8 shadow-md space-y-6">
+                                <h3 className="font-editorial text-2xl font-bold text-forest">Salurkan Donasi</h3>
+                                <p className="text-xs text-charcoal-light leading-relaxed">
+                                    Tentukan nominal donasi Anda untuk program ini. Donasi dapat digabungkan dengan pembelian merchandise.
+                                </p>
+
+                                <div className="space-y-3">
+                                    <label className="block text-xs font-semibold uppercase tracking-wider text-charcoal">Pilih Nominal Cepat</label>
+                                    <div className="grid grid-cols-2 gap-3">
+                                        {[25000, 50000, 100000, 250000].map(amt => (
+                                            <button
+                                                key={amt}
+                                                onClick={() => setCustomAmount(amt)}
+                                                className={`py-3 rounded-xl text-xs font-bold border transition-smooth ${customAmount === amt ? 'bg-forest text-ivory border-forest' : 'bg-ivory text-charcoal border-stone hover:border-forest'}`}
+                                            >
+                                                Rp {amt.toLocaleString('id-ID')}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label className="block text-xs font-semibold uppercase tracking-wider text-charcoal mb-2">Atau Masukkan Nominal Lain</label>
+                                    <div className="relative">
+                                        <span className="absolute left-4 top-3 text-xs font-bold text-charcoal">Rp</span>
+                                        <input 
+                                            type="number"
+                                            value={customAmount}
+                                            onChange={(e) => setCustomAmount(Math.max(10000, Number(e.target.value)))}
+                                            className="w-full bg-ivory border border-stone rounded-xl pl-12 pr-4 py-3 text-xs font-semibold text-charcoal focus:outline-none focus:border-forest"
+                                        />
+                                    </div>
+                                </div>
+
+                                <button 
+                                    onClick={() => {
+                                        setActiveDonationItem({ programId: program.id, programTitle: program.title, amount: customAmount });
+                                        setCurrentView('cart');
+                                    }}
+                                    className="w-full py-4 bg-terracotta hover:bg-terracotta-hover text-white font-semibold rounded-xl transition-smooth shadow-lg flex items-center justify-center space-x-2 text-sm"
+                                >
+                                    <i data-lucide="heart" className="w-4 h-4"></i>
+                                    <span>Tambahkan ke Keranjang & Donasi</span>
+                                </button>
+                                <p className="text-[11px] text-center text-charcoal-light">
+                                    Pencatatan donasi dipisahkan secara logis dari pembelian merchandise demi transparansi penuh.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // --- 6. UNIFIED CART VIEW ---
+        function CartView({ cart, updateCartQty, removeFromCart, activeDonationItem, setActiveDonationItem, programs, setCurrentView }) {
+            const [selectedProgramId, setSelectedProgramId] = useState(programs[0]?.id || '');
+            const [donationInput, setDonationInput] = useState(50000);
+
+            const merchSubtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            const donationAmount = activeDonationItem ? activeDonationItem.amount : 0;
+            const grandTotal = merchSubtotal + donationAmount;
+
+            return (
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8">
+                    <div className="border-b border-stone pb-6">
+                        <span className="text-xs uppercase tracking-widest text-olive font-bold">Keranjang Gabungan</span>
+                        <h1 className="font-editorial text-3xl sm:text-4xl text-forest mt-1">Keranjang Belanja & Donasi Sukarela</h1>
+                        <p className="text-sm text-charcoal-light mt-2">
+                            Anda dapat membeli merchandise dan memberikan donasi dalam satu kali proses checkout yang terintegrasi.
+                        </p>
+                    </div>
+
+                    {cart.length === 0 && !activeDonationItem ? (
+                        <div className="bg-white rounded-3xl border border-stone p-16 text-center space-y-4">
+                            <i data-lucide="shopping-bag" className="w-16 h-16 text-charcoal-light mx-auto"></i>
+                            <h3 className="font-editorial text-2xl font-bold text-forest">Keranjang Anda Masih Kosong</h3>
+                            <p className="text-xs text-charcoal-light max-w-md mx-auto">
+                                Belum ada merchandise atau program donasi yang dipilih. Mulai jelajahi katalog atau pilih program konservasi kami.
+                            </p>
+                            <div className="pt-4 flex justify-center space-x-4">
+                                <button onClick={() => setCurrentView('shop')} className="px-6 py-3 bg-forest text-ivory text-xs font-semibold rounded-xl">Jelajahi Merchandise</button>
+                                <button onClick={() => setCurrentView('programs')} className="px-6 py-3 bg-stone text-forest text-xs font-semibold rounded-xl">Dukung Program Donasi</button>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+                            {/* Items List */}
+                            <div className="lg:col-span-8 space-y-8">
+                                {/* A. Merchandise Section */}
+                                <div className="bg-white rounded-3xl border border-stone p-8 space-y-6 shadow-sm">
+                                    <div className="flex items-center justify-between border-b border-stone pb-4">
+                                        <h3 className="font-editorial text-xl font-bold text-forest flex items-center space-x-2">
+                                            <i data-lucide="package" className="w-5 h-5 text-olive"></i>
+                                            <span>A. Item Merchandise ({cart.reduce((s, i) => s + i.qty, 0)})</span>
+                                        </h3>
+                                        <span className="text-xs font-semibold text-charcoal-light">Subtotal: Rp {merchSubtotal.toLocaleString('id-ID')}</span>
+                                    </div>
+
+                                    {cart.length === 0 ? (
+                                        <p className="text-xs text-charcoal-light py-4 text-center">Tidak ada item merchandise di keranjang.</p>
+                                    ) : (
+                                        <div className="space-y-4">
+                                            {cart.map((item, index) => (
+                                                <div key={index} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 rounded-2xl bg-ivory border border-stone gap-4">
+                                                    <div className="flex items-center space-x-4">
+                                                        <img src={item.image} alt={item.name} className="w-16 h-16 rounded-xl object-cover bg-stone" />
+                                                        <div>
+                                                            <h4 className="font-bold text-sm text-forest">{item.name}</h4>
+                                                            <span className="text-xs text-charcoal-light block">Varian: {item.variant}</span>
+                                                            <span className="text-xs font-bold text-charcoal mt-1 block">Rp {item.price.toLocaleString('id-ID')}</span>
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex items-center justify-between w-full sm:w-auto space-x-6">
+                                                        <div className="flex items-center space-x-2">
+                                                            <button onClick={() => updateCartQty(index, -1)} className="w-8 h-8 rounded-lg bg-white border border-stone font-bold text-xs">-</button>
+                                                            <span className="text-xs font-bold w-6 text-center">{item.qty}</span>
+                                                            <button onClick={() => updateCartQty(index, 1)} className="w-8 h-8 rounded-lg bg-white border border-stone font-bold text-xs">+</button>
+                                                        </div>
+                                                        <button onClick={() => removeFromCart(index)} className="text-terracotta hover:text-red-700 p-2">
+                                                            <i data-lucide="trash-2" className="w-4 h-4"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* B. Donation Section */}
+                                <div className="bg-white rounded-3xl border border-stone p-8 space-y-6 shadow-sm">
+                                    <div className="flex items-center justify-between border-b border-stone pb-4">
+                                        <h3 className="font-editorial text-xl font-bold text-forest flex items-center space-x-2">
+                                            <i data-lucide="heart" className="w-5 h-5 text-terracotta"></i>
+                                            <span>B. Donasi Sukarela Program</span>
+                                        </h3>
+                                        {activeDonationItem && (
+                                            <button 
+                                                onClick={() => setActiveDonationItem(null)}
+                                                className="text-xs text-terracotta font-semibold hover:underline"
+                                            >
+                                                Hapus Donasi
+                                            </button>
+                                        )}
+                                    </div>
+
+                                    {activeDonationItem ? (
+                                        <div className="p-4 rounded-2xl bg-ivory border border-olive/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                                            <div>
+                                                <span className="text-[10px] uppercase tracking-widest text-olive font-bold">Program Tujuan</span>
+                                                <h4 className="font-bold text-sm text-forest">{activeDonationItem.programTitle}</h4>
+                                                <span className="text-xs font-bold text-terracotta mt-1 block">Nominal Donasi: Rp {activeDonationItem.amount.toLocaleString('id-ID')}</span>
+                                            </div>
+                                            <button 
+                                                onClick={() => setActiveDonationItem(null)}
+                                                className="text-xs font-semibold text-charcoal-light hover:text-terracotta"
+                                            >
+                                                Ganti Program / Nominal
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-4 bg-ivory p-6 rounded-2xl border border-stone">
+                                            <p className="text-xs text-charcoal-light">Tambahkan donasi sukarela untuk mendukung program konservasi pilihan Anda secara terpisah.</p>
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                <div>
+                                                    <label className="block text-xs font-semibold text-charcoal mb-1">Pilih Program</label>
+                                                    <select 
+                                                        value={selectedProgramId}
+                                                        onChange={(e) => setSelectedProgramId(e.target.value)}
+                                                        className="w-full bg-white border border-stone rounded-xl px-3 py-2.5 text-xs text-charcoal focus:outline-none focus:border-forest"
+                                                    >
+                                                        {programs.map(p => (
+                                                            <option key={p.id} value={p.id}>{p.title}</option>
+                                                        ))}
+                                                    </select>
+                                                </div>
+                                                <div>
+                                                    <label className="block text-xs font-semibold text-charcoal mb-1">Nominal Donasi (Rp)</label>
+                                                    <input 
+                                                        type="number"
+                                                        value={donationInput}
+                                                        onChange={(e) => setDonationInput(Number(e.target.value))}
+                                                        className="w-full bg-white border border-stone rounded-xl px-3 py-2.5 text-xs text-charcoal focus:outline-none focus:border-forest"
+                                                    />
+                                                </div>
+                                            </div>
+                                            <button 
+                                                onClick={() => {
+                                                    const prog = programs.find(p => p.id === selectedProgramId);
+                                                    if (prog) {
+                                                        setActiveDonationItem({ programId: prog.id, programTitle: prog.title, amount: donationInput });
+                                                        showToast('Donasi sukarela berhasil ditambahkan ke keranjang.');
+                                                    }
+                                                }}
+                                                className="w-full py-3 bg-forest hover:bg-forest-light text-ivory text-xs font-semibold rounded-xl transition-smooth"
+                                            >
+                                                Tambahkan Donasi Ini ke Keranjang
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Summary & Checkout Sidebar */}
+                            <div className="lg:col-span-4">
+                                <div className="sticky top-28 bg-white rounded-3xl border border-stone p-8 space-y-6 shadow-md">
+                                    <h3 className="font-editorial text-2xl font-bold text-forest">Ringkasan Pembayaran</h3>
+
+                                    <div className="space-y-3 text-xs border-b border-stone pb-6">
+                                        <div className="flex justify-between">
+                                            <span className="text-charcoal-light">Subtotal Merchandise ({cart.reduce((s, i) => s + i.qty, 0)} item)</span>
+                                            <span className="font-bold text-charcoal">Rp {merchSubtotal.toLocaleString('id-ID')}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-charcoal-light">Donasi Sukarela Program</span>
+                                            <span className="font-bold text-terracotta">Rp {donationAmount.toLocaleString('id-ID')}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-charcoal-light">Estimasi Ongkir (Dihitung saat checkout)</span>
+                                            <span className="text-charcoal font-medium">Menyesuaikan</span>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex justify-between items-center pt-2">
+                                        <span className="text-sm font-bold text-forest">Total Gabungan</span>
+                                        <span className="text-xl font-bold text-forest">Rp {grandTotal.toLocaleString('id-ID')}</span>
+                                    </div>
+
+                                    <button 
+                                        onClick={() => setCurrentView('checkout')}
+                                        className="w-full py-4 bg-terracotta hover:bg-terracotta-hover text-white font-semibold rounded-xl transition-smooth shadow-lg flex items-center justify-center space-x-2 text-sm"
+                                    >
+                                        <span>Lanjut ke Checkout Pembayaran</span>
+                                        <i data-lucide="arrow-right" className="w-4 h-4"></i>
+                                    </button>
+                                    <p className="text-[11px] text-center text-charcoal-light">
+                                        Transaksi diamankan dengan enkripsi SSL & verifikasi webhook payment gateway resmi.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        // --- 7. CHECKOUT VIEW ---
+        function CheckoutView({ cart, activeDonationItem, setCurrentView, setOrders, setLastCompletedOrder, setCart, setActiveDonationItem }) {
+            const [form, setForm] = useState({
+                name: 'Budi Santoso',
+                email: 'budi.santoso@example.com',
+                phone: '081298765432',
+                address: 'Jl. Taman Siswa No. 14, RT 03/RW 04',
+                province: 'DKI Jakarta',
+                city: 'Jakarta Selatan',
+                district: 'Kebayoran Baru',
+                postalCode: '12180',
+                courier: 'JNE Regular (2-3 Hari) - Rp 20.000',
+                paymentMethod: 'QRIS'
+            });
+
+            const merchSubtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            const donationAmount = activeDonationItem ? activeDonationItem.amount : 0;
+            const shippingCost = 20000; // Fixed mock shipping
+            const grandTotal = merchSubtotal + donationAmount + (cart.length > 0 ? shippingCost : 0);
+
+            const handleCheckoutSubmit = (e) => {
+                e.preventDefault();
+                const newOrder = {
+                    id: `TRX-2026-${Math.floor(1000 + Math.random() * 9000)}`,
+                    date: new Date().toISOString().replace('T', ' ').substring(0, 16),
+                    customerName: form.name,
+                    customerEmail: form.email,
+                    customerPhone: form.phone,
+                    shippingAddress: `${form.address}, ${form.district}, ${form.city}, ${form.province}, ${form.postalCode}`,
+                    items: cart,
+                    donation: activeDonationItem,
+                    shippingCost: cart.length > 0 ? shippingCost : 0,
+                    paymentMethod: form.paymentMethod,
+                    paymentStatus: 'Sukses Terverifikasi (Simulasi)',
+                    fulfillmentStatus: 'Menunggu Diproses',
+                    receiptNumber: cart.length > 0 ? `RESI-BL-${Math.floor(100000 + Math.random() * 900000)}` : 'N/A (Donasi Saja)',
+                    total: grandTotal
+                };
+
+                setOrders(prev => [newOrder, ...prev]);
+                setLastCompletedOrder(newOrder);
+                setCart([]);
+                setActiveDonationItem(null);
+                setCurrentView('success');
+            };
+
+            return (
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                    <button onClick={() => setCurrentView('cart')} className="inline-flex items-center space-x-2 text-xs font-semibold text-charcoal hover:text-forest mb-8">
+                        <i data-lucide="arrow-left" className="w-4 h-4"></i>
+                        <span>Kembali ke Keranjang</span>
+                    </button>
+
+                    <form onSubmit={handleCheckoutSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+                        {/* Form Inputs */}
+                        <div className="lg:col-span-7 space-y-8">
+                            {/* Customer Information */}
+                            <div className="bg-white rounded-3xl border border-stone p-8 space-y-6 shadow-sm">
+                                <h3 className="font-editorial text-xl font-bold text-forest">1. Informasi Penerima & Pengiriman</h3>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                                    <div className="sm:col-span-2">
+                                        <label className="block font-semibold text-charcoal mb-1">Nama Lengkap</label>
+                                        <input 
+                                            type="text" 
+                                            required
+                                            value={form.name} 
+                                            onChange={e => setForm({...form, name: e.target.value})} 
+                                            className="w-full bg-ivory border border-stone rounded-xl px-4 py-3 text-charcoal focus:outline-none focus:border-forest"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block font-semibold text-charcoal mb-1">Email (untuk konfirmasi & resi)</label>
+                                        <input 
+                                            type="email" 
+                                            required
+                                            value={form.email} 
+                                            onChange={e => setForm({...form, email: e.target.value})} 
+                                            className="w-full bg-ivory border border-stone rounded-xl px-4 py-3 text-charcoal focus:outline-none focus:border-forest"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block font-semibold text-charcoal mb-1">Nomor WhatsApp</label>
+                                        <input 
+                                            type="text" 
+                                            required
+                                            value={form.phone} 
+                                            onChange={e => setForm({...form, phone: e.target.value})} 
+                                            className="w-full bg-ivory border border-stone rounded-xl px-4 py-3 text-charcoal focus:outline-none focus:border-forest"
+                                        />
+                                    </div>
+                                    <div className="sm:col-span-2">
+                                        <label className="block font-semibold text-charcoal mb-1">Alamat Lengkap</label>
+                                        <textarea 
+                                            rows="3"
+                                            required
+                                            value={form.address} 
+                                            onChange={e => setForm({...form, address: e.target.value})} 
+                                            className="w-full bg-ivory border border-stone rounded-xl p-4 text-charcoal focus:outline-none focus:border-forest"
+                                        ></textarea>
+                                    </div>
+                                    <div>
+                                        <label className="block font-semibold text-charcoal mb-1">Kota / Kabupaten</label>
+                                        <input 
+                                            type="text" 
+                                            required
+                                            value={form.city} 
+                                            onChange={e => setForm({...form, city: e.target.value})} 
+                                            className="w-full bg-ivory border border-stone rounded-xl px-4 py-3 text-charcoal focus:outline-none focus:border-forest"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block font-semibold text-charcoal mb-1">Kode Pos</label>
+                                        <input 
+                                            type="text" 
+                                            required
+                                            value={form.postalCode} 
+                                            onChange={e => setForm({...form, postalCode: e.target.value})} 
+                                            className="w-full bg-ivory border border-stone rounded-xl px-4 py-3 text-charcoal focus:outline-none focus:border-forest"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Payment Method */}
+                            <div className="bg-white rounded-3xl border border-stone p-8 space-y-6 shadow-sm">
+                                <h3 className="font-editorial text-xl font-bold text-forest">2. Metode Pembayaran Resmi</h3>
+                                <div className="space-y-3 text-xs">
+                                    {['QRIS (Instan & Semua E-Wallet)', 'Virtual Account BCA', 'Virtual Account Mandiri', 'GoPay / OVO / Dana'].map(method => (
+                                        <label key={method} className={`flex items-center justify-between p-4 rounded-2xl border cursor-pointer transition-smooth ${form.paymentMethod === method ? 'bg-forest/5 border-forest' : 'bg-ivory border-stone'}`}>
+                                            <div className="flex items-center space-x-3">
+                                                <input 
+                                                    type="radio" 
+                                                    name="paymentMethod" 
+                                                    checked={form.paymentMethod === method}
+                                                    onChange={() => setForm({...form, paymentMethod: method})}
+                                                    className="text-forest focus:ring-forest"
+                                                />
+                                                <span className="font-bold text-charcoal">{method}</span>
+                                            </div>
+                                            <span className="text-[11px] text-olive font-semibold">Terverifikasi Otomatis</span>
+                                        </label>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Order Summary Sidebar */}
+                        <div className="lg:col-span-5">
+                            <div className="sticky top-28 bg-white rounded-3xl border border-stone p-8 space-y-6 shadow-md">
+                                <h3 className="font-editorial text-2xl font-bold text-forest">3. Konfirmasi Pesanan</h3>
+
+                                <div className="space-y-4 max-h-60 overflow-y-auto pr-2">
+                                    {cart.map((item, idx) => (
+                                        <div key={idx} className="flex justify-between text-xs border-b border-stone pb-3">
+                                            <div>
+                                                <span className="font-bold text-charcoal block">{item.name}</span>
+                                                <span className="text-charcoal-light">({item.variant} x {item.qty})</span>
+                                            </div>
+                                            <span className="font-bold text-charcoal">Rp {(item.price * item.qty).toLocaleString('id-ID')}</span>
+                                        </div>
+                                    ))}
+                                    {activeDonationItem && (
+                                        <div className="flex justify-between text-xs border-b border-stone pb-3">
+                                            <div>
+                                                <span className="font-bold text-terracotta block">Donasi: {activeDonationItem.programTitle}</span>
+                                            </div>
+                                            <span className="font-bold text-terracotta">Rp {activeDonationItem.amount.toLocaleString('id-ID')}</span>
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="space-y-2 text-xs pt-2 border-t border-stone">
+                                    <div className="flex justify-between">
+                                        <span className="text-charcoal-light">Subtotal Merchandise</span>
+                                        <span className="font-bold">Rp {merchSubtotal.toLocaleString('id-ID')}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-charcoal-light">Total Donasi</span>
+                                        <span className="font-bold text-terracotta">Rp {donationAmount.toLocaleString('id-ID')}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-charcoal-light">Ongkir Kurir</span>
+                                        <span className="font-bold">{cart.length > 0 ? `Rp ${shippingCost.toLocaleString('id-ID')}` : 'Rp 0'}</span>
+                                    </div>
+                                </div>
+
+                                <div className="flex justify-between items-center pt-4 border-t border-stone">
+                                    <span className="text-sm font-bold text-forest">Total Pembayaran</span>
+                                    <span className="text-xl font-bold text-forest">Rp {grandTotal.toLocaleString('id-ID')}</span>
+                                </div>
+
+                                <button 
+                                    type="submit"
+                                    className="w-full py-4 bg-terracotta hover:bg-terracotta-hover text-white font-semibold rounded-xl transition-smooth shadow-lg flex items-center justify-center space-x-2 text-sm"
+                                >
+                                    <i data-lucide="shield-check" className="w-5 h-5"></i>
+                                    <span>Bayar Sekarang & Simpan Transaksi</span>
+                                </button>
+                                <p className="text-[11px] text-center text-charcoal-light">
+                                    Dengan menekan tombol ini, Anda menyetujui ketentuan audit pencatatan terpisah yayasan.
+                                </p>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            );
+        }
+
+        // --- 8. SUCCESS & RECEIPT VIEW ---
+        function SuccessView({ order, setCurrentView }) {
+            if (!order) {
+                return (
+                    <div className="max-w-4xl mx-auto py-20 text-center space-y-4">
+                        <h2 className="font-editorial text-2xl font-bold text-forest">Tidak ada data transaksi terbaru.</h2>
+                        <button onClick={() => setCurrentView('home')} className="px-6 py-3 bg-forest text-ivory rounded-xl text-xs font-semibold">Kembali ke Beranda</button>
+                    </div>
+                );
+            }
+
+            return (
+                <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-8">
+                    <div className="bg-white rounded-3xl border border-stone p-8 sm:p-12 shadow-md space-y-8 text-center">
+                        <div className="w-16 h-16 rounded-full bg-forest/10 text-forest flex items-center justify-center mx-auto">
+                            <i data-lucide="check-circle" className="w-10 h-10 text-forest"></i>
+                        </div>
+                        <div className="space-y-2">
+                            <span className="text-xs uppercase tracking-widest text-olive font-bold">Pembayaran Terverifikasi Resmi</span>
+                            <h1 className="font-editorial text-3xl sm:text-4xl text-forest">Terima Kasih, {order.customerName}!</h1>
+                            <p className="text-sm text-charcoal-light max-w-md mx-auto">
+                                Transaksi gabungan Anda telah berhasil diverifikasi melalui webhook payment gateway. Nomor referensi unik Anda adalah <strong className="text-forest">{order.id}</strong>.
+                            </p>
+                        </div>
+
+                        {/* Receipt Box */}
+                        <div className="bg-ivory rounded-2xl border border-stone p-6 sm:p-8 text-left space-y-6">
+                            <div className="flex flex-col sm:flex-row justify-between border-b border-stone pb-4 gap-2">
+                                <div>
+                                    <span className="text-xs text-charcoal-light block">Nomor Referensi</span>
+                                    <strong className="text-sm text-forest">{order.id}</strong>
+                                </div>
+                                <div>
+                                    <span className="text-xs text-charcoal-light block">Waktu Transaksi</span>
+                                    <span className="text-xs font-semibold text-charcoal">{order.date}</span>
+                                </div>
+                                <div>
+                                    <span className="text-xs text-charcoal-light block">Metode Pembayaran</span>
+                                    <span className="text-xs font-semibold text-charcoal">{order.paymentMethod}</span>
+                                </div>
+                            </div>
+
+                            {/* Separated Accounting Display */}
+                            <div className="space-y-4">
+                                <h4 className="text-xs font-semibold uppercase tracking-wider text-olive">Pencatatan Keuangan Terpisah</h4>
+                                
+                                {order.items.length > 0 && (
+                                    <div className="bg-white p-4 rounded-xl border border-stone space-y-2">
+                                        <span className="text-xs font-bold text-forest block">1. Pembelian Merchandise</span>
+                                        {order.items.map((it, i) => (
+                                            <div key={i} className="flex justify-between text-xs text-charcoal">
+                                                <span>{it.name} ({it.variant}) x {it.qty}</span>
+                                                <span>Rp {(it.price * it.qty).toLocaleString('id-ID')}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+
+                                {order.donation && (
+                                    <div className="bg-white p-4 rounded-xl border border-stone space-y-2">
+                                        <span className="text-xs font-bold text-terracotta block">2. Donasi Sukarela Program</span>
+                                        <div className="flex justify-between text-xs text-charcoal">
+                                            <span>{order.donation.programTitle}</span>
+                                            <span className="font-bold text-terracotta">Rp {order.donation.amount.toLocaleString('id-ID')}</span>
+                                        </div>
+                                    </div>
+                                )}
+
+                                <div className="bg-white p-4 rounded-xl border border-stone space-y-2 text-xs">
+                                    <div className="flex justify-between text-charcoal">
+                                        <span>Pengiriman ({order.shippingReceipt || order.receiptNumber})</span>
+                                        <span>Rp {order.shippingCost.toLocaleString('id-ID')}</span>
+                                    </div>
+                                    <div className="flex justify-between font-bold text-forest text-sm pt-2 border-t border-stone">
+                                        <span>Total Gabungan Dibayarkan</span>
+                                        <span>Rp {order.total.toLocaleString('id-ID')}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="flex flex-col sm:flex-row items-center justify-center space-y-3 sm:space-y-0 sm:space-x-4 pt-4">
+                            <button onClick={() => setCurrentView('tracking')} className="w-full sm:w-auto px-8 py-3.5 bg-forest text-ivory text-xs font-semibold rounded-xl shadow">
+                                Lacak Status Pengiriman
+                            </button>
+                            <button onClick={() => setCurrentView('home')} className="w-full sm:w-auto px-8 py-3.5 bg-stone text-forest text-xs font-semibold rounded-xl">
+                                Kembali ke Beranda
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // --- 9. TRACKING VIEW ---
+        function TrackingView({ orders }) {
+            const [query, setQuery] = useState('');
+            const [foundOrder, setFoundOrder] = useState(null);
+
+            const handleSearch = (e) => {
+                e.preventDefault();
+                const found = orders.find(o => o.id.toLowerCase() === query.trim().toLowerCase() || o.customerEmail.toLowerCase() === query.trim().toLowerCase());
+                setFoundOrder(found || null);
+            };
+
+            return (
+                <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8">
+                    <div className="border-b border-stone pb-6 text-center">
+                        <span className="text-xs uppercase tracking-widest text-olive font-bold">Layanan Pelanggan</span>
+                        <h1 className="font-editorial text-3xl sm:text-4xl text-forest mt-1">Lacakan Pengiriman & Status Transaksi</h1>
+                        <p className="text-sm text-charcoal-light mt-2 max-w-lg mx-auto">
+                            Masukkan nomor referensi transaksi (contoh: TRX-2026-8941) atau email Anda untuk melihat status pemenuhan pesanan.
+                        </p>
+                    </div>
+
+                    <form onSubmit={handleSearch} className="flex gap-3 max-w-xl mx-auto">
+                        <input 
+                            type="text" 
+                            required
+                            placeholder="Masukkan No. Referensi atau Email..."
+                            value={query}
+                            onChange={e => setQuery(e.target.value)}
+                            className="flex-grow bg-white border border-stone rounded-xl px-4 py-3 text-xs text-charcoal focus:outline-none focus:border-forest shadow-sm"
+                        />
+                        <button type="submit" className="px-6 py-3 bg-forest text-ivory text-xs font-semibold rounded-xl hover:bg-forest-light shadow">
+                            Cari
+                        </button>
+                    </form>
+
+                    {foundOrder && (
+                        <div className="bg-white rounded-3xl border border-stone p-8 sm:p-10 shadow-md space-y-6">
+                            <div className="flex flex-col sm:flex-row justify-between border-b border-stone pb-4 gap-2">
+                                <div>
+                                    <span className="text-xs text-charcoal-light block">ID Transaksi</span>
+                                    <strong className="text-base text-forest">{foundOrder.id}</strong>
+                                </div>
+                                <div>
+                                    <span className="text-xs text-charcoal-light block">Status Pembayaran</span>
+                                    <span className="px-3 py-1 bg-forest/10 text-forest text-xs font-bold rounded-full">{foundOrder.paymentStatus}</span>
+                                </div>
+                                <div>
+                                    <span className="text-xs text-charcoal-light block">Status Pengiriman</span>
+                                    <span className="px-3 py-1 bg-terracotta/10 text-terracotta text-xs font-bold rounded-full">{foundOrder.fulfillmentStatus}</span>
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-xs">
+                                <div className="space-y-1">
+                                    <span className="text-charcoal-light block">Nama Penerima</span>
+                                    <strong className="text-charcoal">{foundOrder.customerName}</strong>
+                                </div>
+                                <div className="space-y-1">
+                                    <span className="text-charcoal-light block">Nomor Resi Kurir</span>
+                                    <strong className="text-forest">{foundOrder.receiptNumber}</strong>
+                                </div>
+                                <div className="sm:col-span-2 space-y-1">
+                                    <span className="text-charcoal-light block">Alamat Pengiriman</span>
+                                    <strong className="text-charcoal">{foundOrder.shippingAddress}</strong>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        // --- 10. TRANSPARENCY REPORT VIEW ---
+        function TransparencyView({ programs, orders }) {
+            const totalCollectedAll = programs.reduce((sum, p) => sum + p.collected, 0);
+
+            return (
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
+                    <div className="border-b border-stone pb-6">
+                        <span className="text-xs uppercase tracking-widest text-olive font-bold">Akuntabilitas Publik</span>
+                        <h1 className="font-editorial text-3xl sm:text-4xl text-forest mt-1">Laporan Transparansi Dana & Dampak</h1>
+                        <p className="text-sm text-charcoal-light mt-2 max-w-xl">
+                            Kami percaya kepercayaan publik adalah aset terpenting. Berikut adalah rekapitulasi real-time alokasi dana donasi dan penjualan merchandise.
+                        </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="bg-white rounded-2xl border border-stone p-6 shadow-sm">
+                            <span className="text-xs text-charcoal-light uppercase font-semibold">Total Donasi Terverifikasi</span>
+                            <span className="font-editorial text-3xl font-bold text-forest mt-1 block">Rp {totalCollectedAll.toLocaleString('id-ID')}</span>
+                            <span className="text-[11px] text-olive font-medium mt-2 block">100% disalurkan sesuai program</span>
+                        </div>
+                        <div className="bg-white rounded-2xl border border-stone p-6 shadow-sm">
+                            <span className="text-xs text-charcoal-light uppercase font-semibold">Total Transaksi Tercatat</span>
+                            <span className="font-editorial text-3xl font-bold text-forest mt-1 block">{orders.length} Transaksi</span>
+                            <span className="text-[11px] text-olive font-medium mt-2 block">Terverifikasi Webhook Gateway</span>
+                        </div>
+                        <div className="bg-white rounded-2xl border border-stone p-6 shadow-sm">
+                            <span className="text-xs text-charcoal-light uppercase font-semibold">Audit Status</span>
+                            <span className="font-editorial text-3xl font-bold text-forest mt-1 block">Wajar Tanpa Pengecualian</span>
+                            <span className="text-[11px] text-olive font-medium mt-2 block">Kantor Akuntan Publik 2025</span>
+                        </div>
+                    </div>
+
+                    {/* Program breakdown table */}
+                    <div className="bg-white rounded-3xl border border-stone p-8 shadow-sm space-y-6">
+                        <h3 className="font-editorial text-2xl font-bold text-forest">Rekapitulasi Dana Per Program</h3>
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left text-xs">
+                                <thead className="bg-ivory border-b border-stone text-charcoal uppercase tracking-wider font-semibold">
+                                    <tr>
+                                        <th className="p-4">Program Konservasi</th>
+                                        <th className="p-4">Target Dana</th>
+                                        <th className="p-4">Dana Terverifikasi</th>
+                                        <th className="p-4">Progres</th>
+                                        <th className="p-4">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-stone">
+                                    {programs.map(prog => {
+                                        const pct = Math.min(Math.round((prog.collected / prog.target) * 100), 100);
+                                        return (
+                                            <tr key={prog.id} className="hover:bg-ivory/50">
+                                                <td className="p-4 font-bold text-forest">{prog.title}</td>
+                                                <td className="p-4">Rp {prog.target.toLocaleString('id-ID')}</td>
+                                                <td className="p-4 font-bold text-terracotta">Rp {prog.collected.toLocaleString('id-ID')}</td>
+                                                <td className="p-4">{pct}%</td>
+                                                <td className="p-4"><span className="px-2.5 py-1 bg-forest/10 text-forest rounded-full font-semibold">{prog.status}</span></td>
+                                            </tr>
+                                        );
+                                    })}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // --- 11. ABOUT VIEW ---
+        function AboutView() {
+            return (
+                <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-12">
+                    <div className="text-center space-y-4">
+                        <span className="text-xs uppercase tracking-widest text-olive font-bold">Tentang Kami</span>
+                        <h1 className="font-editorial text-4xl sm:text-5xl text-forest">Yayasan Bumi Lestari Nusantara</h1>
+                        <p className="text-base text-charcoal-light max-w-2xl mx-auto leading-relaxed">
+                            Berdiri sejak 2018, kami adalah organisasi nirlaba yang berdedikasi pada pelestarian keanekaragaman hayati, transisi energi bersih di wilayah kepulauan, dan pemberdayaan ekonomi komunitas lokal.
+                        </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div className="bg-white rounded-3xl border border-stone p-8 space-y-4 shadow-sm">
+                            <h3 className="font-editorial text-2xl font-bold text-forest">Visi Kami</h3>
+                            <p className="text-xs text-charcoal leading-relaxed">
+                                Terwujudnya ekosistem nusantara yang lestari, berdaulat secara energi, dan masyarakat pesisir yang mandiri secara ekonomi melalui kolaborasi terbuka dan berkelanjutan.
+                            </p>
+                        </div>
+                        <div className="bg-white rounded-3xl border border-stone p-8 space-y-4 shadow-sm">
+                            <h3 className="font-editorial text-2xl font-bold text-forest">Misi Kami</h3>
+                            <ul className="text-xs text-charcoal space-y-2 list-disc pl-4 leading-relaxed">
+                                <li>Melakukan restorasi habitat kritis seperti hutan mangrove dan lahan gambut.</li>
+                                <li>Mendorong adopsi energi surya di sekolah dan fasilitas kesehatan pelosok.</li>
+                                <li>Mengelola platform e-commerce etikal untuk mendukung perajin lokal.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // --- 12. ADMIN DASHBOARD CMS ---
+        function AdminDashboard({ products, setProducts, programs, setPrograms, orders, setOrders }) {
+            const [activeTab, setActiveTab] = useState('overview'); // overview, products, programs, orders, reports
+
+            const totalMerchSales = orders.reduce((sum, o) => sum + o.items.reduce((s, i) => s + (i.price * i.qty), 0), 0);
+            const totalDonations = orders.reduce((sum, o) => sum + (o.donation ? o.donation.amount : 0), 0);
+
+            return (
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-stone pb-6 gap-4">
+                        <div>
+                            <span className="text-xs uppercase tracking-widest text-olive font-bold">Panel Administrasi & CMS</span>
+                            <h1 className="font-editorial text-3xl text-forest mt-1">Dashboard Operasional Organisasi</h1>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                            {['overview', 'products', 'programs', 'orders', 'reports'].map(tab => (
+                                <button
+                                    key={tab}
+                                    onClick={() => setActiveTab(tab)}
+                                    className={`px-4 py-2 rounded-xl text-xs font-semibold capitalize transition-smooth ${activeTab === tab ? 'bg-forest text-ivory' : 'bg-white border border-stone text-charcoal hover:bg-stone'}`}
+                                >
+                                    {tab}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {activeTab === 'overview' && (
+                        <div className="space-y-8">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                                <div className="bg-white rounded-2xl border border-stone p-6 shadow-sm">
+                                    <span className="text-xs text-charcoal-light font-semibold uppercase">Total Penjualan Merch</span>
+                                    <span className="font-editorial text-2xl font-bold text-forest mt-1 block">Rp {totalMerchSales.toLocaleString('id-ID')}</span>
+                                </div>
+                                <div className="bg-white rounded-2xl border border-stone p-6 shadow-sm">
+                                    <span className="text-xs text-charcoal-light font-semibold uppercase">Total Donasi Masuk</span>
+                                    <span className="font-editorial text-2xl font-bold text-terracotta mt-1 block">Rp {totalDonations.toLocaleString('id-ID')}</span>
+                                </div>
+                                <div className="bg-white rounded-2xl border border-stone p-6 shadow-sm">
+                                    <span className="text-xs text-charcoal-light font-semibold uppercase">Total Pesanan</span>
+                                    <span className="font-editorial text-2xl font-bold text-forest mt-1 block">{orders.length} Pesanan</span>
+                                </div>
+                                <div className="bg-white rounded-2xl border border-stone p-6 shadow-sm">
+                                    <span className="text-xs text-charcoal-light font-semibold uppercase">Program Aktif</span>
+                                    <span className="font-editorial text-2xl font-bold text-forest mt-1 block">{programs.length} Program</span>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {activeTab === 'products' && (
+                        <div className="bg-white rounded-3xl border border-stone p-8 shadow-sm space-y-6">
+                            <h3 className="font-editorial text-xl font-bold text-forest">Manajemen Katalog Merchandise</h3>
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-left text-xs">
+                                    <thead className="bg-ivory border-b border-stone text-charcoal uppercase tracking-wider font-semibold">
+                                        <tr>
+                                            <th className="p-4">Produk</th>
+                                            <th className="p-4">Kategori</th>
+                                            <th className="p-4">Harga</th>
+                                            <th className="p-4">Stok</th>
+                                            <th className="p-4">SKU</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-stone">
+                                        {products.map(p => (
+                                            <tr key={p.id}>
+                                                <td className="p-4 font-bold text-forest flex items-center space-x-3">
+                                                    <img src={p.image} alt={p.name} className="w-10 h-10 rounded-lg object-cover bg-stone" />
+                                                    <span>{p.name}</span>
+                                                </td>
+                                                <td className="p-4">{p.category}</td>
+                                                <td className="p-4">Rp {p.price.toLocaleString('id-ID')}</td>
+                                                <td className="p-4">{p.stock}</td>
+                                                <td className="p-4">{p.sku}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    )}
+
+                    {activeTab === 'programs' && (
+                        <div className="bg-white rounded-3xl border border-stone p-8 shadow-sm space-y-6">
+                            <h3 className="font-editorial text-xl font-bold text-forest">Manajemen Program Donasi</h3>
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-left text-xs">
+                                    <thead className="bg-ivory border-b border-stone text-charcoal uppercase tracking-wider font-semibold">
+                                        <tr>
+                                            <th className="p-4">Judul Program</th>
+                                            <th className="p-4">Kategori</th>
+                                            <th className="p-4">Target Dana</th>
+                                            <th className="p-4">Terkumpul</th>
+                                            <th className="p-4">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-stone">
+                                        {programs.map(pr => (
+                                            <tr key={pr.id}>
+                                                <td className="p-4 font-bold text-forest">{pr.title}</td>
+                                                <td className="p-4">{pr.category}</td>
+                                                <td className="p-4">Rp {pr.target.toLocaleString('id-ID')}</td>
+                                                <td className="p-4 font-bold text-terracotta">Rp {pr.collected.toLocaleString('id-ID')}</td>
+                                                <td className="p-4"><span className="px-2.5 py-1 bg-forest/10 text-forest rounded-full font-semibold">{pr.status}</span></td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    )}
+
+                    {activeTab === 'orders' && (
+                        <div className="bg-white rounded-3xl border border-stone p-8 shadow-sm space-y-6">
+                            <h3 className="font-editorial text-xl font-bold text-forest">Manajemen Pesanan & Pengiriman</h3>
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-left text-xs">
+                                    <thead className="bg-ivory border-b border-stone text-charcoal uppercase tracking-wider font-semibold">
+                                        <tr>
+                                            <th className="p-4">ID Transaksi</th>
+                                            <th className="p-4">Pemesan</th>
+                                            <th className="p-4">Total</th>
+                                            <th className="p-4">Pembayaran</th>
+                                            <th className="p-4">Pengiriman</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-stone">
+                                        {orders.map(o => (
+                                            <tr key={o.id}>
+                                                <td className="p-4 font-bold text-forest">{o.id}</td>
+                                                <td className="p-4">{o.customerName}</td>
+                                                <td className="p-4">Rp {o.total.toLocaleString('id-ID')}</td>
+                                                <td className="p-4"><span className="px-2 py-1 bg-forest/10 text-forest rounded-full font-semibold">{o.paymentStatus}</span></td>
+                                                <td className="p-4"><span className="px-2 py-1 bg-terracotta/10 text-terracotta rounded-full font-semibold">{o.fulfillmentStatus}</span></td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    )}
+
+                    {activeTab === 'reports' && (
+                        <div className="bg-white rounded-3xl border border-stone p-8 shadow-sm space-y-6">
+                            <h3 className="font-editorial text-xl font-bold text-forest">Laporan Keuangan Gabungan & Terpisah</h3>
+                            <p className="text-xs text-charcoal-light">
+                                Laporan ini memisahkan omzet penjualan merchandise dari donasi sukarela program sesuai standar akuntansi nirlaba.
+                            </p>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-4">
+                                <div className="p-6 bg-ivory rounded-2xl border border-stone space-y-2">
+                                    <span className="text-xs font-bold text-forest uppercase">Omzet Merchandise</span>
+                                    <span className="font-editorial text-3xl font-bold text-charcoal block">Rp {totalMerchSales.toLocaleString('id-ID')}</span>
+                                    <span className="text-[11px] text-charcoal-light">Termasuk PPN & Biaya Logistik</span>
+                                </div>
+                                <div className="p-6 bg-ivory rounded-2xl border border-stone space-y-2">
+                                    <span className="text-xs font-bold text-terracotta uppercase">Dana Program Donasi</span>
+                                    <span className="font-editorial text-3xl font-bold text-terracotta block">Rp {totalDonations.toLocaleString('id-ID')}</span>
+                                    <span className="text-[11px] text-charcoal-light">Disalurkan 100% tanpa potongan operasional merch</span>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        // --- RENDER REACT APP ---
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>

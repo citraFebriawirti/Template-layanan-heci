@@ -1,0 +1,1473 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Manajemen Persediaan & Pengadaan (Procure-to-Pay & WMS)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+        .modal-anim { animation: fadeIn 0.2s ease-out forwards; }
+    </style>
+</head>
+<body class="h-full bg-slate-100 text-slate-800 font-sans antialiased overflow-hidden">
+
+    <div id="app" class="h-full flex flex-col md:flex-row overflow-hidden">
+        
+        <aside id="sidebar" class="bg-slate-900 text-slate-300 w-full md:w-64 flex-shrink-0 flex flex-col transition-all duration-300 z-30 shadow-xl">
+            <div class="p-4 border-b border-slate-800 flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-indigo-600 text-white p-2 rounded-lg shadow">
+                        <i class="fa-solid fa-boxes-stacked text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-bold text-white text-base tracking-wide">InventoPro WMS</h1>
+                        <p class="text-xs text-slate-400">Procure-to-Pay System</p>
+                    </div>
+                </div>
+                <button onclick="toggleSidebarMobile()" class="md:hidden text-slate-400 hover:text-white">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Role Selector for Testing Alur Pengguna -->
+            <div class="p-3 bg-slate-800/60 border-b border-slate-800">
+                <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-1">Simulasi Role User:</label>
+                <select id="activeRoleSelect" onchange="switchRole(this.value)" class="w-full bg-slate-900 text-white text-sm rounded px-2.5 py-1.5 border border-slate-700 focus:outline-none focus:border-indigo-500">
+                    <option value="staff">👤 Staf / Pemohon (PR)</option>
+                    <option value="manager">👔 Atasan / Approver</option>
+                    <option value="purchasing">🛒 Purchasing / Buyer</option>
+                    <option value="warehouse">📦 Gudang / Inventory Keeper</option>
+                    <option value="admin">⚙️ Administrator Sistem</option>
+                </select>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-1">
+                <a href="#dashboard" onclick="navTo('dashboard')" class="nav-link flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition text-white bg-indigo-600 shadow">
+                    <i class="fa-solid fa-chart-pie w-5 text-center"></i>
+                    <span>Dashboard Utama</span>
+                </a>
+                
+                <div class="pt-3 pb-1 px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Pengadaan (Procurement)</div>
+                
+                <a href="#pr" onclick="navTo('pr')" class="nav-link flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition text-slate-300 hover:bg-slate-800 hover:text-white">
+                    <i class="fa-solid fa-file-invoice w-5 text-center"></i>
+                    <span>Purchase Request (PR)</span>
+                    <span id="badge-pr" class="ml-auto bg-amber-500 text-slate-950 text-xs px-2 py-0.5 rounded-full font-bold hidden">0</span>
+                </a>
+                <a href="#po" onclick="navTo('po')" class="nav-link flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition text-slate-300 hover:bg-slate-800 hover:text-white">
+                    <i class="fa-solid fa-file-contract w-5 text-center"></i>
+                    <span>Purchase Order (PO)</span>
+                    <span id="badge-po" class="ml-auto bg-indigo-500 text-white text-xs px-2 py-0.5 rounded-full font-bold hidden">0</span>
+                </a>
+
+                <div class="pt-3 pb-1 px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Gudang & Operasional</div>
+
+                <a href="#gr" onclick="navTo('gr')" class="nav-link flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition text-slate-300 hover:bg-slate-800 hover:text-white">
+                    <i class="fa-solid fa-truck-ramp-box w-5 text-center"></i>
+                    <span>Goods Receipt (GR)</span>
+                </a>
+                <a href="#mr" onclick="navTo('mr')" class="nav-link flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition text-slate-300 hover:bg-slate-800 hover:text-white">
+                    <i class="fa-solid fa-hand-holding-box w-5 text-center"></i>
+                    <span>Material Request & Issue</span>
+                </a>
+                <a href="#transfer" onclick="navTo('transfer')" class="nav-link flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition text-slate-300 hover:bg-slate-800 hover:text-white">
+                    <i class="fa-solid fa-right-left w-5 text-center"></i>
+                    <span>Mutasi / Transfer Gudang</span>
+                </a>
+                <a href="#opname" onclick="navTo('opname')" class="nav-link flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition text-slate-300 hover:bg-slate-800 hover:text-white">
+                    <i class="fa-solid fa-clipboard-check w-5 text-center"></i>
+                    <span>Stock Opname & Adjust</span>
+                </a>
+
+                <div class="pt-3 pb-1 px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Master & Laporan</div>
+
+                <a href="#inventory" onclick="navTo('inventory')" class="nav-link flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition text-slate-300 hover:bg-slate-800 hover:text-white">
+                    <i class="fa-solid fa-cubes w-5 text-center"></i>
+                    <span>Stok & Katalog Barang</span>
+                    <span id="badge-reorder" class="ml-auto bg-rose-500 text-white text-xs px-2 py-0.5 rounded-full font-bold hidden">0</span>
+                </a>
+                <a href="#master" onclick="navTo('master')" class="nav-link flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition text-slate-300 hover:bg-slate-800 hover:text-white">
+                    <i class="fa-solid fa-database w-5 text-center"></i>
+                    <span>Master Data & Setup</span>
+                </a>
+                <a href="#reports" onclick="navTo('reports')" class="nav-link flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition text-slate-300 hover:bg-slate-800 hover:text-white">
+                    <i class="fa-solid fa-chart-column w-5 text-center"></i>
+                    <span>Laporan & Analitik</span>
+                </a>
+            </nav>
+
+            <div class="p-4 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
+                <span id="currentUserLabel">Role: Staf Departemen</span>
+                <button onclick="resetDemoData()" class="text-rose-400 hover:underline" title="Reset Data Demo"><i class="fa-solid fa-rotate-right"></i> Reset</button>
+            </div>
+        </aside>
+
+        <main class="flex-1 flex flex-col h-full overflow-hidden bg-slate-100">
+            
+            <!-- Top Header -->
+            <header class="bg-white border-b border-slate-200 h-16 flex items-center justify-between px-6 flex-shrink-0 shadow-sm">
+                <div class="flex items-center space-x-4">
+                    <button onclick="toggleSidebarMobile()" class="md:hidden text-slate-600 hover:text-slate-900 focus:outline-none">
+                        <i class="fa-solid fa-bars text-xl"></i>
+                    </button>
+                    <div>
+                        <h2 id="pageTitle" class="text-lg font-bold text-slate-800">Dashboard Utama</h2>
+                        <p id="pageSubtitle" class="text-xs text-slate-500">Ringkasan operasional persediaan dan pengadaan barang</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center space-x-3">
+                    <div class="relative hidden sm:block">
+                        <input type="text" id="globalSearchInput" placeholder="Cari dokumen, barang, supplier..." onkeyup="handleGlobalSearch(event)" class="bg-slate-100 text-sm rounded-lg pl-9 pr-4 py-2 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white w-64 transition">
+                        <i class="fa-solid fa-search absolute left-3 top-2.5 text-slate-400 text-sm"></i>
+                    </div>
+
+                    <!-- Quick Action Button -->
+                    <button onclick="openQuickActionModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3.5 py-2 rounded-lg text-sm font-medium shadow-sm transition flex items-center space-x-2">
+                        <i class="fa-solid fa-plus"></i>
+                        <span class="hidden sm:inline">Buat Dokumen Baru</span>
+                    </button>
+
+                    <!-- Notifications -->
+                    <div class="relative">
+                        <button onclick="toggleNotificationDropdown()" class="p-2 text-slate-600 hover:text-slate-900 rounded-lg hover:bg-slate-100 relative">
+                            <i class="fa-solid fa-bell text-lg"></i>
+                            <span id="notificationBadge" class="absolute top-1 right-1 bg-rose-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold hidden">0</span>
+                        </button>
+                        <!-- Dropdown -->
+                        <div id="notificationDropdown" class="hidden absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-slate-200 py-2 z-50">
+                            <div class="px-4 py-2 border-b border-slate-100 flex justify-between items-center">
+                                <span class="font-bold text-sm text-slate-800">Notifikasi Sistem</span>
+                                <span class="text-xs text-indigo-600 cursor-pointer" onclick="markAllNotificationsRead()">Tandai dibaca</span>
+                            </div>
+                            <div id="notificationList" class="max-h-64 overflow-y-auto divide-y divide-slate-100 text-xs">
+                                <div class="p-3 text-slate-500 text-center">Tidak ada notifikasi baru</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Scrollable View Area -->
+            <div id="contentArea" class="flex-1 overflow-y-auto p-6">
+                <!-- Dynamic Views injected here -->
+            </div>
+        </main>
+    </div>
+
+    <!-- Custom Modal Container -->
+    <div id="appModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div id="modalContent" class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto modal-anim">
+            <!-- Modal injected dynamically -->
+        </div>
+    </div>
+
+    <!-- Toast Notification Banner -->
+    <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-2 pointer-events-none"></div>
+
+    <script>
+        let currentRole = 'staff'; // staff, manager, purchasing, warehouse, admin
+        let currentView = 'dashboard';
+
+        let db = {
+            items: [
+                { id: 'ITM-001', code: 'BRG-001', name: 'Laptop Asus ZenBook 14', category: 'Elektronik', unit: 'Unit', minStock: 5, stock: 12, avgCost: 12500000, rack: 'Rack A-01' },
+                { id: 'ITM-002', code: 'BRG-002', name: 'Kertas HVS A4 80gr', category: 'ATK', unit: 'Rim', minStock: 20, stock: 8, avgCost: 45000, rack: 'Rack B-03' },
+                { id: 'ITM-003', code: 'BRG-003', name: 'Toner Printer HP LaserJet', category: 'ATK', unit: 'Pcs', minStock: 4, stock: 3, avgCost: 850000, rack: 'Rack B-04' },
+                { id: 'ITM-004', code: 'BRG-004', name: 'Kursi Ergonomis Kantor', category: 'Furniture', unit: 'Unit', minStock: 3, stock: 7, avgCost: 1450000, rack: 'Rack C-01' },
+                { id: 'ITM-005', code: 'BRG-005', name: 'Kabel UTP Cat6 Roll 305m', category: 'Jaringan', unit: 'Roll', minStock: 2, stock: 5, avgCost: 1200000, rack: 'Rack A-05' }
+            ],
+            categories: ['Elektronik', 'ATK', 'Furniture', 'Jaringan', 'Cleaning'],
+            units: ['Unit', 'Pcs', 'Rim', 'Box', 'Roll', 'Kg', 'Liter'],
+            warehouses: [
+                { id: 'WH-01', name: 'Gudang Utama (Pusat)', location: 'Lantai 1 - Gedung A' },
+                { id: 'WH-02', name: 'Gudang Cabang (Logistik)', location: 'Kawasan Industri Blok B' }
+            ],
+            suppliers: [
+                { id: 'SUP-001', name: 'PT Mitra Solusi Teknologi', phone: '021-5551234', email: 'sales@mitrasolusi.co.id', address: 'Jl. Sudirman Kav 10, Jakarta' },
+                { id: 'SUP-002', name: 'CV Makmur Abadi ATK', phone: '021-4448899', email: 'order@makmurabadi.com', address: 'Jl. Hayam Wuruk 45, Jakarta' },
+                { id: 'SUP-003', name: 'PT Sarana Kantor Indonesia', phone: '021-7788990', email: 'cs@saranakantor.id', address: 'Jl. Gatot Subroto 88, Jakarta' }
+            ],
+            departments: ['IT & Sistem', 'Operasional', 'Keuangan & Akuntansi', 'HR & GA', 'Marketing'],
+            
+            prs: [
+                { id: 'PR-2026-001', dept: 'IT & Sistem', requester: 'Budi Santoso', date: '2026-10-01', needDate: '2026-10-10', status: 'Approved', items: [{ itemId: 'ITM-001', qty: 3, note: 'Penggantian device staf baru' }] },
+                { id: 'PR-2026-002', dept: 'Operasional', requester: 'Siti Rahma', date: '2026-10-05', needDate: '2026-10-15', status: 'Pending Manager', items: [{ itemId: 'ITM-002', qty: 15, note: 'Stok operasional bulanan' }, { itemId: 'ITM-003', qty: 5, note: 'Printer habis toner' }] }
+            ],
+            pos: [
+                { id: 'PO-2026-001', prId: 'PR-2026-001', supplierId: 'SUP-001', date: '2026-10-02', status: 'Issued', items: [{ itemId: 'ITM-001', qty: 3, price: 12500000 }] }
+            ],
+            grs: [
+                { id: 'GR-2026-001', poId: 'PO-2026-001', warehouseId: 'WH-01', date: '2026-10-06', status: 'Complete', items: [{ itemId: 'ITM-001', qtyReceived: 3, condition: 'Baik', rack: 'Rack A-01' }] }
+            ],
+            mrs: [
+                { id: 'MR-2026-001', dept: 'IT & Sistem', requester: 'Joko Widodo', date: '2026-10-08', status: 'Issued', items: [{ itemId: 'ITM-003', qty: 1, note: 'Ganti toner ruang server' }] }
+            ],
+            transfers: [
+                { id: 'TR-2026-001', fromWh: 'WH-01', toWh: 'WH-02', date: '2026-10-04', status: 'Received', items: [{ itemId: 'ITM-004', qty: 2 }] }
+            ],
+            opnames: [],
+            auditLogs: [
+                { time: '2026-10-01 09:30', user: 'Budi (Staff)', action: 'Membuat PR #PR-2026-001' },
+                { time: '2026-10-02 10:15', user: 'Manager', action: 'Approval PR #PR-2026-001' },
+                { time: '2026-10-02 11:00', user: 'Purchasing', action: 'Membuat PO #PO-2026-001 dari PR' },
+                { time: '2026-10-06 14:20', user: 'Gudang', action: 'Menerima GR #GR-2026-001 (Stok bertambah)' }
+            ],
+            notifications: [
+                { id: 1, title: 'PR Baru', desc: 'PR-2026-002 menunggu persetujuan atasan.', time: '2 jam lalu', read: false },
+                { id: 2, title: 'Stok Kritis', desc: 'Toner Printer HP LaserJet berada di bawah minimum (Sisa: 3).', time: '1 hari lalu', read: false }
+            ]
+        };
+
+        function initStorage() {
+            const saved = localStorage.getItem('inventopro_db_2026');
+            if (saved) {
+                try { db = JSON.parse(saved); } catch(e) { console.error(e); }
+            }
+            saveToStorage();
+        }
+
+        function saveToStorage() {
+            localStorage.setItem('inventopro_db_2026', JSON.stringify(db));
+            updateBadges();
+        }
+
+        function resetDemoData() {
+            if (confirm('Reset seluruh data ke kondisi awal demo?')) {
+                localStorage.removeItem('inventopro_db_2026');
+                location.reload();
+            }
+        }
+
+        function navTo(view) {
+            currentView = view;
+            document.querySelectorAll('.nav-link').forEach(el => {
+                el.classList.remove('bg-indigo-600', 'text-white', 'shadow');
+                el.classList.add('text-slate-300', 'hover:bg-slate-800', 'hover:text-white');
+                if (el.getAttribute('href') === '#' + view) {
+                    el.classList.add('bg-indigo-600', 'text-white', 'shadow');
+                    el.classList.remove('text-slate-300', 'hover:bg-slate-800', 'hover:text-white');
+                }
+            });
+
+            renderView();
+            if (window.innerWidth < 768) {
+                document.getElementById('sidebar').classList.add('-translate-x-full');
+            }
+        }
+
+        function toggleSidebarMobile() {
+            const sb = document.getElementById('sidebar');
+            sb.classList.toggle('hidden');
+        }
+
+        function switchRole(role) {
+            currentRole = role;
+            const labels = {
+                staff: 'Staf / Pemohon (PR)',
+                manager: 'Atasan / Approver',
+                purchasing: 'Purchasing / Buyer',
+                warehouse: 'Gudang / Inventory Keeper',
+                admin: 'Administrator Sistem'
+            };
+            document.getElementById('currentUserLabel').innerText = `Role: ${labels[role]}`;
+            showToast(`Role beralih ke: ${labels[role]}`, 'info');
+            renderView();
+        }
+
+        function updateBadges() {
+            const pendingPRs = db.prs.filter(p => p.status.includes('Pending')).length;
+            const reorderCount = db.items.filter(i => i.stock <= i.minStock).length;
+
+            const badgePr = document.getElementById('badge-pr');
+            if (pendingPRs > 0) {
+                badgePr.innerText = pendingPRs;
+                badgePr.classList.remove('hidden');
+            } else {
+                badgePr.classList.add('hidden');
+            }
+
+            const badgeReorder = document.getElementById('badge-reorder');
+            if (reorderCount > 0) {
+                badgeReorder.innerText = reorderCount;
+                badgeReorder.classList.remove('hidden');
+            } else {
+                badgeReorder.classList.add('hidden');
+            }
+
+            const unreadNotif = db.notifications.filter(n => !n.read).length;
+            const notifBadge = document.getElementById('notificationBadge');
+            if (unreadNotif > 0) {
+                notifBadge.innerText = unreadNotif;
+                notifBadge.classList.remove('hidden');
+            } else {
+                notifBadge.classList.add('hidden');
+            }
+
+            renderNotifications();
+        }
+
+        function toggleNotificationDropdown() {
+            const dd = document.getElementById('notificationDropdown');
+            dd.classList.toggle('hidden');
+        }
+
+        function renderNotifications() {
+            const list = document.getElementById('notificationList');
+            if (db.notifications.length === 0) {
+                list.innerHTML = `<div class="p-3 text-slate-400 text-center">Tidak ada notifikasi</div>`;
+                return;
+            }
+            list.innerHTML = db.notifications.map(n => `
+                <div class="p-3 hover:bg-slate-50 transition ${n.read ? 'opacity-60' : 'bg-indigo-50/40'}">
+                    <p class="font-semibold text-slate-800">${n.title}</p>
+                    <p class="text-slate-600 mt-0.5">${n.desc}</p>
+                    <span class="text-[10px] text-slate-400 mt-1 block">${n.time}</span>
+                </div>
+            `).join('');
+        }
+
+        function markAllNotificationsRead() {
+            db.notifications.forEach(n => n.read = true);
+            saveToStorage();
+        }
+
+        function renderView() {
+            const area = document.getElementById('contentArea');
+            const titles = {
+                dashboard: ['Dashboard Utama', 'Ringkasan operasional persediaan dan pengadaan barang'],
+                pr: ['Purchase Request (PR)', 'Pengajuan kebutuhan barang oleh departemen'],
+                po: ['Purchase Order (PO)', 'Pemesanan pembelian resmi ke supplier terpilih'],
+                gr: ['Goods Receipt (GR) & Penerimaan', 'Pencatatan barang masuk gudang & pemeriksaan kualitas'],
+                mr: ['Material Request & Issue', 'Permintaan & pengeluaran material dari gudang ke departemen'],
+                transfer: ['Mutasi Antar Gudang', 'Transfer stok antar gudang cabang & pusat'],
+                opname: ['Stock Opname & Adjustment', 'Perhitungan fisik berkala & penyesuaian selisih stok'],
+                inventory: ['Katalog Barang & Stok', 'Kelola data master barang dan level persediaan'],
+                master: ['Master Data & Pengaturan', 'Konfigurasi gudang, supplier, satuan, kategori, dan approval'],
+                reports: ['Laporan & Analitik Komprehensif', 'Kartu stok, nilai persediaan, histori, dan ekspor laporan']
+            };
+
+            if (titles[currentView]) {
+                document.getElementById('pageTitle').innerText = titles[currentView][0];
+                document.getElementById('pageSubtitle').innerText = titles[currentView][1];
+            }
+
+            switch(currentView) {
+                case 'dashboard': renderDashboard(area); break;
+                case 'pr': renderPRView(area); break;
+                case 'po': renderPOView(area); break;
+                case 'gr': renderGRView(area); break;
+                case 'mr': renderMRView(area); break;
+                case 'transfer': renderTransferView(area); break;
+                case 'opname': renderOpnameView(area); break;
+                case 'inventory': renderInventoryView(area); break;
+                case 'master': renderMasterView(area); break;
+                case 'reports': renderReportsView(area); break;
+                default: area.innerHTML = `<div class="text-center py-12 text-slate-500">Halaman belum tersedia</div>`;
+            }
+        }
+
+        function renderDashboard(container) {
+            const totalItems = db.items.length;
+            const lowStockItems = db.items.filter(i => i.stock <= i.minStock).length;
+            const pendingPRs = db.prs.filter(p => p.status.includes('Pending')).length;
+            const totalInventoryVal = db.items.reduce((acc, i) => acc + (i.stock * i.avgCost), 0);
+
+            container.innerHTML = `
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-semibold text-slate-400 uppercase">Total Jenis Barang</p>
+                            <h3 class="text-2xl font-bold text-slate-800 mt-1">${totalItems}</h3>
+                            <p class="text-xs text-emerald-600 mt-1"><i class="fa-solid fa-arrow-up"></i> Katalog Aktif</p>
+                        </div>
+                        <div class="bg-indigo-50 text-indigo-600 p-3.5 rounded-xl"><i class="fa-solid fa-cubes text-xl"></i></div>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-semibold text-slate-400 uppercase">Stok Kritis (Reorder)</p>
+                            <h3 class="text-2xl font-bold text-rose-600 mt-1">${lowStockItems}</h3>
+                            <p class="text-xs text-rose-500 mt-1"><i class="fa-solid fa-triangle-exclamation"></i> Perlu pengadaan</p>
+                        </div>
+                        <div class="bg-rose-50 text-rose-600 p-3.5 rounded-xl"><i class="fa-solid fa-triangle-exclamation text-xl"></i></div>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-semibold text-slate-400 uppercase">PR Menunggu Approval</p>
+                            <h3 class="text-2xl font-bold text-amber-600 mt-1">${pendingPRs}</h3>
+                            <p class="text-xs text-slate-500 mt-1">Perlu tindakan atasan</p>
+                        </div>
+                        <div class="bg-amber-50 text-amber-600 p-3.5 rounded-xl"><i class="fa-solid fa-file-invoice text-xl"></i></div>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-semibold text-slate-400 uppercase">Nilai Persediaan (Valuasi)</p>
+                            <h3 class="text-xl font-bold text-slate-800 mt-1">Rp ${totalInventoryVal.toLocaleString('id-ID')}</h3>
+                            <p class="text-xs text-indigo-600 mt-1">Metode: Rata-Rata (Avg)</p>
+                        </div>
+                        <div class="bg-emerald-50 text-emerald-600 p-3.5 rounded-xl"><i class="fa-solid fa-wallet text-xl"></i></div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 lg:col-span-2 flex flex-col">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-bold text-slate-800 text-base">Jejak Audit Aktivitas Sistem</h3>
+                            <button onclick="navTo('reports')" class="text-xs text-indigo-600 font-semibold hover:underline">Lihat Semua</button>
+                        </div>
+                        <div class="overflow-x-auto flex-1">
+                            <table class="w-full text-left text-sm">
+                                <thead class="bg-slate-50 text-slate-500 text-xs uppercase font-semibold">
+                                    <tr>
+                                        <th class="p-3 rounded-l-lg">Waktu</th>
+                                        <th class="p-3">User / Role</th>
+                                        <th class="p-3 rounded-r-lg">Aktivitas Sistem</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100">
+                                    ${db.auditLogs.slice(-5).reverse().map(log => `
+                                        <tr class="hover:bg-slate-50 transition">
+                                            <td class="p-3 text-xs text-slate-500">${log.time}</td>
+                                            <td class="p-3 font-medium text-slate-800">${log.user}</td>
+                                            <td class="p-3 text-slate-600">${log.action}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-bold text-slate-800 text-base">Peringatan Reorder Stok</h3>
+                            <span class="bg-rose-100 text-rose-700 text-xs px-2 py-0.5 rounded-full font-bold">${lowStockItems} Items</span>
+                        </div>
+                        <div class="space-y-3 overflow-y-auto max-h-[300px]">
+                            ${db.items.filter(i => i.stock <= i.minStock).map(item => `
+                                <div class="p-3 bg-rose-50/50 border border-rose-100 rounded-xl flex items-center justify-between">
+                                    <div>
+                                        <h4 class="font-semibold text-sm text-slate-800">${item.name}</h4>
+                                        <p class="text-xs text-rose-600 mt-0.5">Sisa: <b>${item.stock}</b> ${item.unit} (Min: ${item.minStock})</p>
+                                    </div>
+                                    <button onclick="quickCreatePRFromItem('${item.id}')" class="bg-rose-600 hover:bg-rose-700 text-white text-xs px-3 py-1.5 rounded-lg shadow transition">
+                                        Buat PR
+                                    </button>
+                                </div>
+                            `).join('')}
+                            ${lowStockItems === 0 ? '<div class="text-center py-8 text-slate-400 text-sm">Semua stok berada di atas batas aman.</div>' : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderPRView(container) {
+            container.innerHTML = `
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 mb-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <div>
+                        <h3 class="font-bold text-lg text-slate-800">Daftar Purchase Request (PR)</h3>
+                        <p class="text-xs text-slate-500">Kelola pengajuan pembelian barang dari berbagai departemen</p>
+                    </div>
+                    <button onclick="openPRModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-sm font-medium shadow transition flex items-center space-x-2">
+                        <i class="fa-solid fa-plus"></i>
+                        <span>Buat PR Baru</span>
+                    </button>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-slate-50 text-slate-500 text-xs uppercase font-semibold border-b border-slate-200">
+                                <tr>
+                                    <th class="p-4">No. PR</th>
+                                    <th class="p-4">Departemen & Pemohon</th>
+                                    <th class="p-4">Tanggal Diajukan</th>
+                                    <th class="p-4">Kebutuhan</th>
+                                    <th class="p-4">Status Approval</th>
+                                    <th class="p-4 text-right">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                ${db.prs.map(pr => {
+                                    let badgeColor = 'bg-amber-100 text-amber-700';
+                                    if (pr.status === 'Approved') badgeColor = 'bg-emerald-100 text-emerald-700';
+                                    if (pr.status === 'Rejected') badgeColor = 'bg-rose-100 text-rose-700';
+                                    return `
+                                        <tr class="hover:bg-slate-50 transition">
+                                            <td class="p-4 font-bold text-slate-800">${pr.id}</td>
+                                            <td class="p-4">
+                                                <div class="font-medium text-slate-800">${pr.dept}</div>
+                                                <div class="text-xs text-slate-500">${pr.requester}</div>
+                                            </td>
+                                            <td class="p-4 text-slate-600">${pr.date}</td>
+                                            <td class="p-4 text-slate-600">${pr.needDate}</td>
+                                            <td class="p-4">
+                                                <span class="px-2.5 py-1 rounded-full text-xs font-bold ${badgeColor}">${pr.status}</span>
+                                            </td>
+                                            <td class="p-4 text-right space-x-2">
+                                                <button onclick="viewPRDetail('${pr.id}')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg text-xs font-semibold transition">Detail</button>
+                                                ${pr.status.includes('Pending') && (currentRole === 'manager' || currentRole === 'admin') ? `
+                                                    <button onclick="approvePR('${pr.id}', 'Approved')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition">Approve</button>
+                                                    <button onclick="approvePR('${pr.id}', 'Rejected')" class="bg-rose-600 hover:bg-rose-700 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition">Reject</button>
+                                                ` : ''}
+                                                ${pr.status === 'Approved' && !db.pos.some(po => po.prId === pr.id) && (currentRole === 'purchasing' || currentRole === 'admin') ? `
+                                                    <button onclick="convertPRToPO('${pr.id}')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition"><i class="fa-solid fa-arrow-right"></i> Buat PO</button>
+                                                ` : ''}
+                                            </td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderPOView(container) {
+            container.innerHTML = `
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 mb-6 flex justify-between items-center">
+                    <div>
+                        <h3 class="font-bold text-lg text-slate-800">Daftar Purchase Order (PO)</h3>
+                        <p class="text-xs text-slate-500">Pemesanan resmi ke supplier dan pengiriman dokumen via email (PDF)</p>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-slate-50 text-slate-500 text-xs uppercase font-semibold border-b border-slate-200">
+                                <tr>
+                                    <th class="p-4">No. PO</th>
+                                    <th class="p-4">Referensi PR</th>
+                                    <th class="p-4">Supplier</th>
+                                    <th class="p-4">Tanggal PO</th>
+                                    <th class="p-4">Status</th>
+                                    <th class="p-4 text-right">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                ${db.pos.map(po => {
+                                    const supplier = db.suppliers.find(s => s.id === po.supplierId) || { name: 'Unknown Supplier' };
+                                    const isReceived = db.grs.some(g => g.poId === po.id);
+                                    return `
+                                        <tr class="hover:bg-slate-50 transition">
+                                            <td class="p-4 font-bold text-slate-800">${po.id}</td>
+                                            <td class="p-4 text-indigo-600 font-medium">${po.prId}</td>
+                                            <td class="p-4 font-medium text-slate-800">${supplier.name}</td>
+                                            <td class="p-4 text-slate-600">${po.date}</td>
+                                            <td class="p-4">
+                                                <span class="px-2.5 py-1 rounded-full text-xs font-bold ${isReceived ? 'bg-emerald-100 text-emerald-700' : 'bg-indigo-100 text-indigo-700'}">
+                                                    ${isReceived ? 'Received (Selesai)' : 'Issued to Supplier'}
+                                                </span>
+                                            </td>
+                                            <td class="p-4 text-right space-x-2">
+                                                <button onclick="printPODocument('${po.id}')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg text-xs font-semibold transition"><i class="fa-solid fa-print"></i> Cetak PDF</button>
+                                                ${!isReceived && (currentRole === 'warehouse' || currentRole === 'admin') ? `
+                                                    <button onclick="openGRModalForPO('${po.id}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition"><i class="fa-solid fa-truck"></i> Buat GR</button>
+                                                ` : ''}
+                                            </td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderGRView(container) {
+            container.innerHTML = `
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 mb-6 flex justify-between items-center">
+                    <div>
+                        <h3 class="font-bold text-lg text-slate-800">Goods Receipt (Penerimaan Barang)</h3>
+                        <p class="text-xs text-slate-500">Pencatatan barang datang dari supplier, cek jumlah & kualitas, serta update stok otomatis</p>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-slate-50 text-slate-500 text-xs uppercase font-semibold border-b border-slate-200">
+                                <tr>
+                                    <th class="p-4">No. GR</th>
+                                    <th class="p-4">Referensi PO</th>
+                                    <th class="p-4">Gudang Tujuan</th>
+                                    <th class="p-4">Tanggal Masuk</th>
+                                    <th class="p-4">Kondisi & Status</th>
+                                    <th class="p-4 text-right">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                ${db.grs.map(gr => {
+                                    const wh = db.warehouses.find(w => w.id === gr.warehouseId) || { name: 'Gudang Utama' };
+                                    return `
+                                        <tr class="hover:bg-slate-50 transition">
+                                            <td class="p-4 font-bold text-slate-800">${gr.id}</td>
+                                            <td class="p-4 text-indigo-600 font-medium">${gr.poId}</td>
+                                            <td class="p-4 font-medium text-slate-800">${wh.name}</td>
+                                            <td class="p-4 text-slate-600">${gr.date}</td>
+                                            <td class="p-4">
+                                                <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700">${gr.status}</span>
+                                            </td>
+                                            <td class="p-4 text-right">
+                                                <button onclick="viewGRDetail('${gr.id}')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg text-xs font-semibold transition">Detail</button>
+                                            </td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderMRView(container) {
+            container.innerHTML = `
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 mb-6 flex justify-between items-center">
+                    <div>
+                        <h3 class="font-bold text-lg text-slate-800">Material Request & Goods Issue</h3>
+                        <p class="text-xs text-slate-500">Permintaan material oleh departemen & pengeluaran stok dari gudang (Goods Issue)</p>
+                    </div>
+                    <button onclick="openMRModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-sm font-medium shadow transition flex items-center space-x-2">
+                        <i class="fa-solid fa-plus"></i>
+                        <span>Minta Material</span>
+                    </button>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-slate-50 text-slate-500 text-xs uppercase font-semibold border-b border-slate-200">
+                                <tr>
+                                    <th class="p-4">No. MR</th>
+                                    <th class="p-4">Departemen</th>
+                                    <th class="p-4">Pemohon</th>
+                                    <th class="p-4">Tanggal</th>
+                                    <th class="p-4">Status Issue</th>
+                                    <th class="p-4 text-right">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                ${db.mrs.map(mr => `
+                                    <tr class="hover:bg-slate-50 transition">
+                                        <td class="p-4 font-bold text-slate-800">${mr.id}</td>
+                                        <td class="p-4 font-medium text-slate-800">${mr.dept}</td>
+                                        <td class="p-4 text-slate-600">${mr.requester}</td>
+                                        <td class="p-4 text-slate-600">${mr.date}</td>
+                                        <td class="p-4">
+                                            <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-indigo-100 text-indigo-700">${mr.status}</span>
+                                        </td>
+                                        <td class="p-4 text-right">
+                                            <button onclick="viewMRDetail('${mr.id}')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg text-xs font-semibold transition">Detail</button>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderTransferView(container) {
+            container.innerHTML = `
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 mb-6 flex justify-between items-center">
+                    <div>
+                        <h3 class="font-bold text-lg text-slate-800">Mutasi Antar Gudang</h3>
+                        <p class="text-xs text-slate-500">Pencatatan transfer pengiriman dan penerimaan stok antar gudang</p>
+                    </div>
+                    <button onclick="openTransferModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-sm font-medium shadow transition flex items-center space-x-2">
+                        <i class="fa-solid fa-plus"></i>
+                        <span>Buat Transfer Baru</span>
+                    </button>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-slate-50 text-slate-500 text-xs uppercase font-semibold border-b border-slate-200">
+                                <tr>
+                                    <th class="p-4">No. Transfer</th>
+                                    <th class="p-4">Dari Gudang</th>
+                                    <th class="p-4">Ke Gudang</th>
+                                    <th class="p-4">Tanggal</th>
+                                    <th class="p-4">Status</th>
+                                    <th class="p-4 text-right">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                ${db.transfers.map(tr => {
+                                    const fromWh = db.warehouses.find(w => w.id === tr.fromWh)?.name || tr.fromWh;
+                                    const toWh = db.warehouses.find(w => w.id === tr.toWh)?.name || tr.toWh;
+                                    return `
+                                        <tr class="hover:bg-slate-50 transition">
+                                            <td class="p-4 font-bold text-slate-800">${tr.id}</td>
+                                            <td class="p-4 text-slate-600">${fromWh}</td>
+                                            <td class="p-4 font-medium text-slate-800">${toWh}</td>
+                                            <td class="p-4 text-slate-600">${tr.date}</td>
+                                            <td class="p-4">
+                                                <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700">${tr.status}</span>
+                                            </td>
+                                            <td class="p-4 text-right">
+                                                <button onclick="viewTransferDetail('${tr.id}')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg text-xs font-semibold transition">Detail</button>
+                                            </td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderOpnameView(container) {
+            container.innerHTML = `
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 mb-6 flex justify-between items-center">
+                    <div>
+                        <h3 class="font-bold text-lg text-slate-800">Stock Opname & Adjustment</h3>
+                        <p class="text-xs text-slate-500">Perhitungan fisik berkala, input hasil opname, dan approval selisih stok</p>
+                    </div>
+                    <button onclick="openOpnameModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-sm font-medium shadow transition flex items-center space-x-2">
+                        <i class="fa-solid fa-plus"></i>
+                        <span>Mulai Stock Opname</span>
+                    </button>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 text-center text-slate-500">
+                    <i class="fa-solid fa-clipboard-check text-4xl text-slate-300 mb-3"></i>
+                    <p class="font-medium text-slate-700">Belum ada sesi stock opname aktif periode ini.</p>
+                    <p class="text-xs text-slate-400 mt-1">Klik tombol di atas untuk melakukan opname fisik dan penyesuaian selisih stok gudang.</p>
+                </div>
+            `;
+        }
+
+        function renderInventoryView(container) {
+            container.innerHTML = `
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 mb-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <div>
+                        <h3 class="font-bold text-lg text-slate-800">Katalog Barang & Level Stok</h3>
+                        <p class="text-xs text-slate-500">Daftar seluruh item barang, lokasi rak, dan harga rata-rata</p>
+                    </div>
+                    <button onclick="openItemModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-sm font-medium shadow transition flex items-center space-x-2">
+                        <i class="fa-solid fa-plus"></i>
+                        <span>Tambah Barang Baru</span>
+                    </button>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-slate-50 text-slate-500 text-xs uppercase font-semibold border-b border-slate-200">
+                                <tr>
+                                    <th class="p-4">Kode & Nama Barang</th>
+                                    <th class="p-4">Kategori</th>
+                                    <th class="p-4">Lokasi Rak</th>
+                                    <th class="p-4">Stok Fisik</th>
+                                    <th class="p-4">Harga Rata-Rata</th>
+                                    <th class="p-4 text-right">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                ${db.items.map(item => `
+                                    <tr class="hover:bg-slate-50 transition">
+                                        <td class="p-4">
+                                            <div class="font-bold text-slate-800">${item.name}</div>
+                                            <div class="text-xs text-indigo-600 font-mono">${item.code}</div>
+                                        </td>
+                                        <td class="p-4 text-slate-600">${item.category}</td>
+                                        <td class="p-4 text-slate-600 font-medium">${item.rack || '-'}</td>
+                                        <td class="p-4">
+                                            <span class="font-bold ${item.stock <= item.minStock ? 'text-rose-600' : 'text-slate-800'}">
+                                                ${item.stock} ${item.unit}
+                                            </span>
+                                            ${item.stock <= item.minStock ? '<span class="ml-2 text-[10px] bg-rose-100 text-rose-700 px-2 py-0.5 rounded-full font-bold">Kritis</span>' : ''}
+                                        </td>
+                                        <td class="p-4 text-slate-700 font-medium">Rp ${item.avgCost.toLocaleString('id-ID')}</td>
+                                        <td class="p-4 text-right">
+                                            <button onclick="editItem('${item.id}')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg text-xs font-semibold transition">Edit</button>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderMasterView(container) {
+            container.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-bold text-slate-800 text-base">Daftar Supplier</h3>
+                            <button onclick="openSupplierModal()" class="text-xs bg-indigo-50 text-indigo-600 font-bold px-3 py-1.5 rounded-lg hover:bg-indigo-100 transition">+ Tambah</button>
+                        </div>
+                        <div class="space-y-3">
+                            ${db.suppliers.map(sup => `
+                                <div class="p-3 bg-slate-50 border border-slate-100 rounded-xl">
+                                    <h4 class="font-semibold text-sm text-slate-800">${sup.name}</h4>
+                                    <p class="text-xs text-slate-500 mt-0.5"><i class="fa-solid fa-phone"></i> ${sup.phone} | <i class="fa-solid fa-envelope"></i> ${sup.email}</p>
+                                    <p class="text-xs text-slate-400 mt-1">${sup.address}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <div class="space-y-6">
+                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="font-bold text-slate-800 text-base">Daftar Gudang / Lokasi</h3>
+                                <button onclick="openWarehouseModal()" class="text-xs bg-indigo-50 text-indigo-600 font-bold px-3 py-1.5 rounded-lg hover:bg-indigo-100 transition">+ Tambah</button>
+                            </div>
+                            <div class="space-y-3">
+                                ${db.warehouses.map(wh => `
+                                    <div class="p-3 bg-slate-50 border border-slate-100 rounded-xl flex justify-between items-center">
+                                        <div>
+                                            <h4 class="font-semibold text-sm text-slate-800">${wh.name}</h4>
+                                            <p class="text-xs text-slate-500 mt-0.5"><i class="fa-solid fa-location-dot"></i> ${wh.location}</p>
+                                        </div>
+                                        <span class="text-xs font-mono font-bold bg-slate-200 text-slate-700 px-2 py-1 rounded">${wh.id}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+                            <h3 class="font-bold text-slate-800 text-base mb-3">Departemen Perusahaan</h3>
+                            <div class="flex flex-wrap gap-2">
+                                ${db.departments.map(dept => `
+                                    <span class="bg-slate-100 text-slate-700 px-3 py-1.5 rounded-xl text-xs font-semibold">${dept}</span>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderReportsView(container) {
+            container.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between">
+                        <div>
+                            <div class="bg-indigo-50 text-indigo-600 p-3 w-fit rounded-xl mb-3"><i class="fa-solid fa-file-excel text-xl"></i></div>
+                            <h3 class="font-bold text-slate-800 text-base">Laporan Kartu Stok</h3>
+                            <p class="text-xs text-slate-500 mt-1">Ekspor histori keluar masuk barang secara detail per periode.</p>
+                        </div>
+                        <button onclick="exportReport('Kartu Stok')" class="mt-4 bg-slate-900 hover:bg-slate-800 text-white text-xs py-2 rounded-xl font-semibold transition">Ekspor Excel / PDF</button>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between">
+                        <div>
+                            <div class="bg-emerald-50 text-emerald-600 p-3 w-fit rounded-xl mb-3"><i class="fa-solid fa-wallet text-xl"></i></div>
+                            <h3 class="font-bold text-slate-800 text-base">Nilai Persediaan (Valuasi)</h3>
+                            <p class="text-xs text-slate-500 mt-1">Laporan valuasi aset persediaan gudang berdasarkan metode rata-rata.</p>
+                        </div>
+                        <button onclick="exportReport('Nilai Persediaan')" class="mt-4 bg-slate-900 hover:bg-slate-800 text-white text-xs py-2 rounded-xl font-semibold transition">Ekspor Excel / PDF</button>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between">
+                        <div>
+                            <div class="bg-amber-50 text-amber-600 p-3 w-fit rounded-xl mb-3"><i class="fa-solid fa-chart-line text-xl"></i></div>
+                            <h3 class="font-bold text-slate-800 text-base">Histori Pembelian & Slow-Moving</h3>
+                            <p class="text-xs text-slate-500 mt-1">Analisis performa supplier dan item barang yang jarang bergerak (slow-moving).</p>
+                        </div>
+                        <button onclick="exportReport('Analisis Pembelian')" class="mt-4 bg-slate-900 hover:bg-slate-800 text-white text-xs py-2 rounded-xl font-semibold transition">Ekspor Excel / PDF</button>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+                    <h3 class="font-bold text-slate-800 text-base mb-4">Grafik Tren Valuasi & Pembelian Bulanan</h3>
+                    <div class="h-64 flex items-center justify-center bg-slate-50 rounded-xl text-slate-400">
+                        <canvas id="reportChart" class="w-full h-full max-h-60"></canvas>
+                    </div>
+                </div>
+            `;
+
+            setTimeout(() => {
+                const ctx = document.getElementById('reportChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Juli', 'Agustus', 'September', 'Oktober'],
+                        datasets: [{
+                            label: 'Nilai Pengadaan (Juta Rp)',
+                            data: [45, 62, 38, 85],
+                            backgroundColor: '#6366f1',
+                            borderRadius: 6
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false }
+                });
+            }, 100);
+        }
+
+        function openModalHTML(html) {
+            const modal = document.getElementById('appModal');
+            const content = document.getElementById('modalContent');
+            content.innerHTML = html;
+            modal.classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('appModal').classList.add('hidden');
+        }
+
+        function showToast(msg, type='success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            const bg = type === 'success' ? 'bg-emerald-600' : (type === 'error' ? 'bg-rose-600' : 'bg-indigo-600');
+            toast.className = `${bg} text-white text-xs px-4 py-3 rounded-xl shadow-lg transition transform translate-y-2 opacity-0 flex items-center space-x-2`;
+            toast.innerHTML = `<i class="fa-solid fa-circle-info"></i><span>${msg}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => toast.classList.remove('translate-y-2', 'opacity-0'), 50);
+            setTimeout(() => {
+                toast.classList.add('opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function openPRModal() {
+            openModalHTML(`
+                <div class="p-6 border-b border-slate-200 flex justify-between items-center">
+                    <h3 class="font-bold text-lg text-slate-800">Buat Purchase Request (PR) Baru</h3>
+                    <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+                </div>
+                <form onsubmit="handleCreatePR(event)" class="p-6 space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Departemen</label>
+                            <select id="prDept" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm">
+                                ${db.departments.map(d => `<option value="${d}">${d}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Tanggal Dibutuhkan</label>
+                            <input type="date" id="prNeedDate" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Nama Pemohon</label>
+                        <input type="text" id="prRequester" required placeholder="Nama Staf" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm">
+                    </div>
+                    <div class="border-t border-slate-200 pt-4">
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Pilih Barang</label>
+                        <select id="prItemId" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm mb-3">
+                            ${db.items.map(i => `<option value="${i.id}">${i.name} (Stok: ${i.stock} ${i.unit})</option>`).join('')}
+                        </select>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Jumlah</label>
+                                <input type="number" id="prQty" min="1" value="1" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Catatan Kebutuhan</label>
+                                <input type="text" id="prNote" placeholder="Cth: Keperluan project X" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex justify-end space-x-3 pt-4 border-t border-slate-200">
+                        <button type="button" onclick="closeModal()" class="px-4 py-2 bg-slate-100 text-slate-700 text-sm font-semibold rounded-xl">Batal</button>
+                        <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-xl shadow">Ajukan PR</button>
+                    </div>
+                </form>
+            `);
+        }
+
+        function handleCreatePR(e) {
+            e.preventDefault();
+            const newId = `PR-2026-${String(db.prs.length + 1).padStart(3, '0')}`;
+            const newPR = {
+                id: newId,
+                dept: document.getElementById('prDept').value,
+                requester: document.getElementById('prRequester').value,
+                date: new Date().toISOString().split('T')[0],
+                needDate: document.getElementById('prNeedDate').value,
+                status: 'Pending Manager',
+                items: [{
+                    itemId: document.getElementById('prItemId').value,
+                    qty: parseInt(document.getElementById('prQty').value),
+                    note: document.getElementById('prNote').value
+                }]
+            };
+            db.prs.push(newPR);
+            db.auditLogs.push({ time: new Date().toLocaleString(), user: newPR.requester, action: `Membuat PR #${newId}` });
+            db.notifications.push({ id: Date.now(), title: 'PR Baru', desc: `${newId} menunggu persetujuan atasan.`, time: 'Baru saja', read: false });
+            saveToStorage();
+            closeModal();
+            showToast(`Purchase Request ${newId} berhasil diajukan!`);
+            renderView();
+        }
+
+        function quickCreatePRFromItem(itemId) {
+            const item = db.items.find(i => i.id === itemId);
+            const newId = `PR-2026-${String(db.prs.length + 1).padStart(3, '0')}`;
+            const newPR = {
+                id: newId,
+                dept: 'Operasional',
+                requester: 'Sistem Reorder Otomatis',
+                date: new Date().toISOString().split('T')[0],
+                needDate: new Date(Date.now() + 7*86400000).toISOString().split('T')[0],
+                status: 'Pending Manager',
+                items: [{ itemId: item.id, qty: item.minStock * 2, note: 'Reorder otomatis stok kritis' }]
+            };
+            db.prs.push(newPR);
+            db.auditLogs.push({ time: new Date().toLocaleString(), user: 'Sistem', action: `Reorder otomatis PR #${newId} untuk ${item.name}` });
+            saveToStorage();
+            showToast(`PR Reorder ${newId} untuk ${item.name} berhasil dibuat!`);
+            renderView();
+        }
+
+        function approvePR(prId, status) {
+            const pr = db.prs.find(p => p.id === prId);
+            if (pr) {
+                pr.status = status;
+                db.auditLogs.push({ time: new Date().toLocaleString(), user: currentRole.toUpperCase(), action: `${status} PR #${prId}` });
+                saveToStorage();
+                showToast(`PR ${prId} berhasil di-${status}!`);
+                renderView();
+            }
+        }
+
+        function convertPRToPO(prId) {
+            const pr = db.prs.find(p => p.id === prId);
+            const poId = `PO-2026-${String(db.pos.length + 1).padStart(3, '0')}`;
+            const supplier = db.suppliers[0];
+            
+            const newPO = {
+                id: poId,
+                prId: pr.id,
+                supplierId: supplier.id,
+                date: new Date().toISOString().split('T')[0],
+                status: 'Issued',
+                items: pr.items.map(pi => {
+                    const item = db.items.find(i => i.id === pi.itemId);
+                    return { itemId: pi.itemId, qty: pi.qty, price: item ? item.avgCost : 100000 };
+                })
+            };
+            db.pos.push(newPO);
+            db.auditLogs.push({ time: new Date().toLocaleString(), user: 'Purchasing', action: `Membuat PO #${poId} dari ${prId}` });
+            saveToStorage();
+            showToast(`PO ${poId} berhasil diterbitkan ke ${supplier.name}!`);
+            renderView();
+        }
+
+        function printPODocument(poId) {
+            const po = db.pos.find(p => p.id === poId);
+            const sup = db.suppliers.find(s => s.id === po.supplierId);
+            openModalHTML(`
+                <div class="p-8 bg-white text-slate-800">
+                    <div class="flex justify-between border-b pb-4 mb-6">
+                        <div>
+                            <h2 class="text-xl font-bold">PURCHASE ORDER (PO)</h2>
+                            <p class="text-xs text-slate-500">No: ${po.id}</p>
+                        </div>
+                        <div class="text-right text-xs">
+                            <p class="font-bold">InventoPro Corp</p>
+                            <p>Tanggal: ${po.date}</p>
+                        </div>
+                    </div>
+                    <div class="mb-6 text-sm">
+                        <p class="font-bold text-slate-700">Kepada Supplier:</p>
+                        <p class="font-semibold">${sup.name}</p>
+                        <p class="text-slate-600">${sup.address}</p>
+                        <p class="text-slate-600">Telp: ${sup.phone} | Email: ${sup.email}</p>
+                    </div>
+                    <table class="w-full text-left text-sm mb-6 border-collapse">
+                        <thead class="bg-slate-100 text-slate-600 text-xs uppercase">
+                            <tr>
+                                <th class="p-2 border">Nama Barang</th>
+                                <th class="p-2 border">Jumlah</th>
+                                <th class="p-2 border">Harga Satuan</th>
+                                <th class="p-2 border">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${po.items.map(i => {
+                                const item = db.items.find(it => it.id === i.itemId);
+                                return `
+                                    <tr>
+                                        <td class="p-2 border">${item ? item.name : i.itemId}</td>
+                                        <td class="p-2 border">${i.qty}</td>
+                                        <td class="p-2 border">Rp ${i.price.toLocaleString('id-ID')}</td>
+                                        <td class="p-2 border">Rp ${(i.qty * i.price).toLocaleString('id-ID')}</td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                    <div class="flex justify-end space-x-3">
+                        <button onclick="closeModal()" class="px-4 py-2 bg-slate-200 text-slate-800 text-xs font-semibold rounded-lg">Tutup</button>
+                        <button onclick="window.print()" class="px-4 py-2 bg-indigo-600 text-white text-xs font-semibold rounded-lg"><i class="fa-solid fa-print"></i> Cetak PDF / Kirim Email</button>
+                    </div>
+                </div>
+            `);
+        }
+
+        function openGRModalForPO(poId) {
+            const po = db.pos.find(p => p.id === poId);
+            openModalHTML(`
+                <div class="p-6 border-b border-slate-200 flex justify-between items-center">
+                    <h3 class="font-bold text-lg text-slate-800">Buat Goods Receipt (Penerimaan Barang)</h3>
+                    <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+                </div>
+                <form onsubmit="handleCreateGR(event, '${poId}')" class="p-6 space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Gudang Penerima</label>
+                        <select id="grWarehouse" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm">
+                            ${db.warehouses.map(w => `<option value="${w.id}">${w.name}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div class="border-t border-slate-200 pt-4">
+                        <label class="block text-xs font-semibold text-slate-600 mb-2">Pemeriksaan Barang (QC & Jumlah)</label>
+                        ${po.items.map((pi, idx) => {
+                            const item = db.items.find(i => i.id === pi.itemId);
+                            return `
+                                <div class="bg-slate-50 p-3 rounded-xl mb-3 border border-slate-200">
+                                    <p class="font-bold text-sm text-slate-800">${item ? item.name : pi.itemId} (Dipesan: ${pi.qty})</p>
+                                    <div class="grid grid-cols-2 gap-3 mt-2">
+                                        <div>
+                                            <label class="block text-[10px] font-semibold text-slate-500">Jumlah Diterima</label>
+                                            <input type="number" id="grQty_${idx}" value="${pi.qty}" max="${pi.qty}" min="0" class="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-sm">
+                                        </div>
+                                        <div>
+                                            <label class="block text-[10px] font-semibold text-slate-500">Kondisi / QC</label>
+                                            <select id="grCond_${idx}" class="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-sm">
+                                                <option value="Baik">Baik & Sesuai</option>
+                                                <option value="Sebagian">Partial / Ada Catatan</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                    <div class="flex justify-end space-x-3 pt-4 border-t border-slate-200">
+                        <button type="button" onclick="closeModal()" class="px-4 py-2 bg-slate-100 text-slate-700 text-sm font-semibold rounded-xl">Batal</button>
+                        <button type="submit" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-xl shadow">Simpan GR & Tambah Stok</button>
+                    </div>
+                </form>
+            `);
+        }
+
+        function handleCreateGR(e, poId) {
+            e.preventDefault();
+            const po = db.pos.find(p => p.id === poId);
+            const grId = `GR-2026-${String(db.grs.length + 1).padStart(3, '0')}`;
+            
+            const grItems = po.items.map((pi, idx) => {
+                const qtyRec = parseInt(document.getElementById(`grQty_${idx}`).value);
+                const cond = document.getElementById(`grCond_${idx}`).value;
+                
+                const item = db.items.find(i => i.id === pi.itemId);
+                if (item) {
+                    item.stock += qtyRec;
+                }
+
+                return { itemId: pi.itemId, qtyReceived: qtyRec, condition: cond };
+            });
+
+            const newGR = {
+                id: grId,
+                poId: poId,
+                warehouseId: document.getElementById('grWarehouse').value,
+                date: new Date().toISOString().split('T')[0],
+                status: 'Complete',
+                items: grItems
+            };
+
+            db.grs.push(newGR);
+            db.auditLogs.push({ time: new Date().toLocaleString(), user: 'Gudang', action: `Membuat GR #${grId} (Stok otomatis bertambah)` });
+            saveToStorage();
+            closeModal();
+            showToast(`Goods Receipt ${grId} berhasil dicatat & stok bertambah!`);
+            renderView();
+        }
+
+        function openMRModal() {
+            openModalHTML(`
+                <div class="p-6 border-b border-slate-200 flex justify-between items-center">
+                    <h3 class="font-bold text-lg text-slate-800">Material Request & Goods Issue</h3>
+                    <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+                </div>
+                <form onsubmit="handleCreateMR(event)" class="p-6 space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Departemen</label>
+                            <select id="mrDept" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm">
+                                ${db.departments.map(d => `<option value="${d}">${d}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Nama Pemohon</label>
+                            <input type="text" id="mrRequester" required placeholder="Nama Staf" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm">
+                        </div>
+                    </div>
+                    <div class="border-t border-slate-200 pt-4">
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Pilih Barang dari Gudang</label>
+                        <select id="mrItemId" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm mb-3">
+                            ${db.items.map(i => `<option value="${i.id}">${i.name} (Stok Tersedia: ${i.stock} ${i.unit})</option>`).join('')}
+                        </select>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Jumlah Diminta</label>
+                                <input type="number" id="mrQty" min="1" value="1" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Keperluan</label>
+                                <input type="text" id="mrNote" placeholder="Cth: Maintenance" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex justify-end space-x-3 pt-4 border-t border-slate-200">
+                        <button type="button" onclick="closeModal()" class="px-4 py-2 bg-slate-100 text-slate-700 text-sm font-semibold rounded-xl">Batal</button>
+                        <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-xl shadow">Keluarkan Barang (GI)</button>
+                    </div>
+                </form>
+            `);
+        }
+
+        function handleCreateMR(e) {
+            e.preventDefault();
+            const itemId = document.getElementById('mrItemId').value;
+            const qty = parseInt(document.getElementById('mrQty').value);
+            const item = db.items.find(i => i.id === itemId);
+
+            if (item.stock < qty) {
+                showToast(`Stok tidak mencukupi! Sisa stok: ${item.stock}`, 'error');
+                return;
+            }
+
+            item.stock -= qty;
+
+            const mrId = `MR-2026-${String(db.mrs.length + 1).padStart(3, '0')}`;
+            const newMR = {
+                id: mrId,
+                dept: document.getElementById('mrDept').value,
+                requester: document.getElementById('mrRequester').value,
+                date: new Date().toISOString().split('T')[0],
+                status: 'Issued (Keluar)',
+                items: [{ itemId: itemId, qty: qty, note: document.getElementById('mrNote').value }]
+            };
+
+            db.mrs.push(newMR);
+            db.auditLogs.push({ time: new Date().toLocaleString(), user: 'Gudang', action: `Goods Issue #${mrId} untuk ${item.name} (${qty} ${item.unit})` });
+            saveToStorage();
+            closeModal();
+            showToast(`Material Request & Goods Issue ${mrId} berhasil dicatat & stok berkurang!`);
+            renderView();
+        }
+
+        function openItemModal() {
+            openModalHTML(`
+                <div class="p-6 border-b border-slate-200 flex justify-between items-center">
+                    <h3 class="font-bold text-lg text-slate-800">Tambah Barang Baru</h3>
+                    <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+                </div>
+                <form onsubmit="handleCreateItem(event)" class="p-6 space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Kode Barang</label>
+                            <input type="text" id="itemCode" required placeholder="BRG-XXX" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Nama Barang</label>
+                            <input type="text" id="itemName" required placeholder="Nama Item" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Kategori</label>
+                            <select id="itemCategory" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm">
+                                ${db.categories.map(c => `<option value="${c}">${c}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Satuan</label>
+                            <select id="itemUnit" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm">
+                                ${db.units.map(u => `<option value="${u}">${u}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Lokasi Rak</label>
+                            <input type="text" id="itemRack" placeholder="Rack A-01" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Stok Awal</label>
+                            <input type="number" id="itemStock" min="0" value="0" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Stok Minimum (Reorder)</label>
+                            <input type="number" id="itemMinStock" min="1" value="5" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Harga Satuan (Avg)</label>
+                            <input type="number" id="itemCost" min="0" value="10000" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm">
+                        </div>
+                    </div>
+                    <div class="flex justify-end space-x-3 pt-4 border-t border-slate-200">
+                        <button type="button" onclick="closeModal()" class="px-4 py-2 bg-slate-100 text-slate-700 text-sm font-semibold rounded-xl">Batal</button>
+                        <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-xl shadow">Simpan Barang</button>
+                    </div>
+                </form>
+            `);
+        }
+
+        function handleCreateItem(e) {
+            e.preventDefault();
+            const newItem = {
+                id: `ITM-${String(db.items.length + 1).padStart(3, '0')}`,
+                code: document.getElementById('itemCode').value,
+                name: document.getElementById('itemName').value,
+                category: document.getElementById('itemCategory').value,
+                unit: document.getElementById('itemUnit').value,
+                rack: document.getElementById('itemRack').value,
+                stock: parseInt(document.getElementById('itemStock').value),
+                minStock: parseInt(document.getElementById('itemMinStock').value),
+                avgCost: parseInt(document.getElementById('itemCost').value)
+            };
+            db.items.push(newItem);
+            db.auditLogs.push({ time: new Date().toLocaleString(), user: 'Admin', action: `Menambahkan item barang baru: ${newItem.name}` });
+            saveToStorage();
+            closeModal();
+            showToast(`Barang ${newItem.name} berhasil ditambahkan ke katalog!`);
+            renderView();
+        }
+
+        function openSupplierModal() {
+            openModalHTML(`
+                <div class="p-6 border-b border-slate-200 flex justify-between items-center">
+                    <h3 class="font-bold text-lg text-slate-800">Tambah Supplier Baru</h3>
+                    <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+                </div>
+                <form onsubmit="handleCreateSupplier(event)" class="p-6 space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Nama Perusahaan Supplier</label>
+                        <input type="text" id="supName" required placeholder="PT Mitra ..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">No. Telepon</label>
+                            <input type="text" id="supPhone" required placeholder="021-..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Email</label>
+                            <input type="email" id="supEmail" required placeholder="email@supplier.com" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Alamat Lengkap</label>
+                        <textarea id="supAddress" required placeholder="Alamat supplier" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm"></textarea>
+                    </div>
+                    <div class="flex justify-end space-x-3 pt-4 border-t border-slate-200">
+                        <button type="button" onclick="closeModal()" class="px-4 py-2 bg-slate-100 text-slate-700 text-sm font-semibold rounded-xl">Batal</button>
+                        <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-xl shadow">Simpan Supplier</button>
+                    </div>
+                </form>
+            `);
+        }
+
+        function handleCreateSupplier(e) {
+            e.preventDefault();
+            const newSup = {
+                id: `SUP-${String(db.suppliers.length + 1).padStart(3, '0')}`,
+                name: document.getElementById('supName').value,
+                phone: document.getElementById('supPhone').value,
+                email: document.getElementById('supEmail').value,
+                address: document.getElementById('supAddress').value
+            };
+            db.suppliers.push(newSup);
+            saveToStorage();
+            closeModal();
+            showToast(`Supplier ${newSup.name} berhasil ditambahkan!`);
+            renderView();
+        }
+
+        function openWarehouseModal() {
+            openModalHTML(`
+                <div class="p-6 border-b border-slate-200 flex justify-between items-center">
+                    <h3 class="font-bold text-lg text-slate-800">Tambah Lokasi Gudang Baru</h3>
+                    <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+                </div>
+                <form onsubmit="handleCreateWH(event)" class="p-6 space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Nama Gudang</label>
+                        <input type="text" id="whName" required placeholder="Gudang Cabang X" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Lokasi / Alamat</label>
+                        <input type="text" id="whLocation" required placeholder="Lantai / Komplek Gudang" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm">
+                    </div>
+                    <div class="flex justify-end space-x-3 pt-4 border-t border-slate-200">
+                        <button type="button" onclick="closeModal()" class="px-4 py-2 bg-slate-100 text-slate-700 text-sm font-semibold rounded-xl">Batal</button>
+                        <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-xl shadow">Simpan Gudang</button>
+                    </div>
+                </form>
+            `);
+        }
+
+        function handleCreateWH(e) {
+            e.preventDefault();
+            const newWh = {
+                id: `WH-0${db.warehouses.length + 1}`,
+                name: document.getElementById('whName').value,
+                location: document.getElementById('whLocation').value
+            };
+            db.warehouses.push(newWh);
+            saveToStorage();
+            closeModal();
+            showToast(`Gudang ${newWh.name} berhasil ditambahkan!`);
+            renderView();
+        }
+
+        function exportReport(type) {
+            showToast(`Laporan "${type}" berhasil diekspor ke Excel/PDF!`);
+        }
+
+        function openQuickActionModal() {
+            openPRModal();
+        }
+
+        function handleGlobalSearch(e) {
+            if (e.key === 'Enter') {
+                const keyword = e.target.value.toLowerCase();
+                showToast(`Pencarian untuk "${keyword}" ditemukan dalam sistem.`);
+            }
+        }
+
+        window.onload = function() {
+            initStorage();
+            renderView();
+        };
+    </script>
+</body>
+</html>

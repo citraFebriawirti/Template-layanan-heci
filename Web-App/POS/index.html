@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kasir Online (POS Lite) — Premium Retail SaaS</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        forest: {
+                            600: '#166534',
+                            700: '#14532d',
+                            800: '#0f3c22'
+                        },
+                        brand: {
+                            DEFAULT: '#166534',
+                            accent: '#22A06B',
+                            light: '#F6F7F5',
+                            dark: '#202722',
+                            muted: '#737B75',
+                            border: '#E5E9E5'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #F6F7F5; color: #202722; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #F6F7F5; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        @media print {
+            body * { visibility: hidden; }
+            #printable-receipt, #printable-receipt * { visibility: visible; }
+            #printable-receipt { position: absolute; left: 0; top: 0; width: 100%; }
+        }
+    </style>
+</head>
+<body class="h-full overflow-hidden flex flex-col">
+
+    <div id="app" class="h-full flex flex-col overflow-hidden">
+        <!-- Rendered dynamically by JavaScript -->
+    </div>
+
+    <!-- Receipt Printable Modal Hidden Template -->
+    <div id="receipt-modal-container"></div>
+
+    <script>
+        /* ==========================================================================
+           APPLICATION STATE & MOCK DATABASE (In-Memory with Unsplash Images)
+           ========================================================================== */
+        const AppState = {
+            currentView: 'pos', // 'pos', 'dashboard', 'products', 'inventory', 'shift', 'history', 'reports', 'users'
+            currentUser: {
+                id: 'usr_1',
+                name: 'Budi Santoso',
+                username: 'budi_kasir',
+                role: 'cashier', // 'owner', 'admin', 'cashier'
+                outletId: 'out_1',
+                permissions: {
+                    viewCost: false,
+                    giveDiscount: true,
+                    voidTransaction: false,
+                    processRefund: false,
+                    manageProducts: false,
+                    accessReports: false,
+                    manageUsers: false
+                }
+            },
+            activeOutlet: { id: 'out_1', name: 'Cabang Utama Sudirman', address: 'Jl. Jend. Sudirman No. 45, Jakarta' },
+            activeShift: null, 
+            offlineMode: false,
+            localQueueCount: 0,
+            
+            // Master Data with Unsplash Images
+            categories: [
+                { id: 'cat_all', name: 'Semua Produk' },
+                { id: 'cat_bev', name: 'Minuman' },
+                { id: 'cat_food', name: 'Makanan & Snack' },
+                { id: 'cat_merch', name: 'Merchandise' },
+                { id: 'cat_supp', name: 'Supplies' }
+            ],
+            products: [
+                { id: 'p1', sku: 'BEV-001', barcode: '899123456701', name: 'Kopi Susu Gula Aren', category: 'cat_bev', price: 22000, cost: 12000, stock: 45, minStock: 5, active: true, image: 'https://images.unsplash.com/photo-1541167760496-1628856ab772?auto=format&fit=crop&w=400&q=80' },
+                { id: 'p2', sku: 'BEV-002', barcode: '899123456702', name: 'Americano Ice/Hot', category: 'cat_bev', price: 18000, cost: 8000, stock: 60, minStock: 10, active: true, image: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=400&q=80' },
+                { id: 'p3', sku: 'BEV-003', barcode: '899123456703', name: 'Matcha Latte Premium', category: 'cat_bev', price: 28000, cost: 15000, stock: 3, minStock: 5, active: true, image: 'https://images.unsplash.com/photo-1536256263959-770b48d82b0a?auto=format&fit=crop&w=400&q=80' },
+                { id: 'p4', sku: 'FOO-001', barcode: '899123456704', name: 'Croissant Butter', category: 'cat_food', price: 25000, cost: 14000, stock: 12, minStock: 5, active: true, image: 'https://images.unsplash.com/photo-1555507036-ab1f4038808a?auto=format&fit=crop&w=400&q=80' },
+                { id: 'p5', sku: 'FOO-002', barcode: '899123456705', name: 'Spaghetti Carbonara', category: 'cat_food', price: 45000, cost: 24000, stock: 8, minStock: 4, active: true, image: 'https://images.unsplash.com/photo-1612874742237-6526221588e3?auto=format&fit=crop&w=400&q=80' },
+                { id: 'p6', sku: 'FOO-003', barcode: '899123456706', name: 'Roti Bakar Keju Susu', category: 'cat_food', price: 20000, cost: 9000, stock: 25, minStock: 5, active: true, image: 'https://images.unsplash.com/photo-1528735602780-2552fd46c7af?auto=format&fit=crop&w=400&q=80' },
+                { id: 'p7', sku: 'MER-001', barcode: '899123456707', name: 'Tumbler Stainless Steel', category: 'cat_merch', price: 125000, cost: 70000, stock: 15, minStock: 3, active: true, image: 'https://images.unsplash.com/photo-1602143407151-7111542de6e8?auto=format&fit=crop&w=400&q=80' }
+            ],
+            
+            // POS Active State
+            cart: [],
+            cartDiscountPercent: 0,
+            cartNote: '',
+            selectedCategory: 'cat_all',
+            searchQuery: '',
+            openBills: [],
+            
+            // Transactions History
+            transactions: [
+                { id: 'TRX-20261011-001', time: '10:35', date: '2026-10-11', cashier: 'Budi Santoso', outlet: 'Cabang Utama Sudirman', items: [{name: 'Kopi Susu Gula Aren', quantity: 2, price: 22000}], total: 44000, paymentMethod: 'Tunai', paid: 50000, change: 6000, status: 'Selesai' },
+                { id: 'TRX-20261011-002', time: '11:10', date: '2026-10-11', cashier: 'Budi Santoso', outlet: 'Cabang Utama Sudirman', items: [{name: 'Spaghetti Carbonara', quantity: 1, price: 45000}, {name: 'Americano Ice/Hot', quantity: 1, price: 18000}], total: 63000, paymentMethod: 'QRIS', paid: 63000, change: 0, status: 'Selesai' }
+            ],
+
+            // Shifts History
+            shifts: [
+                { id: 'SH-001', date: '2026-10-10', cashier: 'Budi Santoso', openedAt: '08:00', closedAt: '17:00', startCash: 500000, expectedCash: 1850000, actualCash: 1850000, diff: 0, status: 'Ditutup' }
+            ],
+
+            // Users List
+            users: [
+                { id: 'usr_1', name: 'Budi Santoso', username: 'budi_kasir', role: 'cashier', outlet: 'Cabang Utama Sudirman', status: 'Aktif', lastLogin: 'Hari ini, 08:00' },
+                { id: 'usr_2', name: 'Siti Aminah', username: 'siti_admin', role: 'admin', outlet: 'Cabang Utama Sudirman', status: 'Aktif', lastLogin: 'Hari ini, 07:30' },
+                { id: 'usr_3', name: 'Pak Hartono', username: 'owner_utama', role: 'owner', outlet: 'Semua Outlet', status: 'Aktif', lastLogin: 'Kemarin, 20:15' }
+            ],
+
+            toast: null
+        };
+
+        // Helper Formatters
+        const formatRupiah = (number) => {
+            return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(number);
+        };
+
+        const showToast = (message, type = 'success') => {
+            AppState.toast = { message, type };
+            render();
+            setTimeout(() => {
+                if (AppState.toast && AppState.toast.message === message) {
+                    AppState.toast = null;
+                    render();
+                }
+            }, 3000);
+        };
+
+        /* ==========================================================================
+           CORE RENDER ENGINE
+           ========================================================================== */
+        function render() {
+            const appEl = document.getElementById('app');
+            appEl.innerHTML = `
+                ${AppState.toast ? `
+                    <div class="fixed top-5 right-5 z-50 flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg border text-sm font-medium transition-all animate-bounce ${
+                        AppState.toast.type === 'error' ? 'bg-red-50 border-red-200 text-red-800' : 
+                        AppState.toast.type === 'warning' ? 'bg-amber-50 border-amber-200 text-amber-800' : 
+                        'bg-emerald-50 border-emerald-200 text-emerald-800'
+                    }">
+                        <i data-lucide="${AppState.toast.type === 'error' ? 'alert-circle' : AppState.toast.type === 'warning' ? 'alert-triangle' : 'check-circle-2'}" class="w-5 h-5"></i>
+                        <span>${AppState.toast.message}</span>
+                    </div>
+                ` : ''}
+
+                <!-- Top Navbar / Header -->
+                <header class="bg-white border-b border-brand-border h-16 flex items-center justify-between px-4 lg:px-6 shrink-0 z-20">
+                    <div class="flex items-center gap-4">
+                        <div class="flex items-center gap-2">
+                            <div class="w-10 h-10 rounded-xl bg-forest-600 flex items-center justify-center text-white font-bold shadow-sm">
+                                <i data-lucide="store" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <h1 class="font-bold text-brand-dark leading-tight flex items-center gap-2">
+                                    POS LITE <span class="text-xs px-2 py-0.5 rounded bg-emerald-100 text-forest-700 font-semibold">Retail SaaS</span>
+                                </h1>
+                                <p class="text-xs text-brand-muted">${AppState.activeOutlet.name}</p>
+                            </div>
+                        </div>
+
+                        <!-- Shift Status Badge -->
+                        <div class="hidden md:flex items-center gap-2 ml-4 pl-4 border-l border-brand-border">
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${AppState.activeShift ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-amber-50 text-amber-700 border border-amber-200'}">
+                                <span class="w-1.5 h-1.5 rounded-full mr-1.5 ${AppState.activeShift ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}"></span>
+                                ${AppState.activeShift ? 'Shift Aktif' : 'Shift Belum Dibuka'}
+                            </span>
+                            ${!AppState.activeShift ? `
+                                <button onclick="openShiftModal()" class="text-xs font-medium text-forest-600 hover:underline">Buka Shift</button>
+                            ` : `
+                                <button onclick="closeShiftModal()" class="text-xs font-medium text-red-600 hover:underline">Tutup Shift</button>
+                            `}
+                        </div>
+                    </div>
+
+                    <!-- Navigation Tabs -->
+                    <nav class="hidden xl:flex items-center gap-1 bg-brand-light p-1 rounded-xl border border-brand-border">
+                        <button onclick="switchView('pos')" class="px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ${AppState.currentView === 'pos' ? 'bg-white text-forest-700 shadow-sm' : 'text-brand-muted hover:text-brand-dark'}">
+                            <i data-lucide="calculator" class="w-4 h-4"></i> Kasir (POS)
+                        </button>
+                        <button onclick="switchView('dashboard')" class="px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ${AppState.currentView === 'dashboard' ? 'bg-white text-forest-700 shadow-sm' : 'text-brand-muted hover:text-brand-dark'}">
+                            <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard
+                        </button>
+                        <button onclick="switchView('products')" class="px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ${AppState.currentView === 'products' ? 'bg-white text-forest-700 shadow-sm' : 'text-brand-muted hover:text-brand-dark'}">
+                            <i data-lucide="package" class="w-4 h-4"></i> Produk & Stok
+                        </button>
+                        <button onclick="switchView('history')" class="px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ${AppState.currentView === 'history' ? 'bg-white text-forest-700 shadow-sm' : 'text-brand-muted hover:text-brand-dark'}">
+                            <i data-lucide="receipt" class="w-4 h-4"></i> Riwayat
+                        </button>
+                        <button onclick="switchView('reports')" class="px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ${AppState.currentView === 'reports' ? 'bg-white text-forest-700 shadow-sm' : 'text-brand-muted hover:text-brand-dark'}">
+                            <i data-lucide="bar-chart-3" class="w-4 h-4"></i> Laporan
+                        </button>
+                        <button onclick="switchView('users')" class="px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ${AppState.currentView === 'users' ? 'bg-white text-forest-700 shadow-sm' : 'text-brand-muted hover:text-brand-dark'}">
+                            <i data-lucide="users" class="w-4 h-4"></i> Pengguna
+                        </button>
+                    </nav>
+
+                    <!-- User Profile & Quick Actions -->
+                    <div class="flex items-center gap-3">
+                        <div class="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 text-xs font-medium border border-slate-200">
+                            <i data-lucide="${AppState.offlineMode ? 'wifi-off' : 'wifi'}" class="w-3.5 h-3.5 ${AppState.offlineMode ? 'text-amber-600' : 'text-emerald-600'}"></i>
+                            <span>${AppState.offlineMode ? 'Offline' : 'Online'}</span>
+                        </div>
+
+                        <div class="flex items-center gap-2 pl-3 border-l border-brand-border">
+                            <div class="text-right hidden sm:block">
+                                <div class="text-xs font-bold text-brand-dark">${AppState.currentUser.name}</div>
+                                <div class="text-[10px] text-brand-muted uppercase tracking-wider font-semibold">${AppState.currentUser.role}</div>
+                            </div>
+                            <div class="w-9 h-9 rounded-xl bg-forest-100 border border-forest-200 text-forest-800 font-bold flex items-center justify-center text-sm">
+                                ${AppState.currentUser.name.charAt(0)}
+                            </div>
+                            <button onclick="toggleMobileMenu()" class="xl:hidden p-2 rounded-lg text-brand-dark hover:bg-brand-light">
+                                <i data-lucide="menu" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                    </div>
+                </header>
+
+                <!-- Mobile Navigation Drawer -->
+                <div id="mobile-menu" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm hidden xl:hidden flex justify-end">
+                    <div class="w-72 bg-white h-full shadow-2xl p-5 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between pb-4 border-b border-brand-border mb-4">
+                                <span class="font-bold text-brand-dark">Menu Navigasi</span>
+                                <button onclick="toggleMobileMenu()" class="p-1 rounded-lg text-brand-muted hover:bg-brand-light">
+                                    <i data-lucide="x" class="w-5 h-5"></i>
+                                </button>
+                            </div>
+                            <div class="space-y-1">
+                                <button onclick="switchView('pos'); toggleMobileMenu();" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-sm ${AppState.currentView === 'pos' ? 'bg-emerald-50 text-forest-700 font-semibold' : 'text-brand-dark hover:bg-brand-light'}">
+                                    <i data-lucide="calculator" class="w-5 h-5"></i> Kasir (POS)
+                                </button>
+                                <button onclick="switchView('dashboard'); toggleMobileMenu();" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-sm ${AppState.currentView === 'dashboard' ? 'bg-emerald-50 text-forest-700 font-semibold' : 'text-brand-dark hover:bg-brand-light'}">
+                                    <i data-lucide="layout-dashboard" class="w-5 h-5"></i> Dashboard Pemilik
+                                </button>
+                                <button onclick="switchView('products'); toggleMobileMenu();" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-sm ${AppState.currentView === 'products' ? 'bg-emerald-50 text-forest-700 font-semibold' : 'text-brand-dark hover:bg-brand-light'}">
+                                    <i data-lucide="package" class="w-5 h-5"></i> Produk & Stok
+                                </button>
+                                <button onclick="switchView('history'); toggleMobileMenu();" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-sm ${AppState.currentView === 'history' ? 'bg-emerald-50 text-forest-700 font-semibold' : 'text-brand-dark hover:bg-brand-light'}">
+                                    <i data-lucide="receipt" class="w-5 h-5"></i> Riwayat Transaksi
+                                </button>
+                                <button onclick="switchView('reports'); toggleMobileMenu();" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-sm ${AppState.currentView === 'reports' ? 'bg-emerald-50 text-forest-700 font-semibold' : 'text-brand-dark hover:bg-brand-light'}">
+                                    <i data-lucide="bar-chart-3" class="w-5 h-5"></i> Laporan & Analitik
+                                </button>
+                                <button onclick="switchView('users'); toggleMobileMenu();" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-sm ${AppState.currentView === 'users' ? 'bg-emerald-50 text-forest-700 font-semibold' : 'text-brand-dark hover:bg-brand-light'}">
+                                    <i data-lucide="users" class="w-5 h-5"></i> Manajemen Pengguna
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Dynamic Content Area -->
+                <main class="flex-1 overflow-hidden flex flex-col">
+                    ${renderViewContent()}
+                </main>
+            `;
+            lucide.createIcons();
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            if (menu) menu.classList.toggle('hidden');
+        }
+
+        function switchView(viewName) {
+            AppState.currentView = viewName;
+            render();
+        }
+
+        /* ==========================================================================
+           VIEW ROUTER
+           ========================================================================== */
+        function renderViewContent() {
+            switch (AppState.currentView) {
+                case 'pos': return renderPOSView();
+                case 'dashboard': return renderDashboardView();
+                case 'products': return renderProductsView();
+                case 'history': return renderHistoryView();
+                case 'reports': return renderReportsView();
+                case 'users': return renderUsersView();
+                default: return renderPOSView();
+            }
+        }
+
+        /* ==========================================================================
+           1. POS KASIR VIEW (With Unsplash Product Cards)
+           ========================================================================== */
+        function renderPOSView() {
+            const filteredProducts = AppState.products.filter(p => {
+                const matchCat = AppState.selectedCategory === 'cat_all' || p.category === AppState.selectedCategory;
+                const matchQuery = p.name.toLowerCase().includes(AppState.searchQuery.toLowerCase()) || p.sku.toLowerCase().includes(AppState.searchQuery.toLowerCase()) || p.barcode.includes(AppState.searchQuery);
+                return matchCat && matchQuery && p.active;
+            });
+
+            const subtotal = AppState.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const discountAmount = (subtotal * AppState.cartDiscountPercent) / 100;
+            const finalTotal = subtotal - discountAmount;
+            const totalItemsCount = AppState.cart.reduce((sum, item) => sum + item.quantity, 0);
+
+            return `
+                <div class="h-full flex flex-col lg:flex-row overflow-hidden">
+                    <!-- Katalog Produk (Area Kiri) -->
+                    <div class="flex-1 flex flex-col bg-brand-light p-4 overflow-hidden border-r border-brand-border">
+                        <!-- Search & Barcode Input Bar -->
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="relative flex-1">
+                                <i data-lucide="search" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-brand-muted"></i>
+                                <input type="text" id="product-search" value="${AppState.searchQuery}" oninput="handleSearchInput(event)" placeholder="Cari nama produk, SKU, atau scan barcode..." class="w-full bg-white border border-brand-border rounded-xl pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:border-forest-600 transition-colors shadow-sm">
+                            </div>
+                            <button onclick="openOpenBillModal()" class="px-4 py-2.5 bg-white border border-brand-border rounded-xl text-xs font-semibold text-brand-dark hover:bg-slate-50 flex items-center gap-2 shadow-sm shrink-0">
+                                <i data-lucide="bookmark" class="w-4 h-4 text-amber-600"></i>
+                                <span class="hidden sm:inline">Open Bill</span> (${AppState.openBills.length})
+                            </button>
+                        </div>
+
+                        <!-- Kategori Filter Chips -->
+                        <div class="flex items-center gap-2 overflow-x-auto pb-2 mb-3 shrink-0">
+                            ${AppState.categories.map(cat => `
+                                <button onclick="selectCategory('${cat.id}')" class="px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${AppState.selectedCategory === cat.id ? 'bg-forest-600 text-white shadow-sm' : 'bg-white text-brand-dark border border-brand-border hover:bg-slate-50'}">
+                                    ${cat.name}
+                                </button>
+                            `).join('')}
+                        </div>
+
+                        <!-- Grid Produk dengan Unsplash Photos -->
+                        <div class="flex-1 overflow-y-auto pr-1">
+                            ${filteredProducts.length === 0 ? `
+                                <div class="h-full flex flex-col items-center justify-center text-center p-8 bg-white rounded-2xl border border-brand-border shadow-sm">
+                                    <div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-brand-muted mb-3">
+                                        <i data-lucide="package-open" class="w-6 h-6"></i>
+                                    </div>
+                                    <h3 class="font-bold text-brand-dark text-base mb-1">Produk Tidak Ditemukan</h3>
+                                    <p class="text-xs text-brand-muted max-w-xs mb-4">Periksa kembali kata kunci pencarian atau pilih kategori produk yang lain.</p>
+                                    <button onclick="resetPOSFilter()" class="px-4 py-2 rounded-xl bg-forest-600 text-white text-xs font-semibold shadow-sm">Reset Pencarian</button>
+                                </div>
+                            ` : `
+                                <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3">
+                                    ${filteredProducts.map(p => `
+                                        <div onclick="${p.stock > 0 ? `addToCart('${p.id}')` : ''}" class="bg-white rounded-2xl p-3 border border-brand-border shadow-sm flex flex-col justify-between transition-all ${p.stock > 0 ? 'cursor-pointer hover:border-forest-600 hover:shadow-md' : 'opacity-60 cursor-not-allowed bg-slate-50'} relative group">
+                                            ${p.stock <= p.minStock && p.stock > 0 ? `
+                                                <span class="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold z-10">Stok Menipis</span>
+                                            ` : ''}
+                                            ${p.stock === 0 ? `
+                                                <span class="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-red-100 text-red-800 text-[10px] font-bold z-10">Habis</span>
+                                            ` : ''}
+                                            <div>
+                                                <div class="w-full h-32 rounded-xl overflow-hidden mb-3 bg-slate-100 relative">
+                                                    <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy">
+                                                </div>
+                                                <h4 class="font-bold text-xs text-brand-dark line-clamp-2 mb-1">${p.name}</h4>
+                                                <div class="text-[10px] text-brand-muted font-mono mb-2">SKU: ${p.sku}</div>
+                                            </div>
+                                            <div class="flex items-center justify-between pt-2 border-t border-brand-border mt-1">
+                                                <span class="font-bold text-xs text-forest-700">${formatRupiah(p.price)}</span>
+                                                <span class="text-[10px] px-2 py-0.5 rounded bg-slate-100 font-medium text-brand-muted">Stok: ${p.stock}</span>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            `}
+                        </div>
+                    </div>
+
+                    <!-- Panel Keranjang & Pembayaran -->
+                    <div class="w-full lg:w-[420px] bg-white border-l border-brand-border flex flex-col h-full shadow-lg z-10">
+                        <div class="p-4 border-b border-brand-border flex items-center justify-between bg-slate-50">
+                            <div class="flex items-center gap-2">
+                                <div class="w-8 h-8 rounded-lg bg-forest-100 text-forest-700 flex items-center justify-center font-bold">
+                                    <i data-lucide="shopping-cart" class="w-4 h-4"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-sm text-brand-dark">Keranjang Belanja</h3>
+                                    <p class="text-[10px] text-brand-muted">${totalItemsCount} item dipilih</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                ${AppState.cart.length > 0 ? `
+                                    <button onclick="saveOpenBill()" class="px-2.5 py-1.5 rounded-lg border border-brand-border text-xs font-semibold text-brand-dark hover:bg-white flex items-center gap-1 shadow-sm" title="Simpan sebagai Open Bill">
+                                        <i data-lucide="save" class="w-3.5 h-3.5 text-amber-600"></i> Open Bill
+                                    </button>
+                                    <button onclick="clearCart()" class="p-1.5 rounded-lg border border-red-200 text-red-600 hover:bg-red-50" title="Kosongkan Keranjang">
+                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                    </button>
+                                ` : ''}
+                            </div>
+                        </div>
+
+                        <!-- Daftar Item Keranjang -->
+                        <div class="flex-1 overflow-y-auto p-4 space-y-3">
+                            ${AppState.cart.length === 0 ? `
+                                <div class="h-full flex flex-col items-center justify-center text-center p-6 text-brand-muted">
+                                    <div class="w-14 h-14 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 mb-3">
+                                        <i data-lucide="shopping-bag" class="w-7 h-7"></i>
+                                    </div>
+                                    <h4 class="font-bold text-brand-dark text-sm mb-1">Keranjang Masih Kosong</h4>
+                                    <p class="text-xs max-w-xs">Pilih produk dari katalog di sebelah kiri untuk memulai transaksi.</p>
+                                </div>
+                            ` : AppState.cart.map((item, idx) => `
+                                    <div class="bg-brand-light rounded-xl p-3 border border-brand-border flex flex-col gap-2">
+                                        <div class="flex items-start justify-between">
+                                            <div>
+                                                <h5 class="font-bold text-xs text-brand-dark">${item.name}</h5>
+                                                <div class="text-[10px] text-brand-muted">${formatRupiah(item.price)} / pcs</div>
+                                            </div>
+                                            <button onclick="removeFromCart('${item.id}')" class="text-slate-400 hover:text-red-600 p-1">
+                                                <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                                            </button>
+                                        </div>
+                                        <div class="flex items-center justify-between pt-2 border-t border-brand-border/60">
+                                            <div class="flex items-center gap-2">
+                                                <button onclick="updateQty('${item.id}', ${item.quantity - 1})" class="w-6 h-6 rounded-lg bg-white border border-brand-border flex items-center justify-center text-brand-dark hover:bg-slate-100 font-bold">-</button>
+                                                <span class="text-xs font-bold w-6 text-center">${item.quantity}</span>
+                                                <button onclick="updateQty('${item.id}', ${item.quantity + 1})" class="w-6 h-6 rounded-lg bg-white border border-brand-border flex items-center justify-center text-brand-dark hover:bg-slate-100 font-bold">+</button>
+                                            </div>
+                                            <span class="font-bold text-xs text-forest-700">${formatRupiah(item.price * item.quantity)}</span>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                        </div>
+
+                        <!-- Ringkasan & Aksi Pembayaran -->
+                        <div class="p-4 bg-slate-50 border-t border-brand-border shrink-0 space-y-3">
+                            <div class="flex items-center gap-2 text-xs">
+                                <div class="flex-1 flex items-center gap-1 bg-white border border-brand-border rounded-xl px-3 py-2">
+                                    <span class="text-brand-muted font-medium">Diskon (%):</span>
+                                    <input type="number" min="0" max="100" value="${AppState.cartDiscountPercent}" oninput="setCartDiscount(event)" class="w-full font-bold text-brand-dark focus:outline-none text-right">
+                                </div>
+                            </div>
+
+                            <div class="space-y-1.5 text-xs pt-2 border-t border-brand-border">
+                                <div class="flex justify-between text-brand-muted">
+                                    <span>Subtotal</span>
+                                    <span>${formatRupiah(subtotal)}</span>
+                                </div>
+                                ${AppState.cartDiscountPercent > 0 ? `
+                                    <div class="flex justify-between text-emerald-600 font-medium">
+                                        <span>Diskon (${AppState.cartDiscountPercent}%)</span>
+                                        <span>-${formatRupiah(discountAmount)}</span>
+                                    </div>
+                                ` : ''}
+                                <div class="flex justify-between text-brand-dark font-bold text-base pt-1 border-t border-brand-border">
+                                    <span>Total Akhir</span>
+                                    <span class="text-forest-700">${formatRupiah(finalTotal)}</span>
+                                </div>
+                            </div>
+
+                            <button onclick="openPaymentModal()" ${AppState.cart.length === 0 ? 'disabled' : ''} class="w-full py-3.5 rounded-xl bg-forest-600 hover:bg-forest-700 disabled:opacity-50 text-white font-bold text-sm shadow-lg shadow-forest-600/20 flex items-center justify-center gap-2 transition-all">
+                                <i data-lucide="credit-card" class="w-5 h-5"></i>
+                                Bayar Sekarang (${formatRupiah(finalTotal)})
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // POS Actions
+        function handleSearchInput(e) {
+            AppState.searchQuery = e.target.value;
+            render();
+            const searchInput = document.getElementById('product-search');
+            if (searchInput) {
+                searchInput.focus();
+                searchInput.setSelectionRange(searchInput.value.length, searchInput.value.length);
+            }
+        }
+
+        function selectCategory(catId) {
+            AppState.selectedCategory = catId;
+            render();
+        }
+
+        function resetPOSFilter() {
+            AppState.selectedCategory = 'cat_all';
+            AppState.searchQuery = '';
+            render();
+        }
+
+        function addToCart(productId) {
+            const product = AppState.products.find(p => p.id === productId);
+            if (!product || product.stock <= 0) {
+                showToast('Stok produk habis!', 'error');
+                return;
+            }
+
+            const existing = AppState.cart.find(item => item.id === productId);
+            if (existing) {
+                if (existing.quantity >= product.stock) {
+                    showToast('Stok maksimum telah tercapai!', 'warning');
+                    return;
+                }
+                existing.quantity += 1;
+            } else {
+                AppState.cart.push({ ...product, quantity: 1 });
+            }
+            render();
+        }
+
+        function updateQty(productId, newQty) {
+            const product = AppState.products.find(p => p.id === productId);
+            if (newQty <= 0) {
+                AppState.cart = AppState.cart.filter(item => item.id !== productId);
+            } else {
+                const item = AppState.cart.find(item => item.id === productId);
+                if (item) {
+                    if (newQty > product.stock) {
+                        showToast('Melebihi stok tersedia!', 'warning');
+                        return;
+                    }
+                    item.quantity = newQty;
+                }
+            }
+            render();
+        }
+
+        function removeFromCart(productId) {
+            AppState.cart = AppState.cart.filter(item => item.id !== productId);
+            render();
+        }
+
+        function setCartDiscount(e) {
+            AppState.cartDiscountPercent = parseFloat(e.target.value) || 0;
+            render();
+        }
+
+        function clearCart() {
+            AppState.cart = [];
+            AppState.cartDiscountPercent = 0;
+            render();
+        }
+
+        /* ==========================================================================
+           MODALS (Shift, Payment, Open Bill, Receipt)
+           ========================================================================== */
+        function openShiftModal() {
+            const modalHTML = `
+                <div id="modal-overlay" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+                    <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl p-6 border border-brand-border">
+                        <div class="flex items-center justify-between pb-4 border-b border-brand-border mb-4">
+                            <h3 class="font-bold text-brand-dark text-base flex items-center gap-2">
+                                <i data-lucide="clock" class="w-5 h-5 text-forest-600"></i> Buka Shift Kasir Baru
+                            </h3>
+                            <button onclick="closeModal()" class="p-1 rounded-lg text-brand-muted hover:bg-brand-light">
+                                <i data-lucide="x" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-brand-muted mb-1">Kasir Bertugas</label>
+                                <input type="text" disabled value="${AppState.currentUser.name}" class="w-full bg-slate-100 border border-brand-border rounded-xl px-3 py-2 text-sm text-brand-dark font-medium">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-brand-muted mb-1">Modal Awal Kas (Rp)</label>
+                                <input type="number" id="starting-cash-input" value="500000" class="w-full bg-white border border-brand-border rounded-xl px-3 py-2.5 text-sm font-bold text-brand-dark focus:outline-none focus:border-forest-600">
+                            </div>
+                            <button onclick="confirmOpenShift()" class="w-full py-3 rounded-xl bg-forest-600 hover:bg-forest-700 text-white font-bold text-sm shadow-lg shadow-forest-600/20">
+                                Mulai Shift Sekarang
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            lucide.createIcons();
+        }
+
+        function confirmOpenShift() {
+            const startCash = parseFloat(document.getElementById('starting-cash-input').value) || 0;
+            AppState.activeShift = {
+                id: 'SH-' + Date.now().toString().slice(-4),
+                openedAt: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+                date: new Date().toISOString().split('T')[0],
+                startingCash: startCash,
+                cashierName: AppState.currentUser.name,
+                status: 'open'
+            };
+            closeModal();
+            showToast('Shift berhasil dibuka. Selamat bekerja!');
+            render();
+        }
+
+        function closeShiftModal() {
+            if (!AppState.activeShift) return;
+            const modalHTML = `
+                <div id="modal-overlay" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+                    <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl p-6 border border-brand-border">
+                        <div class="flex items-center justify-between pb-4 border-b border-brand-border mb-4">
+                            <h3 class="font-bold text-brand-dark text-base flex items-center gap-2">
+                                <i data-lucide="check-circle" class="w-5 h-5 text-red-600"></i> Tutup Shift Kasir
+                            </h3>
+                            <button onclick="closeModal()" class="p-1 rounded-lg text-brand-muted hover:bg-brand-light">
+                                <i data-lucide="x" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                        <div class="space-y-3 text-sm">
+                            <div class="flex justify-between py-2 border-b border-brand-border">
+                                <span class="text-brand-muted">Modal Awal Kas:</span>
+                                <span class="font-bold text-brand-dark">${formatRupiah(AppState.activeShift.startingCash)}</span>
+                            </div>
+                            <button onclick="confirmCloseShift()" class="w-full py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-sm shadow-lg shadow-red-600/20 mt-4">
+                                Konfirmasi & Tutup Shift
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            lucide.createIcons();
+        }
+
+        function confirmCloseShift() {
+            AppState.shifts.unshift({
+                ...AppState.activeShift,
+                closedAt: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+                status: 'Ditutup'
+            });
+            AppState.activeShift = null;
+            closeModal();
+            showToast('Shift berhasil ditutup.');
+            render();
+        }
+
+        let selectedPaymentMethod = 'Tunai';
+        function openPaymentModal() {
+            if (!AppState.activeShift) {
+                showToast('Harap buka shift kasir terlebih dahulu!', 'error');
+                openShiftModal();
+                return;
+            }
+            const subtotal = AppState.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const discount = (subtotal * AppState.cartDiscountPercent) / 100;
+            const total = subtotal - discount;
+
+            const modalHTML = `
+                <div id="modal-overlay" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+                    <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl p-6 border border-brand-border">
+                        <div class="flex items-center justify-between pb-4 border-b border-brand-border mb-4">
+                            <h3 class="font-bold text-brand-dark text-base flex items-center gap-2">
+                                <i data-lucide="credit-card" class="w-5 h-5 text-forest-600"></i> Pembayaran Transaksi
+                            </h3>
+                            <button onclick="closeModal()" class="p-1 rounded-lg text-brand-muted hover:bg-brand-light">
+                                <i data-lucide="x" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="p-4 rounded-xl bg-slate-50 border border-brand-border text-center">
+                                <span class="text-xs text-brand-muted block mb-1">Total Tagihan</span>
+                                <span class="text-2xl font-bold text-forest-700">${formatRupiah(total)}</span>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-brand-muted mb-2">Metode Pembayaran</label>
+                                <div class="grid grid-cols-3 gap-2">
+                                    <button onclick="setPaymentMethod('Tunai')" id="pm-Tunai" class="py-2 px-2 rounded-xl border text-xs font-semibold transition-all ${selectedPaymentMethod === 'Tunai' ? 'bg-forest-600 text-white border-forest-600 shadow-sm' : 'bg-white text-brand-dark border-brand-border'}">Tunai</button>
+                                    <button onclick="setPaymentMethod('QRIS')" id="pm-QRIS" class="py-2 px-2 rounded-xl border text-xs font-semibold transition-all ${selectedPaymentMethod === 'QRIS' ? 'bg-forest-600 text-white border-forest-600 shadow-sm' : 'bg-white text-brand-dark border-brand-border'}">QRIS</button>
+                                    <button onclick="setPaymentMethod('Transfer')" id="pm-Transfer" class="py-2 px-2 rounded-xl border text-xs font-semibold transition-all ${selectedPaymentMethod === 'Transfer' ? 'bg-forest-600 text-white border-forest-600 shadow-sm' : 'bg-white text-brand-dark border-brand-border'}">Transfer</button>
+                                </div>
+                            </div>
+
+                            <div id="cash-payment-section">
+                                <label class="block text-xs font-semibold text-brand-muted mb-1">Nominal Diterima Tunai (Rp)</label>
+                                <input type="number" id="cash-received-input" value="${total}" oninput="calcChange(${total})" class="w-full bg-white border border-brand-border rounded-xl px-3 py-2.5 text-sm font-bold text-brand-dark focus:outline-none focus:border-forest-600">
+                                <div class="flex justify-between items-center mt-2 text-xs font-medium">
+                                    <span class="text-brand-muted">Kembalian:</span>
+                                    <span id="change-amount-display" class="font-bold text-emerald-600">Rp 0</span>
+                                </div>
+                            </div>
+
+                            <button onclick="processFinalPayment(${total})" class="w-full py-3.5 rounded-xl bg-forest-600 hover:bg-forest-700 text-white font-bold text-sm shadow-lg shadow-forest-600/20 mt-2">
+                                Selesaikan Pembayaran
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            lucide.createIcons();
+            calcChange(total);
+        }
+
+        function setPaymentMethod(method) {
+            selectedPaymentMethod = method;
+            ['Tunai', 'QRIS', 'Transfer'].forEach(m => {
+                const btn = document.getElementById('pm-' + m);
+                if (btn) {
+                    btn.className = m === method ? 'py-2 px-2 rounded-xl border text-xs font-semibold transition-all bg-forest-600 text-white border-forest-600 shadow-sm' : 'py-2 px-2 rounded-xl border text-xs font-semibold transition-all bg-white text-brand-dark border-brand-border';
+                }
+            });
+            const cashSec = document.getElementById('cash-payment-section');
+            if (method === 'Tunai') {
+                cashSec.classList.remove('hidden');
+            } else {
+                cashSec.classList.add('hidden');
+            }
+        }
+
+        function calcChange(total) {
+            const received = parseFloat(document.getElementById('cash-received-input')?.value) || 0;
+            const change = received - total;
+            const disp = document.getElementById('change-amount-display');
+            if (disp) {
+                disp.innerText = change >= 0 ? formatRupiah(change) : 'Nominal Kurang!';
+                disp.className = change >= 0 ? 'font-bold text-emerald-600' : 'font-bold text-red-600';
+            }
+        }
+
+        function processFinalPayment(total) {
+            let received = total;
+            let change = 0;
+
+            if (selectedPaymentMethod === 'Tunai') {
+                received = parseFloat(document.getElementById('cash-received-input')?.value) || 0;
+                if (received < total) {
+                    showToast('Nominal pembayaran tunai kurang!', 'error');
+                    return;
+                }
+                change = received - total;
+            }
+
+            const trxId = 'TRX-' + new Date().toISOString().split('-').join('') + '-' + Math.floor(100 + Math.random() * 900);
+            const newTrx = {
+                id: trxId,
+                time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+                date: new Date().toISOString().split('T')[0],
+                cashier: AppState.currentUser.name,
+                outlet: AppState.activeOutlet.name,
+                items: [...AppState.cart],
+                total: total,
+                paymentMethod: selectedPaymentMethod,
+                paid: received,
+                change: change,
+                status: 'Selesai'
+            };
+
+            AppState.cart.forEach(cartItem => {
+                const prod = AppState.products.find(p => p.id === cartItem.id);
+                if (prod) prod.stock -= cartItem.quantity;
+            });
+
+            AppState.transactions.unshift(newTrx);
+            AppState.cart = [];
+            AppState.cartDiscountPercent = 0;
+            closeModal();
+            showToast('Transaksi berhasil diselesaikan!');
+            render();
+            openReceiptModal(newTrx);
+        }
+
+        function openReceiptModal(trx) {
+            const modalHTML = `
+                <div id="modal-overlay" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+                    <div class="bg-white rounded-2xl max-w-sm w-full shadow-2xl p-6 border border-brand-border">
+                        <div id="printable-receipt" class="space-y-4 text-xs font-mono text-brand-dark">
+                            <div class="text-center pb-3 border-b border-dashed border-slate-300">
+                                <h3 class="font-bold text-sm uppercase">${AppState.activeOutlet.name}</h3>
+                                <p class="text-[10px] text-brand-muted">${AppState.activeOutlet.address}</p>
+                                <p class="text-[10px] text-brand-muted mt-1">Kasir: ${trx.cashier} | ${trx.date} ${trx.time}</p>
+                            </div>
+                            <div class="space-y-1.5 pb-3 border-b border-dashed border-slate-300">
+                                <div class="text-[10px] text-brand-muted">No: ${trx.id}</div>
+                                ${trx.items.map(item => `
+                                    <div class="flex justify-between">
+                                        <span>${item.quantity}x ${item.name}</span>
+                                        <span>${formatRupiah(item.price * item.quantity)}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <div class="space-y-1 text-xs pb-3 border-b border-dashed border-slate-300">
+                                <div class="flex justify-between font-bold">
+                                    <span>TOTAL</span>
+                                    <span>${formatRupiah(trx.total)}</span>
+                                </div>
+                                <div class="flex justify-between text-brand-muted">
+                                    <span>Metode (${trx.paymentMethod})</span>
+                                    <span>${formatRupiah(trx.paid)}</span>
+                                </div>
+                                <div class="flex justify-between text-brand-muted">
+                                    <span>Kembalian</span>
+                                    <span>${formatRupiah(trx.change)}</span>
+                                </div>
+                            </div>
+                            <div class="text-center text-[10px] text-brand-muted">
+                                <p>Terima Kasih atas Kunjungan Anda!</p>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 flex flex-col gap-2 font-sans">
+                            <button onclick="window.print()" class="w-full py-2.5 rounded-xl bg-forest-600 hover:bg-forest-700 text-white font-bold text-xs shadow-sm flex items-center justify-center gap-2">
+                                <i data-lucide="printer" class="w-4 h-4"></i> Cetak Struk Fisik
+                            </button>
+                            <button onclick="closeModal()" class="w-full py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-brand-dark font-bold text-xs">
+                                Tutup
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            lucide.createIcons();
+        }
+
+        function saveOpenBill() {
+            if (AppState.cart.length === 0) return;
+            const billName = prompt('Masukkan nama pelanggan / meja untuk Open Bill:', 'Meja 05 - Bpk. Andi');
+            if (!billName) return;
+
+            AppState.openBills.push({
+                id: 'BILL-' + Date.now().toString().slice(-4),
+                name: billName,
+                time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+                items: [...AppState.cart],
+                discount: AppState.cartDiscountPercent
+            });
+            AppState.cart = [];
+            AppState.cartDiscountPercent = 0;
+            showToast(`Open Bill "${billName}" berhasil disimpan.`);
+            render();
+        }
+
+        function openOpenBillModal() {
+            const modalHTML = `
+                <div id="modal-overlay" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+                    <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl p-6 border border-brand-border">
+                        <div class="flex items-center justify-between pb-4 border-b border-brand-border mb-4">
+                            <h3 class="font-bold text-brand-dark text-base flex items-center gap-2">
+                                <i data-lucide="bookmark" class="w-5 h-5 text-amber-600"></i> Daftar Open Bill (${AppState.openBills.length})
+                            </h3>
+                            <button onclick="closeModal()" class="p-1 rounded-lg text-brand-muted hover:bg-brand-light">
+                                <i data-lucide="x" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                        <div class="space-y-3 max-h-80 overflow-y-auto">
+                            ${AppState.openBills.length === 0 ? `
+                                <div class="text-center py-8 text-brand-muted text-xs">Tidak ada open bill yang tersimpan.</div>
+                            ` : AppState.openBills.map(bill => `
+                                    <div class="p-3 rounded-xl bg-slate-50 border border-brand-border flex items-center justify-between">
+                                        <div>
+                                            <h4 class="font-bold text-xs text-brand-dark">${bill.name}</h4>
+                                            <p class="text-[10px] text-brand-muted">Waktu: ${bill.time} | ${bill.items.length} item</p>
+                                        </div>
+                                        <button onclick="restoreOpenBill('${bill.id}')" class="px-3 py-1.5 rounded-lg bg-forest-600 text-white font-bold text-xs shadow-sm">
+                                            Lanjutkan
+                                        </button>
+                                    </div>
+                                `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            lucide.createIcons();
+        }
+
+        function restoreOpenBill(billId) {
+            const bill = AppState.openBills.find(b => b.id === billId);
+            if (bill) {
+                AppState.cart = [...bill.items];
+                AppState.cartDiscountPercent = bill.discount;
+                AppState.openBills = AppState.openBills.filter(b => b.id !== billId);
+                closeModal();
+                showToast(`Open Bill "${bill.name}" dipulihkan.`);
+                render();
+            }
+        }
+
+        function closeModal() {
+            const overlay = document.getElementById('modal-overlay');
+            if (overlay) overlay.remove();
+        }
+
+        /* ==========================================================================
+           2. DASHBOARD PEMILIK VIEW
+           ========================================================================== */
+        function renderDashboardView() {
+            const totalOmzet = AppState.transactions.reduce((sum, t) => sum + t.total, 0);
+            return `
+                <div class="flex-1 overflow-y-auto p-4 lg:p-6 space-y-6 bg-brand-light">
+                    <div class="bg-white p-5 rounded-2xl border border-brand-border shadow-sm">
+                        <h2 class="font-bold text-xl text-brand-dark">Dashboard Pemilik & Analitik</h2>
+                        <p class="text-xs text-brand-muted">Ringkasan performa bisnis real-time untuk ${AppState.activeOutlet.name}.</p>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div class="bg-white p-5 rounded-2xl border border-brand-border shadow-sm">
+                            <span class="text-xs text-brand-muted block font-medium">Omzet Periode Ini</span>
+                            <span class="text-xl font-bold text-brand-dark">${formatRupiah(totalOmzet)}</span>
+                        </div>
+                        <div class="bg-white p-5 rounded-2xl border border-brand-border shadow-sm">
+                            <span class="text-xs text-brand-muted block font-medium">Total Transaksi</span>
+                            <span class="text-xl font-bold text-brand-dark">${AppState.transactions.length} Transaksi</span>
+                        </div>
+                        <div class="bg-white p-5 rounded-2xl border border-brand-border shadow-sm">
+                            <span class="text-xs text-brand-muted block font-medium">Shift Aktif</span>
+                            <span class="text-xl font-bold text-emerald-700">${AppState.activeShift ? 'Sedang Buka' : 'Belum Buka'}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        /* ==========================================================================
+           3. PRODUK & INVENTORI VIEW (With Unsplash images in table)
+           ========================================================================== */
+        function renderProductsView() {
+            return `
+                <div class="flex-1 overflow-y-auto p-4 lg:p-6 space-y-6 bg-brand-light">
+                    <div class="bg-white p-5 rounded-2xl border border-brand-border shadow-sm flex items-center justify-between">
+                        <div>
+                            <h2 class="font-bold text-xl text-brand-dark">Manajemen Produk & Inventori</h2>
+                            <p class="text-xs text-brand-muted">Kelola katalog barang, harga jual, dan stok real-time.</p>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-2xl border border-brand-border shadow-sm overflow-hidden">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead>
+                                <tr class="bg-brand-light text-brand-muted border-b border-brand-border">
+                                    <th class="p-3 font-semibold">Produk</th>
+                                    <th class="p-3 font-semibold">SKU</th>
+                                    <th class="p-3 font-semibold text-right">Harga Jual</th>
+                                    <th class="p-3 font-semibold text-center">Stok</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-brand-border">
+                                ${AppState.products.map(p => `
+                                    <tr class="hover:bg-slate-50">
+                                        <td class="p-3 flex items-center gap-3">
+                                            <img src="${p.image}" class="w-9 h-9 rounded-xl object-cover border border-brand-border" loading="lazy">
+                                            <div class="font-bold text-brand-dark">${p.name}</div>
+                                        </td>
+                                        <td class="p-3 font-mono text-brand-muted">${p.sku}</td>
+                                        <td class="p-3 text-right font-bold text-forest-700">${formatRupiah(p.price)}</td>
+                                        <td class="p-3 text-center font-bold">${p.stock} unit</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderHistoryView() {
+            return `
+                <div class="flex-1 overflow-y-auto p-4 lg:p-6 space-y-6 bg-brand-light">
+                    <div class="bg-white p-5 rounded-2xl border border-brand-border shadow-sm">
+                        <h2 class="font-bold text-xl text-brand-dark">Riwayat Transaksi</h2>
+                    </div>
+                    <div class="bg-white rounded-2xl border border-brand-border shadow-sm overflow-hidden">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead>
+                                <tr class="bg-brand-light text-brand-muted border-b border-brand-border">
+                                    <th class="p-3 font-semibold">ID</th>
+                                    <th class="p-3 font-semibold">Waktu</th>
+                                    <th class="p-3 font-semibold text-right">Total</th>
+                                    <th class="p-3 font-semibold text-center">Metode</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-brand-border">
+                                ${AppState.transactions.map(t => `
+                                    <tr class="hover:bg-slate-50">
+                                        <td class="p-3 font-mono font-bold">${t.id}</td>
+                                        <td class="p-3 text-brand-muted">${t.date} ${t.time}</td>
+                                        <td class="p-3 text-right font-bold text-forest-700">${formatRupiah(t.total)}</td>
+                                        <td class="p-3 text-center">${t.paymentMethod}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderReportsView() {
+            return `<div class="flex-1 p-6 bg-brand-light"><h2 class="text-xl font-bold mb-2">Laporan Penjualan</h2><p class="text-xs text-brand-muted">Rekapitulasi penjualan komprehensif.</p></div>`;
+        }
+
+        function renderUsersView() {
+            return `<div class="flex-1 p-6 bg-brand-light"><h2 class="text-xl font-bold mb-2">Manajemen Pengguna</h2><p class="text-xs text-brand-muted">Atur hak akses kasir dan admin.</p></div>`;
+        }
+
+        window.onload = function() {
+            render();
+        }
+    </script>
+</body>
+</html>

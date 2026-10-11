@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kopi Senja Nusantara — Artisan Coffee & Roastery | Heci.Tech Showcase</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        warm: '#FAF7F2',
+                        charcoal: '#242622',
+                        olive: '#394735',
+                        terracotta: '#C66B49',
+                        surface: '#FFFFFF'
+                    },
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        serif: ['"Playfair Display"', 'serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        [x-cloak] { display: none !important; }
+        /* Custom scrollbar for clean editorial feel */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #FAF7F2; }
+        ::-webkit-scrollbar-thumb { background: #394735; border-radius: 3px; }
+    </style>
+</head>
+<body x-data="storefrontApp()" class="bg-warm text-charcoal font-sans antialiased selection:bg-terracotta selection:text-white">
+
+    <!-- A. Announcement Bar -->
+    <div x-show="announcement.active" class="bg-olive text-warm text-xs sm:text-sm py-2 px-4 text-center font-medium relative transition-all duration-300">
+        <span x-text="announcement.text"></span>
+        <button @click="announcement.active = false" class="absolute right-3 top-1/2 -translate-y-1/2 text-warm/70 hover:text-warm">&times;</button>
+    </div>
+
+    <!-- B. Header & Navigation -->
+    <header class="sticky top-0 z-40 bg-warm/90 backdrop-blur-md border-b border-charcoal/10 transition-all">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <a href="#" class="flex items-center gap-2">
+                <span class="font-serif font-bold text-xl sm:text-2xl tracking-tight text-olive" x-text="store.name">Kopi Senja</span>
+            </a>
+
+            <!-- Desktop Nav -->
+            <nav class="hidden md:flex items-center gap-8 text-sm font-medium">
+                <a href="#katalog" class="hover:text-terracotta transition-colors">Produk</a>
+                <a href="#keunggulan" class="hover:text-terracotta transition-colors">Keunggulan</a>
+                <a href="#tentang" class="hover:text-terracotta transition-colors">Tentang</a>
+                <a href="#lokasi" class="hover:text-terracotta transition-colors">Lokasi & Kontak</a>
+            </nav>
+
+            <div class="flex items-center gap-3">
+                <button @click="activeModal = 'admin'" class="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border border-charcoal/20 hover:border-olive text-charcoal transition-all">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    CMS Admin
+                </button>
+                <a href="#katalog" class="bg-terracotta hover:bg-terracotta/90 text-white text-xs sm:text-sm font-medium px-4 py-2 rounded-full transition-all shadow-sm">
+                    Pesan Sekarang
+                </a>
+                <!-- Mobile Menu Button -->
+                <button @click="mobileMenuOpen = !mobileMenuOpen" class="md:hidden p-2 text-charcoal">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Drawer Nav -->
+        <div x-show="mobileMenuOpen" @click.away="mobileMenuOpen = false" x-transition class="md:hidden bg-white border-b border-charcoal/10 px-4 pt-2 pb-6 space-y-3">
+            <a href="#katalog" @click="mobileMenuOpen = false" class="block py-2 font-medium border-b border-warm">Produk</a>
+            <a href="#keunggulan" @click="mobileMenuOpen = false" class="block py-2 font-medium border-b border-warm">Keunggulan</a>
+            <a href="#tentang" @click="mobileMenuOpen = false" class="block py-2 font-medium border-b border-warm">Tentang</a>
+            <a href="#lokasi" @click="mobileMenuOpen = false" class="block py-2 font-medium border-b border-warm">Lokasi & Kontak</a>
+            <button @click="mobileMenuOpen = false; activeModal = 'admin'" class="w-full text-left py-2 font-medium text-olive flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/></svg>
+                Dashboard CMS Admin
+            </button>
+        </div>
+    </header>
+
+    <!-- C. Hero Section -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-20 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        <div class="lg:col-span-7 space-y-6">
+            <span class="inline-block text-xs uppercase tracking-widest font-semibold text-olive bg-olive/10 px-3 py-1 rounded-full">
+                Dibuat dengan perhatian pada setiap detail
+            </span>
+            <h1 class="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight text-charcoal">
+                Rasa yang selalu ingin kamu bawa pulang.
+            </h1>
+            <p class="text-base sm:text-lg text-charcoal/80 max-w-xl leading-relaxed">
+                Biji kopi pilihan dari dataran tinggi Nusantara, disangrai dengan presisi artisan untuk menghadirkan pengalaman seduh terbaik di rumahmu.
+            </p>
+            <div class="flex flex-wrap items-center gap-4 pt-2">
+                <a href="#katalog" class="bg-olive hover:bg-olive/90 text-white font-medium px-6 py-3 rounded-full transition-all shadow-sm">
+                    Jelajahi Produk
+                </a>
+                <a :href="'https://wa.me/' + store.whatsapp + '?text=' + encodeURIComponent('Halo, saya ingin bertanya mengenai produk kopi artisan.')" target="_blank" @click="trackLead('Hero Section', 'General Inquiry')" class="border border-charcoal/20 hover:border-olive font-medium px-6 py-3 rounded-full transition-all flex items-center gap-2">
+                    <svg class="w-4 h-4 text-emerald-600" fill="currentColor" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.183 0-5.767 2.584-5.767 5.767 0 1.015.265 1.968.727 2.793l-.772 2.822 2.894-.759c.783.43 1.701.678 2.918.678 3.183 0 5.767-2.584 5.767-5.767s-2.584-5.767-5.767-5.767zm3.439 8.192c-.147.414-.849.774-1.168.824-.319.05-.724.088-2.227-.517-1.503-.605-2.474-2.128-2.55-2.23-.075-.102-.602-.802-.602-1.529 0-.727.378-1.085.513-1.233.135-.148.295-.184.393-.184.098 0 .196.002.282.008.09.006.212-.034.331.253.119.287.406.989.442 1.061.036.072.06.156.012.252-.048.096-.072.156-.144.24-.072.084-.152.187-.216.252-.072.072-.147.15-.063.294.084.144.372.615.798.996.549.492 1.014.644 1.158.716.144.072.228.06.312-.036.084-.096.36-.42.456-.564.096-.144.192-.12.324-.072.132.048.84.396.984.468.144.072.24.108.276.168.036.06.036.348-.111.762z"/></svg>
+                    Pesan via WhatsApp
+                </a>
+            </div>
+        </div>
+        <div class="lg:col-span-5 relative">
+            <div class="relative rounded-2xl overflow-hidden shadow-xl border border-charcoal/10 aspect-[4/5] bg-surface">
+                <img src="https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=800&q=80" alt="Artisan Coffee" class="w-full h-full object-cover">
+                <div class="absolute bottom-4 left-4 right-4 bg-warm/90 backdrop-blur-md p-4 rounded-xl border border-charcoal/10 flex items-center justify-between">
+                    <div>
+                        <p class="text-xs uppercase tracking-wider font-bold text-olive">Featured Blend</p>
+                        <p class="font-serif font-bold text-base">Kerinci Honey Dark Roast</p>
+                    </div>
+                    <span class="text-terracotta font-bold text-sm">Rp 85.000</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- D. Featured Product & Promo Banner -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="bg-olive text-warm rounded-2xl p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-md">
+            <div class="space-y-2 text-center md:text-left">
+                <span class="bg-terracotta text-white text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">Promo Minggu Ini</span>
+                <h3 class="font-serif text-2xl sm:text-3xl font-bold">Bundle Keluarga Nusantara</h3>
+                <p class="text-warm/80 text-sm max-w-lg">Dapatkan 2 pack kopi pilihan (Arabica Gayo & Robusta Temanggung) gratis mug keramik eksklusif.</p>
+            </div>
+            <div class="flex flex-col sm:flex-row items-center gap-4">
+                <div class="text-center md:text-right">
+                    <span class="text-xs text-warm/70 line-through block">Rp 180.000</span>
+                    <span class="text-2xl font-bold text-warm">Rp 150.000</span>
+                </div>
+                <button @click="openProductModal(products[3])" class="bg-terracotta hover:bg-terracotta/90 text-white font-medium px-5 py-2.5 rounded-full transition-all text-sm whitespace-nowrap">
+                    Ambil Promo
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- E. Katalog Produk -->
+    <section id="katalog" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+            <div>
+                <span class="text-xs uppercase tracking-widest font-semibold text-olive">Katalog Resmi</span>
+                <h2 class="font-serif text-3xl sm:text-4xl font-bold mt-1">Pilihan Produk Artisan</h2>
+            </div>
+            <!-- Category Filter -->
+            <div class="flex flex-wrap gap-2">
+                <button @click="selectedCategory = 'Semua'" :class="selectedCategory === 'Semua' ? 'bg-olive text-white' : 'bg-white text-charcoal border border-charcoal/10 hover:border-olive'" class="text-xs font-medium px-4 py-2 rounded-full transition-all">Semua</button>
+                <template x-for="cat in categories" :key="cat">
+                    <button @click="selectedCategory = cat" :class="selectedCategory === cat ? 'bg-olive text-white' : 'bg-white text-charcoal border border-charcoal/10 hover:border-olive'" class="text-xs font-medium px-4 py-2 rounded-full transition-all" x-text="cat"></button>
+                </template>
+            </div>
+        </div>
+
+        <!-- Product Grid -->
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+            <template x-for="product in filteredProducts" :key="product.id">
+                <div class="bg-surface rounded-xl border border-charcoal/10 overflow-hidden flex flex-col group transition-all hover:shadow-lg">
+                    <div class="relative aspect-square bg-warm overflow-hidden cursor-pointer" @click="openProductModal(product)">
+                        <img :src="product.image" :alt="product.name" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 loading="lazy">
+                        <!-- Badges -->
+                        <div class="absolute top-2 left-2 flex flex-col gap-1">
+                            <span x-show="product.badge" class="bg-terracotta text-white text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider" x-text="product.badge"></span>
+                            <span x-show="product.status === 'habis'" class="bg-charcoal text-white text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">Habis</span>
+                        </div>
+                    </div>
+                    <div class="p-4 flex-1 flex flex-col justify-between space-y-3">
+                        <div>
+                            <span class="text-[11px] uppercase tracking-wider text-charcoal/60 block mb-1" x-text="product.category"></span>
+                            <h3 @click="openProductModal(product)" class="font-serif font-bold text-sm sm:text-base text-charcoal line-clamp-1 cursor-pointer hover:text-terracotta transition-colors" x-text="product.name"></h3>
+                        </div>
+                        <div class="flex items-center justify-between pt-2 border-t border-charcoal/5">
+                            <div>
+                                <span class="text-xs text-charcoal/60 line-through block" x-show="product.originalPrice" x-text="'Rp ' + formatPrice(product.originalPrice)"></span>
+                                <span class="font-bold text-sm sm:text-base text-charcoal" x-text="'Rp ' + formatPrice(product.price)"></span>
+                            </div>
+                            <button @click="openProductModal(product)" :disabled="product.status === 'habis'" :class="product.status === 'habis' ? 'bg-charcoal/10 text-charcoal/40 cursor-not-allowed' : 'bg-olive hover:bg-olive/90 text-white'" class="text-xs font-medium px-3.5 py-2 rounded-lg transition-all">
+                                <span x-text="product.status === 'habis' ? 'Habis' : 'Detail'"></span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </div>
+    </section>
+
+    <!-- F. Product Detail Modal / Drawer -->
+    <div x-show="isModalOpen" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-charcoal/60 backdrop-blur-sm transition-opacity">
+        <div @click.away="closeProductModal()" class="bg-surface rounded-2xl max-w-2xl w-full overflow-hidden shadow-2xl border border-charcoal/10 max-h-[90vh] flex flex-col md:flex-row">
+            <!-- Modal Image -->
+            <div class="md:w-1/2 relative bg-warm aspect-square md:aspect-auto">
+                <img :src="activeProduct.image" :alt="activeProduct.name" class="w-full h-full object-cover">
+                <button @click="closeProductModal()" class="absolute top-3 left-3 md:hidden bg-white/80 p-2 rounded-full text-charcoal">&times;</button>
+            </div>
+            <!-- Modal Content -->
+            <div class="md:w-1/2 p-6 overflow-y-auto flex flex-col justify-between space-y-6">
+                <div class="space-y-4">
+                    <div class="flex items-start justify-between">
+                        <div>
+                            <span class="text-xs uppercase tracking-wider text-olive font-semibold block mb-1" x-text="activeProduct.category"></span>
+                            <h3 class="font-serif text-2xl font-bold text-charcoal" x-text="activeProduct.name"></h3>
+                        </div>
+                        <button @click="closeProductModal()" class="hidden md:block text-charcoal/60 hover:text-charcoal text-xl font-bold">&times;</button>
+                    </div>
+                    <div>
+                        <span class="text-xl font-bold text-charcoal" x-text="'Rp ' + formatPrice(activeProduct.price)"></span>
+                        <span class="text-xs text-charcoal/60 ml-2" x-show="activeProduct.status === 'habis'">(Stok Kosong)</span>
+                    </div>
+                    <p class="text-sm text-charcoal/80 leading-relaxed" x-text="activeProduct.description"></p>
+
+                    <!-- Varian Selector -->
+                    <template x-if="activeProduct.variants && activeProduct.variants.length > 0">
+                        <div class="space-y-2">
+                            <label class="text-xs font-semibold uppercase tracking-wider text-charcoal/70 block">Pilih Varian:</label>
+                            <div class="flex flex-wrap gap-2">
+                                <template x-for="variant in activeProduct.variants" :key="variant">
+                                    <button @click="selectedVariant = variant" :class="selectedVariant === variant ? 'border-olive bg-olive/10 text-olive font-semibold' : 'border-charcoal/20 text-charcoal hover:border-charcoal'" class="border text-xs px-3.5 py-2 rounded-lg transition-all" x-text="variant"></button>
+                                </template>
+                            </div>
+                        </div>
+                    </template>
+
+                    <!-- Quantity -->
+                    <div class="space-y-2">
+                        <label class="text-xs font-semibold uppercase tracking-wider text-charcoal/70 block">Jumlah:</label>
+                        <div class="flex items-center gap-3">
+                            <button @click="quantity > 1 ? quantity-- : null" class="w-9 h-9 rounded-lg border border-charcoal/20 flex items-center justify-center font-bold hover:bg-warm">-</button>
+                            <span class="font-semibold text-base w-8 text-center" x-text="quantity"></span>
+                            <button @click="quantity++" class="w-9 h-9 rounded-lg border border-charcoal/20 flex items-center justify-center font-bold hover:bg-warm">+</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- WhatsApp Order CTA -->
+                <div class="pt-4 border-t border-charcoal/10">
+                    <button @click="checkoutWhatsApp()" :disabled="activeProduct.status === 'habis' || (activeProduct.variants && activeProduct.variants.length > 0 && !selectedVariant)" :class="(activeProduct.status === 'habis' || (activeProduct.variants && activeProduct.variants.length > 0 && !selectedVariant)) ? 'bg-charcoal/10 text-charcoal/40 cursor-not-allowed' : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-md'" class="w-full py-3 rounded-xl font-medium transition-all flex items-center justify-center gap-2 text-sm sm:text-base">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.183 0-5.767 2.584-5.767 5.767 0 1.015.265 1.968.727 2.793l-.772 2.822 2.894-.759c.783.43 1.701.678 2.918.678 3.183 0 5.767-2.584 5.767-5.767s-2.584-5.767-5.767-5.767zm3.439 8.192c-.147.414-.849.774-1.168.824-.319.05-.724.088-2.227-.517-1.503-.605-2.474-2.128-2.55-2.23-.075-.102-.602-.802-.602-1.529 0-.727.378-1.085.513-1.233.135-.148.295-.184.393-.184.098 0 .196.002.282.008.09.006.212-.034.331.253.119.287.406.989.442 1.061.036.072.06.156.012.252-.048.096-.072.156-.144.24-.072.084-.152.187-.216.252-.072.072-.147.15-.063.294.084.144.372.615.798.996.549.492 1.014.644 1.158.716.144.072.228.06.312-.036.084-.096.36-.42.456-.564.096-.144.192-.12.324-.072.132.048.84.396.984.468.144.072.24.108.276.168.036.06.036.348-.111.762z"/></svg>
+                        <span x-text="activeProduct.status === 'habis' ? 'Stok Habis' : ((activeProduct.variants && activeProduct.variants.length > 0 && !selectedVariant) ? 'Pilih Varian Terlebih Dahulu' : 'Pesan via WhatsApp')"></span>
+                    </button>
+                    <p class="text-[11px] text-center text-charcoal/50 mt-2">Langsung terhubung dengan admin toko tanpa buat akun.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- G. Keunggulan Toko -->
+    <section id="keunggulan" class="bg-white py-16 border-y border-charcoal/10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-2xl mx-auto mb-12">
+                <span class="text-xs uppercase tracking-widest font-semibold text-olive">Mengapa Kopi Senja?</span>
+                <h2 class="font-serif text-3xl font-bold mt-1">Komitmen Kualitas Kami</h2>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="space-y-3 p-6 rounded-xl bg-warm border border-charcoal/5">
+                    <div class="w-12 h-12 rounded-lg bg-olive/10 flex items-center justify-center text-olive font-bold text-xl">🌱</div>
+                    <h3 class="font-serif font-bold text-lg">Biji Pilihan</h3>
+                    <p class="text-sm text-charcoal/70 leading-relaxed">Dipetik langsung dari petani lokal pilihan di dataran tinggi Kerinci dan Gayo.</p>
+                </div>
+                <div class="space-y-3 p-6 rounded-xl bg-warm border border-charcoal/5">
+                    <div class="w-12 h-12 rounded-lg bg-olive/10 flex items-center justify-center text-olive font-bold text-xl">🔥</div>
+                    <h3 class="font-serif font-bold text-lg">Proses Roasting Terjaga</h3>
+                    <p class="text-sm text-charcoal/70 leading-relaxed">Disangrai secara batch kecil untuk menjamin kesegaran aroma dan profil rasa optimal.</p>
+                </div>
+                <div class="space-y-3 p-6 rounded-xl bg-warm border border-charcoal/5">
+                    <div class="w-12 h-12 rounded-lg bg-olive/10 flex items-center justify-center text-olive font-bold text-xl">📦</div>
+                    <h3 class="font-serif font-bold text-lg">Pengemasan Aman</h3>
+                    <p class="text-sm text-charcoal/70 leading-relaxed">Dilengkapi valve kedap udara untuk menjaga kualitas kopi tetap segar sampai di tanganmu.</p>
+                </div>
+                <div class="space-y-3 p-6 rounded-xl bg-warm border border-charcoal/5">
+                    <div class="w-12 h-12 rounded-lg bg-olive/10 flex items-center justify-center text-olive font-bold text-xl">💬</div>
+                    <h3 class="font-serif font-bold text-lg">Respon Cepat</h3>
+                    <p class="text-sm text-charcoal/70 leading-relaxed">Layanan konsultasi seduh dan pemesanan langsung via WhatsApp yang responsif.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- H. Tentang Brand -->
+    <section id="tentang" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+            <div class="lg:col-span-5 space-y-6">
+                <span class="text-xs uppercase tracking-widest font-semibold text-olive">Cerita Kami</span>
+                <h2 class="font-serif text-3xl sm:text-4xl font-bold leading-tight">Menghubungkan Pecinta Kopi dengan Petani Lokal.</h2>
+                <p class="text-sm sm:text-base text-charcoal/80 leading-relaxed">
+                    Kopi Senja lahir dari kecintaan mendalam terhadap kekayaan kopi Nusantara. Kami percaya bahwa setiap cangkir kopi menyimpan cerita tentang tanah tempat ia tumbuh dan tangan terampil petani yang merawatnya.
+                </p>
+                <p class="text-sm sm:text-base text-charcoal/80 leading-relaxed">
+                    Melalui platform digital yang sederhana dan transparan, kami ingin membawa biji kopi artisan berkualitas tinggi langsung ke meja seduhmu.
+                </p>
+            </div>
+            <div class="lg:col-span-7">
+                <div class="rounded-2xl overflow-hidden shadow-xl border border-charcoal/10 aspect-[16/10]">
+                    <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=1000&q=80" alt="Tentang Kopi Senja" class="w-full h-full object-cover">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- I. Testimoni -->
+    <section class="bg-warm py-16 border-t border-charcoal/10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-2xl mx-auto mb-12">
+                <span class="text-xs uppercase tracking-widest font-semibold text-olive">Kata Pelanggan</span>
+                <h2 class="font-serif text-3xl font-bold mt-1">Pengalaman Mereka</h2>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-surface p-6 rounded-xl border border-charcoal/10 space-y-4 shadow-sm">
+                    <p class="text-sm italic text-charcoal/80">"Aroma kopinya luar biasa harum saat kemasan dibuka. Pengiriman cepat dan admin sangat membantu memilih gilingan yang pas."</p>
+                    <div class="pt-4 border-t border-charcoal/5 flex items-center justify-between">
+                        <div>
+                            <p class="font-bold text-sm">Rian Pratama</p>
+                            <p class="text-xs text-charcoal/60">Membeli: Kerinci Honey Dark Roast</p>
+                        </div>
+                        <span class="text-amber-500">★★★★★</span>
+                    </div>
+                </div>
+                <div class="bg-surface p-6 rounded-xl border border-charcoal/10 space-y-4 shadow-sm">
+                    <p class="text-sm italic text-charcoal/80">"Sebagai penikmat manual brew, beans dari Kopi Senja konsisten banget. Notes-nya keluar pas diseduh V60."</p>
+                    <div class="pt-4 border-t border-charcoal/5 flex items-center justify-between">
+                        <div>
+                            <p class="font-bold text-sm">Dewi Lestari</p>
+                            <p class="text-xs text-charcoal/60">Membeli: Gayo Wine Process</p>
+                        </div>
+                        <span class="text-amber-500">★★★★★</span>
+                    </div>
+                </div>
+                <div class="bg-surface p-6 rounded-xl border border-charcoal/10 space-y-4 shadow-sm">
+                    <p class="text-sm italic text-charcoal/80">"Praktis banget pesannya langsung via WhatsApp, nggak perlu bikin akun ribet. Recommended!"</p>
+                    <div class="pt-4 border-t border-charcoal/5 flex items-center justify-between">
+                        <div>
+                            <p class="font-bold text-sm">Ahmad Fauzi</p>
+                            <p class="text-xs text-charcoal/60">Membeli: Bundle Keluarga</p>
+                        </div>
+                        <span class="text-amber-500">★★★★★</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- J. Lokasi dan Jam Operasional -->
+    <section id="lokasi" class="bg-white py-16 border-t border-charcoal/10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-12">
+            <div class="space-y-6">
+                <span class="text-xs uppercase tracking-widest font-semibold text-olive">Kunjungi Kami</span>
+                <h2 class="font-serif text-3xl font-bold">Lokasi & Jam Operasional</h2>
+                <div class="space-y-4 text-sm text-charcoal/80">
+                    <div class="flex items-start gap-3">
+                        <span class="font-bold text-olive">Alamat:</span>
+                        <p x-text="store.address"></p>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <span class="font-bold text-olive">Jam Toko:</span>
+                        <p x-text="store.operationalHours"></p>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <span class="font-bold text-olive">WhatsApp:</span>
+                        <p x-text="'+' + store.whatsapp"></p>
+                    </div>
+                </div>
+                <div class="pt-2 flex flex-wrap gap-4">
+                    <a :href="store.googleMapsUrl" target="_blank" class="bg-olive hover:bg-olive/90 text-white text-xs font-medium px-5 py-2.5 rounded-full transition-all flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        Buka Google Maps
+                    </a>
+                    <a :href="'https://instagram.com/' + store.instagram" target="_blank" class="border border-charcoal/20 hover:border-olive text-charcoal text-xs font-medium px-5 py-2.5 rounded-full transition-all">
+                        Instagram (@<span x-text="store.instagram"></span>)
+                    </a>
+                </div>
+            </div>
+            <div class="bg-warm rounded-2xl p-8 border border-charcoal/10 flex flex-col justify-center space-y-4">
+                <span class="text-xs uppercase tracking-widest font-semibold text-olive">Pesan Langsung</span>
+                <h3 class="font-serif text-2xl font-bold">Ada pertanyaan seputar produk?</h3>
+                <p class="text-sm text-charcoal/70">Tim roastery kami siap membantu merekomendasikan tingkat gilingan dan biji kopi yang sesuai dengan alat seduhmu.</p>
+                <a :href="'https://wa.me/' + store.whatsapp" target="_blank" class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium px-6 py-3 rounded-xl transition-all text-center inline-block shadow-sm">
+                    Hubungi Admin via WhatsApp
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- K. Final CTA & Footer -->
+    <footer class="bg-charcoal text-warm py-12 border-t border-charcoal/20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-6 pb-8 border-b border-white/10">
+                <div class="text-center md:text-left">
+                    <h3 class="font-serif text-2xl font-bold text-white">Sudah menemukan yang kamu suka?</h3>
+                    <p class="text-warm/70 text-sm mt-1">Pilih produk favoritmu dan lanjutkan pemesanan langsung melalui WhatsApp.</p>
+                </div>
+                <a href="#katalog" class="bg-terracotta hover:bg-terracotta/90 text-white font-medium px-6 py-3 rounded-full transition-all text-sm whitespace-nowrap">
+                    Pesan Sekarang
+                </a>
+            </div>
+            <div class="flex flex-col sm:flex-row items-center justify-between text-xs text-warm/60 gap-4">
+                <p>&copy; 2026 <span x-text="store.name"></span>. Hak cipta dilindungi.</p>
+                <p class="flex items-center gap-1">
+                    Powered by <a href="https://heci.tech" target="_blank" class="text-warm font-semibold hover:underline">Heci.Tech</a> UMKM Showcase Template
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ADMIN CMS MODAL / DASHBOARD -->
+    <div x-show="activeModal === 'admin'" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-charcoal/80 backdrop-blur-sm">
+        <div class="bg-surface rounded-2xl max-w-5xl w-full max-h-[92vh] overflow-hidden shadow-2xl flex flex-col border border-charcoal/10">
+            <!-- Admin Header -->
+            <div class="bg-olive text-warm px-6 py-4 flex items-center justify-between">
+                <div>
+                    <h3 class="font-serif font-bold text-lg sm:text-xl">Heci.Tech CMS & Dashboard Admin</h3>
+                    <p class="text-xs text-warm/80">Kelola katalog toko dan pantau statistik leads WhatsApp</p>
+                </div>
+                <button @click="activeModal = null" class="text-warm/80 hover:text-white text-2xl font-bold">&times;</button>
+            </div>
+
+            <!-- Admin Tabs -->
+            <div class="flex border-b border-charcoal/10 bg-warm px-6 gap-6 text-xs sm:text-sm font-semibold">
+                <button @click="adminTab = 'products'" :class="adminTab === 'products' ? 'border-b-2 border-olive text-olive py-3' : 'text-charcoal/60 py-3 hover:text-charcoal'">Kelola Produk (<span x-text="products.length"></span>)</button>
+                <button @click="adminTab = 'store'" :class="adminTab === 'store' ? 'border-b-2 border-olive text-olive py-3' : 'text-charcoal/60 py-3 hover:text-charcoal'">Pengaturan Toko</button>
+                <button @click="adminTab = 'analytics'" :class="adminTab === 'analytics' ? 'border-b-2 border-olive text-olive py-3' : 'text-charcoal/60 py-3 hover:text-charcoal'">Statistik & Leads</button>
+            </div>
+
+            <!-- Admin Content Body -->
+            <div class="p-6 overflow-y-auto flex-1 space-y-6 bg-surface">
+                
+                <!-- TAB 1: PRODUCTS MANAGEMENT -->
+                <div x-show="adminTab === 'products'" class="space-y-6">
+                    <div class="flex items-center justify-between">
+                        <h4 class="font-serif font-bold text-lg">Daftar Produk Katalog</h4>
+                        <button @click="openProductEditor(null)" class="bg-olive hover:bg-olive/90 text-white text-xs font-medium px-4 py-2 rounded-lg transition-all">+ Tambah Produk</button>
+                    </div>
+
+                    <!-- Products Table -->
+                    <div class="overflow-x-auto border border-charcoal/10 rounded-xl">
+                        <table class="w-full text-left text-xs sm:text-sm">
+                            <thead class="bg-warm border-b border-charcoal/10 text-charcoal/70 uppercase text-[11px]">
+                                <tr>
+                                    <th class="p-3">Produk</th>
+                                    <th class="p-3">Kategori</th>
+                                    <th class="p-3">Harga</th>
+                                    <th class="p-3">Status</th>
+                                    <th class="p-3 text-right">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-charcoal/10">
+                                <template x-for="product in products" :key="product.id">
+                                    <tr class="hover:bg-warm/50">
+                                        <td class="p-3 flex items-center gap-3">
+                                            <img :src="product.image" class="w-10 h-10 rounded-lg object-cover border border-charcoal/10">
+                                            <div>
+                                                <p class="font-bold text-charcoal" x-text="product.name"></p>
+                                                <span class="text-[11px] text-terracotta font-semibold" x-text="product.badge"></span>
+                                            </div>
+                                        </td>
+                                        <td class="p-3 text-charcoal/80" x-text="product.category"></td>
+                                        <td class="p-3 font-semibold" x-text="'Rp ' + formatPrice(product.price)"></td>
+                                        <td class="p-3">
+                                            <button @click="toggleProductStatus(product.id)" :class="product.status === 'tersedia' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'" class="px-2.5 py-1 rounded-full text-xs font-semibold capitalize transition-all">
+                                                <span x-text="product.status"></span>
+                                            </button>
+                                        </td>
+                                        <td class="p-3 text-right space-x-2">
+                                            <button @click="openProductEditor(product)" class="text-olive hover:underline font-medium">Edit</button>
+                                            <button @click="deleteProduct(product.id)" class="text-rose-600 hover:underline font-medium">Hapus</button>
+                                        </td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- TAB 2: STORE SETTINGS -->
+                <div x-show="adminTab === 'store'" class="space-y-4 max-w-2xl">
+                    <h4 class="font-serif font-bold text-lg">Konfigurasi Toko & WhatsApp</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-charcoal/70 mb-1">Nama Brand Toko</label>
+                            <input type="text" x-model="store.name" class="w-full p-2.5 rounded-lg border border-charcoal/20 text-sm focus:border-olive focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-charcoal/70 mb-1">Nomor WhatsApp (Format Internasional)</label>
+                            <input type="text" x-model="store.whatsapp" class="w-full p-2.5 rounded-lg border border-charcoal/20 text-sm focus:border-olive focus:outline-none" placeholder="6281234567890">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-charcoal/70 mb-1">Instagram Handle</label>
+                            <input type="text" x-model="store.instagram" class="w-full p-2.5 rounded-lg border border-charcoal/20 text-sm focus:border-olive focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-charcoal/70 mb-1">Jam Operasional</label>
+                            <input type="text" x-model="store.operationalHours" class="w-full p-2.5 rounded-lg border border-charcoal/20 text-sm focus:border-olive focus:outline-none">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-charcoal/70 mb-1">Alamat Lengkap Toko</label>
+                        <textarea x-model="store.address" rows="2" class="w-full p-2.5 rounded-lg border border-charcoal/20 text-sm focus:border-olive focus:outline-none"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-charcoal/70 mb-1">URL Google Maps</label>
+                        <input type="text" x-model="store.googleMapsUrl" class="w-full p-2.5 rounded-lg border border-charcoal/20 text-sm focus:border-olive focus:outline-none">
+                    </div>
+                    <button @click="showToast('Pengaturan toko berhasil disimpan!')" class="bg-olive hover:bg-olive/90 text-white font-medium px-5 py-2.5 rounded-lg text-sm transition-all">Simpan Pengaturan</button>
+                </div>
+
+                <!-- TAB 3: ANALYTICS & LEADS -->
+                <div x-show="adminTab === 'analytics'" class="space-y-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h4 class="font-serif font-bold text-lg">Statistik Leads WhatsApp</h4>
+                            <p class="text-xs text-charcoal/60">Catatan interaksi klik pemesanan dari pelanggan</p>
+                        </div>
+                        <div class="bg-warm px-4 py-2 rounded-xl border border-charcoal/10">
+                            <span class="text-xs text-charcoal/70">Total Klik Leads:</span>
+                            <span class="font-bold text-lg text-olive ml-2" x-text="leads.length"></span>
+                        </div>
+                    </div>
+
+                    <!-- Leads Analytics Table -->
+                    <div class="overflow-x-auto border border-charcoal/10 rounded-xl">
+                        <table class="w-full text-left text-xs sm:text-sm">
+                            <thead class="bg-warm border-b border-charcoal/10 text-charcoal/70 uppercase text-[11px]">
+                                <tr>
+                                    <th class="p-3">Waktu</th>
+                                    <th class="p-3">Produk Diminati</th>
+                                    <th class="p-3">Varian</th>
+                                    <th class="p-3">Jumlah</th>
+                                    <th class="p-3">Sumber Konteks</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-charcoal/10">
+                                <template x-for="lead in leads" :key="lead.timestamp">
+                                    <tr class="hover:bg-warm/50">
+                                        <td class="p-3 text-charcoal/70" x-text="lead.timeFormatted"></td>
+                                        <td class="p-3 font-bold text-charcoal" x-text="lead.productName"></td>
+                                        <td class="p-3 text-charcoal/80" x-text="lead.variant || '-'"></td>
+                                        <td class="p-3 font-semibold" x-text="lead.quantity"></td>
+                                        <td class="p-3">
+                                            <span class="bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded-full text-xs font-medium" x-text="lead.source"></span>
+                                        </td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div x-show="leads.length === 0" class="text-center py-12 text-charcoal/50 text-sm">
+                        Belum ada data leads WhatsApp yang tercatat. Coba lakukan simulasi klik pesan pada katalog publik.
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- PRODUCT EDITOR SUB-MODAL FOR CMS -->
+    <div x-show="isProductEditorOpen" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-charcoal/90 backdrop-blur-sm">
+        <div @click.away="isProductEditorOpen = false" class="bg-surface rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl border border-charcoal/10 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between">
+                <h4 class="font-serif font-bold text-xl" x-text="editingProduct.id ? 'Edit Produk' : 'Tambah Produk Baru'"></h4>
+                <button @click="isProductEditorOpen = false" class="text-charcoal/60 hover:text-charcoal text-xl font-bold">&times;</button>
+            </div>
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-charcoal/70 mb-1">Nama Produk</label>
+                    <input type="text" x-model="editingProduct.name" class="w-full p-2.5 rounded-lg border border-charcoal/20 text-sm focus:border-olive focus:outline-none">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-charcoal/70 mb-1">Kategori</label>
+                        <input type="text" x-model="editingProduct.category" class="w-full p-2.5 rounded-lg border border-charcoal/20 text-sm focus:border-olive focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-charcoal/70 mb-1">Harga (Rp)</label>
+                        <input type="number" x-model="editingProduct.price" class="w-full p-2.5 rounded-lg border border-charcoal/20 text-sm focus:border-olive focus:outline-none">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-charcoal/70 mb-1">Label Badge</label>
+                        <input type="text" x-model="editingProduct.badge" placeholder="Best Seller / Baru" class="w-full p-2.5 rounded-lg border border-charcoal/20 text-sm focus:border-olive focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-charcoal/70 mb-1">Status Stok</label>
+                        <select x-model="editingProduct.status" class="w-full p-2.5 rounded-lg border border-charcoal/20 text-sm focus:border-olive focus:outline-none">
+                            <option value="tersedia">Tersedia</option>
+                            <option value="habis">Habis</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-charcoal/70 mb-1">URL Gambar (Unsplash/Foto)</label>
+                    <input type="text" x-model="editingProduct.image" class="w-full p-2.5 rounded-lg border border-charcoal/20 text-sm focus:border-olive focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-charcoal/70 mb-1">Deskripsi Produk</label>
+                    <textarea x-model="editingProduct.description" rows="3" class="w-full p-2.5 rounded-lg border border-charcoal/20 text-sm focus:border-olive focus:outline-none"></textarea>
+                </div>
+            </div>
+            <div class="flex justify-end gap-3 pt-2">
+                <button @click="isProductEditorOpen = false" class="px-4 py-2 rounded-lg border border-charcoal/20 text-xs font-medium">Batal</button>
+                <button @click="saveProduct()" class="bg-olive hover:bg-olive/90 text-white px-5 py-2 rounded-lg text-xs font-medium">Simpan Produk</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div x-show="toast.show" x-cloak x-transition class="fixed bottom-6 right-6 z-50 bg-charcoal text-warm px-4 py-3 rounded-xl shadow-xl flex items-center gap-3 text-xs sm:text-sm">
+        <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+        <span x-text="toast.message"></span>
+    </div>
+
+    <script>
+        function storefrontApp() {
+            return {
+                mobileMenuOpen: false,
+                activeModal: null,
+                adminTab: 'products',
+                isProductEditorOpen: false,
+                selectedCategory: 'Semua',
+                categories: ['Single Origin', 'House Blend', 'Signature Drinks'],
+                
+                announcement: {
+                    active: true,
+                    text: '✨ Gratis ongkir untuk pembelian minimal Rp150.000 ke seluruh Pulau Jawa'
+                },
+
+                store: {
+                    name: 'Kopi Senja Nusantara',
+                    whatsapp: '6281234567890',
+                    instagram: 'kopisenja.id',
+                    operationalHours: 'Senin - Sabtu: 08.00 - 21.00 WIB',
+                    address: 'Jl. Ahmad Dahlan No. 45, Kebayoran Baru, Jakarta Selatan',
+                    googleMapsUrl: 'https://maps.google.com/?q=Kebayoran+Baru+Jakarta+Selatan'
+                },
+
+                products: [
+                    {
+                        id: 1,
+                        name: 'Kerinci Honey Dark Roast',
+                        category: 'Single Origin',
+                        price: 85000,
+                        originalPrice: 95000,
+                        badge: 'Best Seller',
+                        status: 'tersedia',
+                        image: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=800&q=80',
+                        description: 'Biji kopi pilihan dari lereng Gunung Kerinci dengan metode honey process. Memiliki notes manis karamel, sedikit sentuhan buah tropis, dan body yang tebal.',
+                        variants: ['Biji Utuh (Whole Bean)', 'Giling Kasar (Coarse)', 'Giling Sedang (Medium)', 'Giling Halus (Fine)']
+                    },
+                    {
+                        id: 2,
+                        name: 'Gayo Wine Process Special',
+                        category: 'Single Origin',
+                        price: 110000,
+                        originalPrice: null,
+                        badge: 'Baru',
+                        status: 'tersedia',
+                        image: 'https://images.unsplash.com/photo-1559056199-641a0ac8b55e?auto=format&fit=crop&w=800&q=80',
+                        description: 'Kopi Gayo dengan fermentasi khusus ala wine. Menghasilkan kompleksitas rasa buah berry ranum, fermented notes yang bersih, dan aftertaste manis.',
+                        variants: ['Biji Utuh (Whole Bean)', 'Giling Sedang (Medium)']
+                    },
+                    {
+                        id: 3,
+                        name: 'Senja Signature House Blend',
+                        category: 'House Blend',
+                        price: 75000,
+                        originalPrice: 85000,
+                        badge: 'Promo',
+                        status: 'tersedia',
+                        image: 'https://images.unsplash.com/photo-1511920170033-f8396924c348?auto=format&fit=crop&w=800&q=80',
+                        description: 'Kombinasi harmonis Arabica dan Robusta pilihan untuk kebutuhan es kopi susu harian atau espresso rumahanmu.',
+                        variants: ['Biji Utuh (Whole Bean)', 'Giling Halus (Fine)']
+                    },
+                    {
+                        id: 4,
+                        name: 'Bundle Keluarga Nusantara',
+                        category: 'House Blend',
+                        price: 150000,
+                        originalPrice: 180000,
+                        badge: 'Paket Hemat',
+                        status: 'tersedia',
+                        image: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=800&q=80',
+                        description: 'Paket lengkap 2 pack kopi pilihan (Kerinci Honey & House Blend) plus bonus eksklusif merchandise.',
+                        variants: ['Standar Roastery']
+                    },
+                    {
+                        id: 5,
+                        name: 'Temanggung Robusta Grade A',
+                        category: 'Single Origin',
+                        price: 65000,
+                        originalPrice: null,
+                        badge: '',
+                        status: 'habis',
+                        image: 'https://images.unsplash.com/photo-1511920170033-f8396924c348?auto=format&fit=crop&w=800&q=80',
+                        description: 'Robusta murni dengan aroma earthy yang kuat, crema tebal, dan kadar keasaman rendah. Cocok untuk penikmat kopi tubruk sejati.',
+                        variants: ['Giling Halus (Fine)']
+                    }
+                ],
+
+                leads: [],
+
+                activeProduct: {},
+                isModalOpen: false,
+                selectedVariant: '',
+                quantity: 1,
+
+                editingProduct: {},
+
+                get filteredProducts() {
+                    if (this.selectedCategory === 'Semua') return this.products;
+                    return this.products.filter(p => p.category === this.selectedCategory);
+                },
+
+                openProductModal(product) {
+                    this.activeProduct = product;
+                    this.selectedVariant = product.variants && product.variants.length > 0 ? product.variants[0] : '';
+                    this.quantity = 1;
+                    this.isModalOpen = true;
+                },
+
+                closeProductModal() {
+                    this.isModalOpen = false;
+                },
+
+                formatPrice(num) {
+                    return num.toLocaleString('id-ID');
+                },
+
+                checkoutWhatsApp() {
+                    if (this.activeProduct.status === 'habis') return;
+                    
+                    const subtotal = this.activeProduct.price * this.quantity;
+                    const message = `Halo, saya mau pesan:\n\nProduk: ${this.activeProduct.name}\nVarian: ${this.selectedVariant || 'Standar'}\nJumlah: ${this.quantity}\nHarga satuan: Rp ${this.formatPrice(this.activeProduct.price)}\nSubtotal: Rp ${this.formatPrice(subtotal)}\n\nMohon informasi selanjutnya. Terima kasih.`;
+                    
+                    // Track Leads Analytics
+                    this.leads.unshift({
+                        timestamp: new Date().getTime(),
+                        timeFormatted: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', dateString: 'short' }),
+                        productName: this.activeProduct.name,
+                        variant: this.selectedVariant || 'Standar',
+                        quantity: this.quantity,
+                        source: 'Katalog Publik WhatsApp CTA'
+                    });
+
+                    const waUrl = `https://wa.me/${this.store.whatsapp}?text=${encodeURIComponent(message)}`;
+                    window.open(waUrl, '_blank');
+                    this.closeProductModal();
+                    this.showToast('Membuka WhatsApp untuk pesanan Anda...');
+                },
+
+                trackLead(sourceName, detail) {
+                    this.leads.unshift({
+                        timestamp: new Date().getTime(),
+                        timeFormatted: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
+                        productName: detail,
+                        variant: '-',
+                        quantity: 1,
+                        source: sourceName
+                    });
+                },
+
+                toggleProductStatus(id) {
+                    const p = this.products.find(item => item.id === id);
+                    if (p) {
+                        p.status = p.status === 'tersedia' ? 'habis' : 'tersedia';
+                        this.showToast(`Status ${p.name} diubah menjadi ${p.status}`);
+                    }
+                },
+
+                openProductEditor(product) {
+                    if (product) {
+                        this.editingProduct = JSON.parse(JSON.stringify(product));
+                    } else {
+                        this.editingProduct = {
+                            id: Date.now(),
+                            name: '',
+                            category: 'Single Origin',
+                            price: 75000,
+                            originalPrice: null,
+                            badge: 'Baru',
+                            status: 'tersedia',
+                            image: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=800&q=80',
+                            description: '',
+                            variants: ['Standar']
+                        };
+                    }
+                    this.isProductEditorOpen = true;
+                },
+
+                saveProduct() {
+                    const idx = this.products.findIndex(p => p.id === this.editingProduct.id);
+                    if (idx !== -1) {
+                        this.products[idx] = this.editingProduct;
+                    } else {
+                        this.products.unshift(this.editingProduct);
+                    }
+                    this.isProductEditorOpen = false;
+                    this.showToast('Produk berhasil disimpan ke katalog!');
+                },
+
+                deleteProduct(id) {
+                    if (confirm('Apakah Anda yakin ingin menghapus produk ini dari katalog?')) {
+                        this.products = this.products.filter(p => p.id !== id);
+                        this.showToast('Produk berhasil dihapus.');
+                    }
+                },
+
+                toast: {
+                    show: false,
+                    message: ''
+                },
+
+                showToast(msg) {
+                    this.toast.message = msg;
+                    this.toast.show = true;
+                    setTimeout(() => {
+                        this.toast.show = false;
+                    }, 3500);
+                }
+            }
+        }
+    </script>
+</body>
+</html>

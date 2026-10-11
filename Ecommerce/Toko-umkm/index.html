@@ -1,0 +1,1218 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nusantara Crafted — Toko Online UMKM | Heci.Tech</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        warmbg: '#FBF9F5',
+                        charcoal: '#1E1E1C',
+                        terracotta: {
+                            DEFAULT: '#C85A32',
+                            hover: '#A94B27',
+                            light: '#F4E6E1'
+                        },
+                        sand: '#EFECE6',
+                        stoneborder: '#D9D5CC'
+                    },
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        [x-cloak] { display: none !important; }
+        /* Custom smooth scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #FBF9F5; }
+        ::-webkit-scrollbar-thumb { background: #D9D5CC; border-radius: 3px; }
+    </style>
+</head>
+<body class="bg-warmbg text-charcoal font-sans antialiased selection:bg-terracotta selection:text-white" x-data="appState()">
+
+    <!-- TOP NOTIFICATION BAR -->
+    <div class="bg-charcoal text-warmbg text-xs py-2 px-4 text-center font-medium tracking-wide flex items-center justify-center gap-2">
+        <span>✨ Powered by Heci.Tech E-Commerce Engine • Gratis Ongkir Seluruh Jawa dengan Kode <strong class="underline cursor-pointer" @click="applyPromo('HECIJAYA')">HECIJAYA</strong></span>
+    </div>
+
+    <!-- MAIN APP CONTAINER -->
+    <div class="min-h-screen flex flex-col justify-between">
+
+        <!-- ==================== HEADER & NAVIGATION ==================== -->
+        <header class="sticky top-0 z-40 bg-warmbg/90 backdrop-blur-md border-b border-stoneborder transition-all">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+                
+                <!-- Left: Logo & View Switcher -->
+                <div class="flex items-center gap-6">
+                    <a href="#" @click.prevent="currentView = 'storefront'; currentSubView = 'home'" class="flex items-center gap-2.5 group">
+                        <div class="w-10 h-10 bg-charcoal text-warmbg flex items-center justify-center font-bold text-lg rounded-md group-hover:bg-terracotta transition-colors">
+                            NC
+                        </div>
+                        <div>
+                            <span class="font-bold text-lg tracking-tight block leading-none">Nusantara Crafted</span>
+                            <span class="text-[10px] text-terracotta font-semibold uppercase tracking-wider">Heci.Tech Demo Store</span>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Center: Desktop Search & Nav -->
+                <div class="hidden md:flex items-center flex-1 max-w-md mx-4">
+                    <div class="relative w-full">
+                        <input type="text" x-model="searchQuery" @input="filterProducts()" placeholder="Cari tas rotan, dompet kulit, ornamen..." class="w-full bg-white border border-stoneborder rounded-md py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:border-terracotta transition-colors">
+                        <svg class="w-4 h-4 text-stone-400 absolute left-3.5 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                    </div>
+                </div>
+
+                <!-- Right: Actions (Storefront vs Admin Toggle & Cart) -->
+                <div class="flex items-center gap-3">
+                    <!-- Mode Switcher for Demo -->
+                    <div class="bg-sand p-1 rounded-md border border-stoneborder flex items-center text-xs font-semibold">
+                        <button @click="currentMode = 'storefront'; if(currentView=='admin') currentView='storefront';" :class="currentMode === 'storefront' ? 'bg-white text-charcoal shadow-sm' : 'text-stone-500 hover:text-charcoal'" class="px-3 py-1.5 rounded transition-all">
+                            Storefront
+                        </button>
+                        <button @click="currentMode = 'admin'; currentView = 'admin';" :class="currentMode === 'admin' ? 'bg-charcoal text-white shadow-sm' : 'text-stone-500 hover:text-charcoal'" class="px-3 py-1.5 rounded transition-all flex items-center gap-1">
+                            <span>Admin Dashboard</span>
+                        </button>
+                    </div>
+
+                    <!-- Cart Trigger (Only Storefront) -->
+                    <template x-if="currentMode === 'storefront'">
+                        <button @click="cartOpen = true" class="relative p-2.5 border border-stoneborder rounded-md hover:bg-stone-100 transition-colors flex items-center justify-center">
+                            <svg class="w-5 h-5 text-charcoal" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+                            <span x-show="cartCount > 0" x-text="cartCount" class="absolute -top-1.5 -right-1.5 bg-terracotta text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center shadow-sm"></span>
+                        </button>
+                    </template>
+                </div>
+            </div>
+            
+            <!-- Mobile Search Bar -->
+            <div class="md:hidden px-4 pb-3">
+                <div class="relative w-full">
+                    <input type="text" x-model="searchQuery" @input="filterProducts()" placeholder="Cari produk kerajinan..." class="w-full bg-white border border-stoneborder rounded-md py-2 pl-9 pr-3 text-sm focus:outline-none focus:border-terracotta">
+                    <svg class="w-4 h-4 text-stone-400 absolute left-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                </div>
+            </div>
+        </header>
+
+        <!-- ==================== MAIN CONTENT AREA ==================== -->
+        <main class="flex-1">
+
+            <!-- ======================================================== -->
+            <!-- STOREFRONT MODE                                          -->
+            <!-- ======================================================== -->
+            <div x-show="currentMode === 'storefront'">
+
+                <!-- 1. HOME VIEW -->
+                <template x-if="currentView === 'storefront' && currentSubView === 'home'">
+                    <div>
+                        <!-- Editorial Hero -->
+                        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20">
+                            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                                <div class="lg:col-span-7 space-y-6">
+                                    <div class="inline-flex items-center gap-2 px-3 py-1 bg-terracotta-light text-terracotta text-xs font-semibold rounded-full uppercase tracking-wider">
+                                        <span>Koleksi Kurasi Artisan Lokal</span>
+                                    </div>
+                                    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1]">
+                                        Keindahan Kriya Nusantara dalam Sentuhan Modern.
+                                    </h1>
+                                    <p class="text-stone-600 text-base sm:text-lg max-w-xl font-normal leading-relaxed">
+                                        Setiap produk di Nusantara Crafted dibuat dengan tangan penuh ketelitian oleh pengrajin lokal menggunakan material berkelanjutan berkualitas tinggi.
+                                    </p>
+                                    <div class="flex flex-wrap items-center gap-4 pt-2">
+                                        <button @click="currentSubView = 'catalog'" class="bg-charcoal text-white hover:bg-terracotta font-medium px-8 py-3.5 rounded-md transition-all shadow-sm">
+                                            Jelajahi Katalog
+                                        </button>
+                                        <button @click="currentSubView = 'catalog'; selectedCategory = 'Tas & Aksesori'" class="border border-stoneborder hover:border-charcoal font-medium px-6 py-3.5 rounded-md transition-all">
+                                            Lihat Tas Rotan
+                                        </button>
+                                    </div>
+                                    <!-- Trust Badges -->
+                                    <div class="grid grid-cols-3 gap-4 pt-8 border-t border-stoneborder text-xs text-stone-500 font-medium">
+                                        <div>🌿 100% Material Alami</div>
+                                        <div>🤝 Langsung dari Pengrajin</div>
+                                        <div>📦 Garansi Pengiriman Aman</div>
+                                    </div>
+                                </div>
+                                <div class="lg:col-span-5 relative">
+                                    <div class="aspect-[4/5] rounded-lg overflow-hidden border border-stoneborder shadow-lg bg-sand">
+                                        <img src="https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&q=80&w=800" alt="Hero Artisan Product" class="w-full h-full object-cover object-center hover:scale-105 transition-transform duration-700">
+                                    </div>
+                                    <div class="absolute -bottom-6 -left-6 bg-white p-4 rounded-md border border-stoneborder shadow-md max-w-xs hidden sm:block">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-10 h-10 rounded-full bg-terracotta-light text-terracotta flex items-center justify-center font-bold">⭐</div>
+                                            <div>
+                                                <div class="text-xs text-stone-500 font-medium">Rating Pelanggan</div>
+                                                <div class="text-sm font-bold text-charcoal">4.9 / 5.0 (1.420+ Ulasan)</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- Featured Categories -->
+                        <section class="bg-sand/50 py-16 border-y border-stoneborder">
+                            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                                <div class="flex justify-between items-end mb-8">
+                                    <div>
+                                        <span class="text-xs font-semibold text-terracotta uppercase tracking-wider">Kategori Pilihan</span>
+                                        <h2 class="text-2xl sm:text-3xl font-bold tracking-tight mt-1">Jelajahi Berdasarkan Kategori</h2>
+                                    </div>
+                                    <button @click="currentSubView = 'catalog'" class="text-sm font-semibold text-charcoal hover:text-terracotta transition-colors hidden sm:block">Lihat Semua →</button>
+                                </div>
+                                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+                                    <template x-for="cat in categories" :key="cat">
+                                        <div @click="selectedCategory = cat; currentSubView = 'catalog'" class="group cursor-pointer bg-white p-6 rounded-md border border-stoneborder hover:border-charcoal transition-all text-center flex flex-col items-center justify-center aspect-[4/3]">
+                                            <div class="w-12 h-12 rounded-full bg-warmbg flex items-center justify-center text-xl mb-3 group-hover:bg-terracotta group-hover:text-white transition-colors">
+                                                <span x-text="getCategoryIcon(cat)"></span>
+                                            </div>
+                                            <h3 class="font-bold text-sm text-charcoal" x-text="cat"></h3>
+                                            <span class="text-xs text-stone-500 mt-1">Koleksi Terbaru</span>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- Featured Products Grid -->
+                        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+                            <div class="flex justify-between items-end mb-8">
+                                <div>
+                                    <span class="text-xs font-semibold text-terracotta uppercase tracking-wider">Kurasi Terbaik</span>
+                                    <h2 class="text-2xl sm:text-3xl font-bold tracking-tight mt-1">Produk Unggulan</h2>
+                                </div>
+                                <button @click="currentSubView = 'catalog'" class="text-sm font-semibold text-charcoal hover:text-terracotta transition-colors">Lihat Katalog Lengkap →</button>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                                <template x-for="product in products.slice(0, 4)" :key="product.id">
+                                    <div class="group bg-white rounded-md border border-stoneborder overflow-hidden flex flex-col justify-between hover:shadow-md transition-all">
+                                        <div>
+                                            <div class="aspect-square bg-sand relative overflow-hidden cursor-pointer" @click="viewProduct(product)">
+                                                <img :src="product.image" :alt="product.name" class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500">
+                                                <div class="absolute top-2 left-2 flex flex-col gap-1">
+                                                    <span x-show="product.badge" class="bg-charcoal text-white text-[10px] font-bold px-2.5 py-1 rounded-sm uppercase tracking-wide" x-text="product.badge"></span>
+                                                    <span x-show="product.stock === 0" class="bg-red-600 text-white text-[10px] font-bold px-2.5 py-1 rounded-sm uppercase tracking-wide">Habis</span>
+                                                </div>
+                                            </div>
+                                            <div class="p-4">
+                                                <span class="text-[11px] text-stone-500 uppercase tracking-wider font-semibold" x-text="product.category"></span>
+                                                <h3 @click="viewProduct(product)" class="font-bold text-sm text-charcoal mt-1 line-clamp-1 cursor-pointer hover:text-terracotta transition-colors" x-text="product.name"></h3>
+                                                <div class="mt-2 flex items-baseline gap-2">
+                                                    <span class="font-bold text-base text-charcoal" x-text="formatIDR(product.price)"></span>
+                                                    <span x-show="product.originalPrice" class="text-xs text-stone-400 line-through" x-text="formatIDR(product.originalPrice)"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="p-4 pt-0">
+                                            <button @click="viewProduct(product)" class="w-full bg-sand text-charcoal hover:bg-charcoal hover:text-white text-xs font-semibold py-2.5 rounded transition-colors">
+                                                Pilih Varian & Beli
+                                            </button>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </section>
+
+                        <!-- Value Proposition Banner -->
+                        <section class="bg-charcoal text-warmbg py-16">
+                            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center max-w-2xl space-y-4">
+                                <span class="text-terracotta font-bold text-xs uppercase tracking-widest">Standard Kualitas Heci.Tech</span>
+                                <h2 class="text-3xl font-bold tracking-tight">Mendukung Ekonomi Kreatif & UMKM Indonesia</h2>
+                                <p class="text-stone-300 text-sm leading-relaxed">
+                                    Setiap transaksi di toko ini langsung memberdayakan pengrajin lokal di berbagai daerah, memastikan standar upah yang adil dan keberlanjutan warisan budaya nusantara.
+                                </p>
+                            </div>
+                        </section>
+                    </div>
+                </template>
+
+                <!-- 2. CATALOG VIEW -->
+                <template x-if="currentView === 'storefront' && currentSubView === 'catalog'">
+                    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+                        <div class="mb-8">
+                            <nav class="text-xs text-stone-500 mb-2 flex items-center gap-2">
+                                <a href="#" @click.prevent="currentSubView = 'home'" class="hover:text-charcoal">Beranda</a>
+                                <span>/</span>
+                                <span class="text-charcoal font-semibold">Katalog Produk</span>
+                            </nav>
+                            <h1 class="text-3xl font-bold tracking-tight">Katalog Lengkap</h1>
+                            <p class="text-stone-500 text-sm mt-1">Temukan produk kriya dan lifestyle terbaik untuk kebutuhan Anda.</p>
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                            <!-- Sidebar Filters -->
+                            <div class="space-y-6">
+                                <div class="bg-white p-6 rounded-md border border-stoneborder space-y-6">
+                                    <div class="flex items-center justify-between pb-4 border-b border-stoneborder">
+                                        <h3 class="font-bold text-sm">Filter & Kategori</h3>
+                                        <button @click="selectedCategory = 'Semua'; searchQuery = ''; priceFilter = 1000000;" class="text-xs text-terracotta font-semibold hover:underline">Reset</button>
+                                    </div>
+
+                                    <!-- Category Filter -->
+                                    <div>
+                                        <label class="block text-xs font-bold uppercase tracking-wider text-stone-500 mb-3">Kategori</label>
+                                        <div class="space-y-2">
+                                            <button @click="selectedCategory = 'Semua'" :class="selectedCategory === 'Semua' ? 'font-bold text-terracotta' : 'text-stone-600 hover:text-charcoal'" class="block text-sm text-left w-full transition-colors">Semua Kategori</button>
+                                            <template x-for="cat in categories" :key="cat">
+                                                <button @click="selectedCategory = cat" :class="selectedCategory === cat ? 'font-bold text-terracotta' : 'text-stone-600 hover:text-charcoal'" class="block text-sm text-left w-full transition-colors" x-text="cat"></button>
+                                            </template>
+                                        </div>
+                                    </div>
+
+                                    <!-- Price Range Filter -->
+                                    <div class="pt-4 border-t border-stoneborder">
+                                        <label class="block text-xs font-bold uppercase tracking-wider text-stone-500 mb-2">Maksimum Harga: <span class="text-charcoal font-bold" x-text="formatIDR(priceFilter)"></span></label>
+                                        <input type="range" min="50000" max="1000000" step="25000" x-model.number="priceFilter" class="w-full accent-terracotta cursor-pointer">
+                                        <div class="flex justify-between text-[10px] text-stone-400 mt-1">
+                                            <span>Rp 50.000</span>
+                                            <span>Rp 1.000.000</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Product Grid -->
+                            <div class="lg:col-span-3 space-y-6">
+                                <div class="flex flex-wrap items-center justify-between gap-4 bg-white p-4 rounded-md border border-stoneborder">
+                                    <div class="text-xs text-stone-600">
+                                        Menampilkan <span class="font-bold text-charcoal" x-text="filteredProducts.length"></span> produk
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-xs text-stone-500">Urutkan:</span>
+                                        <select x-model="sortBy" class="bg-sand border border-stoneborder text-xs rounded px-2.5 py-1.5 focus:outline-none focus:border-terracotta">
+                                            <option value="newest">Terbaru</option>
+                                            <option value="price-low">Harga Terendah</option>
+                                            <option value="price-high">Harga Tertinggi</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- Grid -->
+                                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                                    <template x-for="product in filteredProducts" :key="product.id">
+                                        <div class="group bg-white rounded-md border border-stoneborder overflow-hidden flex flex-col justify-between hover:shadow-md transition-all">
+                                            <div>
+                                                <div class="aspect-square bg-sand relative overflow-hidden cursor-pointer" @click="viewProduct(product)">
+                                                    <img :src="product.image" :alt="product.name" class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500">
+                                                    <div class="absolute top-2 left-2 flex flex-col gap-1">
+                                                        <span x-show="product.badge" class="bg-charcoal text-white text-[10px] font-bold px-2 py-0.5 rounded-sm uppercase tracking-wide" x-text="product.badge"></span>
+                                                        <span x-show="product.stock === 0" class="bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-sm uppercase tracking-wide">Habis</span>
+                                                    </div>
+                                                </div>
+                                                <div class="p-4">
+                                                    <span class="text-[11px] text-stone-500 uppercase tracking-wider font-semibold" x-text="product.category"></span>
+                                                    <h3 @click="viewProduct(product)" class="font-bold text-sm text-charcoal mt-1 line-clamp-1 cursor-pointer hover:text-terracotta transition-colors" x-text="product.name"></h3>
+                                                    <div class="mt-2 flex items-baseline gap-2">
+                                                        <span class="font-bold text-base text-charcoal" x-text="formatIDR(product.price)"></span>
+                                                        <span x-show="product.originalPrice" class="text-xs text-stone-400 line-through" x-text="formatIDR(product.originalPrice)"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="p-4 pt-0">
+                                                <button @click="viewProduct(product)" class="w-full bg-sand text-charcoal hover:bg-charcoal hover:text-white text-xs font-semibold py-2.5 rounded transition-colors">
+                                                    Pilih Varian & Beli
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </template>
+                                </div>
+
+                                <!-- Empty State -->
+                                <div x-show="filteredProducts.length === 0" class="bg-white rounded-md border border-stoneborder p-12 text-center space-y-4">
+                                    <div class="w-12 h-12 bg-sand rounded-full flex items-center justify-center mx-auto text-xl">🔍</div>
+                                    <h3 class="font-bold text-base">Tidak ada produk ditemukan</h3>
+                                    <p class="text-xs text-stone-500 max-w-sm mx-auto">Coba sesuaikan kata kunci pencarian atau reset filter kategori dan harga Anda.</p>
+                                    <button @click="selectedCategory = 'Semua'; searchQuery = ''; priceFilter = 1000000;" class="bg-charcoal text-white text-xs font-semibold px-4 py-2 rounded">Reset Filter</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- 3. PRODUCT DETAIL VIEW -->
+                <template x-if="currentView === 'storefront' && currentSubView === 'detail' && activeProduct">
+                    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+                        <nav class="text-xs text-stone-500 mb-6 flex items-center gap-2">
+                            <a href="#" @click.prevent="currentSubView = 'home'" class="hover:text-charcoal">Beranda</a>
+                            <span>/</span>
+                            <a href="#" @click.prevent="currentSubView = 'catalog'" class="hover:text-charcoal">Katalog</a>
+                            <span>/</span>
+                            <span class="text-charcoal font-semibold" x-text="activeProduct.name"></span>
+                        </nav>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+                            <!-- Left: Image Gallery -->
+                            <div class="lg:col-span-7 space-y-4">
+                                <div class="aspect-[4/3] bg-sand rounded-lg border border-stoneborder overflow-hidden">
+                                    <img :src="activeProduct.image" :alt="activeProduct.name" class="w-full h-full object-cover object-center">
+                                </div>
+                                <div class="grid grid-cols-3 gap-4">
+                                    <div class="aspect-square bg-sand rounded border border-stoneborder overflow-hidden cursor-pointer opacity-80 hover:opacity-100"><img :src="activeProduct.image" class="w-full h-full object-cover"></div>
+                                    <div class="aspect-square bg-sand rounded border border-stoneborder overflow-hidden cursor-pointer opacity-80 hover:opacity-100"><img src="https://images.unsplash.com/photo-1590874103328-eac38a683ce7?auto=format&fit=crop&q=80&w=400" class="w-full h-full object-cover"></div>
+                                    <div class="aspect-square bg-sand rounded border border-stoneborder overflow-hidden cursor-pointer opacity-80 hover:opacity-100"><img src="https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&q=80&w=400" class="w-full h-full object-cover"></div>
+                                </div>
+                            </div>
+
+                            <!-- Right: Product Info & Actions -->
+                            <div class="lg:col-span-5 space-y-6">
+                                <div>
+                                    <span class="text-xs font-semibold text-terracotta uppercase tracking-wider" x-text="activeProduct.category"></span>
+                                    <h1 class="text-3xl font-bold tracking-tight mt-1" x-text="activeProduct.name"></h1>
+                                    <div class="mt-3 flex items-baseline gap-3">
+                                        <span class="text-2xl font-bold text-charcoal" x-text="formatIDR(activeProduct.price)"></span>
+                                        <span x-show="activeProduct.originalPrice" class="text-sm text-stone-400 line-through" x-text="formatIDR(activeProduct.originalPrice)"></span>
+                                    </div>
+                                </div>
+
+                                <!-- Rating & Stock Status -->
+                                <div class="flex items-center gap-4 py-3 border-y border-stoneborder text-xs">
+                                    <div class="flex items-center gap-1 font-bold text-amber-600">
+                                        <span>★ 4.9</span>
+                                        <span class="text-stone-500 font-normal">(128 Ulasan Terverifikasi)</span>
+                                    </div>
+                                    <div class="text-stone-300">|</div>
+                                    <div>
+                                        <span :class="activeProduct.stock > 0 ? 'text-emerald-600 font-semibold' : 'text-red-600 font-semibold'" x-text="activeProduct.stock > 0 ? 'Stok Tersedia (' + activeProduct.stock + ')' : 'Stok Habis'"></span>
+                                    </div>
+                                </div>
+
+                                <!-- Description -->
+                                <p class="text-stone-600 text-sm leading-relaxed" x-text="activeProduct.description"></p>
+
+                                <!-- Variants (Size/Color) -->
+                                <div class="space-y-4 pt-2">
+                                    <div>
+                                        <label class="block text-xs font-bold uppercase tracking-wider text-stone-500 mb-2">Pilih Varian / Ukuran:</label>
+                                        <div class="flex flex-wrap gap-2">
+                                            <template x-for="v in activeProduct.variants" :key="v">
+                                                <button @click="selectedVariant = v" :class="selectedVariant === v ? 'bg-charcoal text-white border-charcoal' : 'bg-white text-charcoal border-stoneborder hover:border-charcoal'" class="px-4 py-2 text-xs font-semibold rounded border transition-all" x-text="v"></button>
+                                            </template>
+                                        </div>
+                                    </div>
+
+                                    <!-- Quantity selector -->
+                                    <div>
+                                        <label class="block text-xs font-bold uppercase tracking-wider text-stone-500 mb-2">Jumlah Pembelian:</label>
+                                        <div class="flex items-center w-32 border border-stoneborder rounded bg-white overflow-hidden">
+                                            <button @click="if(quantity > 1) quantity--" class="w-10 h-10 flex items-center justify-center text-stone-500 hover:bg-sand transition-colors">-</button>
+                                            <input type="text" x-model.number="quantity" class="w-12 text-center text-sm font-semibold focus:outline-none" readonly>
+                                            <button @click="if(quantity < activeProduct.stock) quantity++" class="w-10 h-10 flex items-center justify-center text-stone-500 hover:bg-sand transition-colors">+</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Add to Cart & Buy Now -->
+                                <div class="space-y-3 pt-4">
+                                    <button @click="addToCart(activeProduct)" :disabled="activeProduct.stock === 0" :class="activeProduct.stock === 0 ? 'bg-stone-300 text-stone-500 cursor-not-allowed' : 'bg-charcoal text-white hover:bg-terracotta'" class="w-full font-semibold py-4 rounded-md transition-all shadow-sm">
+                                        <span x-text="activeProduct.stock === 0 ? 'Stok Habis' : '+ Masukkan ke Keranjang'"></span>
+                                    </button>
+                                    <button @click="addToCart(activeProduct); cartOpen = true;" :disabled="activeProduct.stock === 0" class="w-full border border-stoneborder hover:border-charcoal font-semibold py-3.5 rounded-md transition-all text-xs">
+                                        Beli Langsung
+                                    </button>
+                                </div>
+
+                                <!-- Shipping info banner -->
+                                <div class="bg-sand p-4 rounded border border-stoneborder space-y-2 text-xs text-stone-600">
+                                    <div class="flex items-center gap-2 font-bold text-charcoal">
+                                        <span>🚚</span> Informasi Pengiriman & Garansi
+                                    </div>
+                                    <p>Dikirim dari Gudang Utama UMKM (Padang/Yogyakarta). Estimasi tiba 2-4 hari kerja dengan JNE/SiCepat/J&T.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- 4. CHECKOUT VIEW -->
+                <template x-if="currentView === 'storefront' && currentSubView === 'checkout'">
+                    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+                        <div class="mb-8">
+                            <h1 class="text-3xl font-bold tracking-tight">Checkout Pesanan</h1>
+                            <p class="text-stone-500 text-sm mt-1">Lengkapi informasi pengiriman dan pilih metode pembayaran.</p>
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                            <!-- Form Details -->
+                            <div class="lg:col-span-7 space-y-6">
+                                <!-- Step 1: Customer Info -->
+                                <div class="bg-white p-6 rounded-md border border-stoneborder space-y-4">
+                                    <h2 class="font-bold text-base flex items-center gap-2">
+                                        <span class="w-6 h-6 rounded-full bg-terracotta text-white text-xs flex items-center justify-center font-bold">1</span>
+                                        Informasi Pembeli
+                                    </h2>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-xs font-bold uppercase tracking-wider text-stone-500 mb-1">Nama Lengkap</label>
+                                            <input type="text" x-model="checkoutForm.name" placeholder="cth. Budi Santoso" class="w-full bg-sand border border-stoneborder rounded p-2.5 text-sm focus:outline-none focus:border-terracotta">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-bold uppercase tracking-wider text-stone-500 mb-1">Nomor WhatsApp / HP</label>
+                                            <input type="text" x-model="checkoutForm.phone" placeholder="cth. 081234567890" class="w-full bg-sand border border-stoneborder rounded p-2.5 text-sm focus:outline-none focus:border-terracotta">
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold uppercase tracking-wider text-stone-500 mb-1">Email untuk Konfirmasi</label>
+                                        <input type="email" x-model="checkoutForm.email" placeholder="cth. budi@email.com" class="w-full bg-sand border border-stoneborder rounded p-2.5 text-sm focus:outline-none focus:border-terracotta">
+                                    </div>
+                                </div>
+
+                                <!-- Step 2: Shipping Address -->
+                                <div class="bg-white p-6 rounded-md border border-stoneborder space-y-4">
+                                    <h2 class="font-bold text-base flex items-center gap-2">
+                                        <span class="w-6 h-6 rounded-full bg-terracotta text-white text-xs flex items-center justify-center font-bold">2</span>
+                                        Alamat Pengiriman
+                                    </h2>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-xs font-bold uppercase tracking-wider text-stone-500 mb-1">Provinsi</label>
+                                            <input type="text" x-model="checkoutForm.province" placeholder="cth. Sumatera Barat" class="w-full bg-sand border border-stoneborder rounded p-2.5 text-sm focus:outline-none focus:border-terracotta">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-bold uppercase tracking-wider text-stone-500 mb-1">Kota / Kabupaten</label>
+                                            <input type="text" x-model="checkoutForm.city" placeholder="cth. Padang" class="w-full bg-sand border border-stoneborder rounded p-2.5 text-sm focus:outline-none focus:border-terracotta">
+                                        </div>
+                                    </div>
+                                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                                        <div>
+                                            <label class="block text-xs font-bold uppercase tracking-wider text-stone-500 mb-1">Kecamatan</label>
+                                            <input type="text" x-model="checkoutForm.district" placeholder="cth. Padang Utara" class="w-full bg-sand border border-stoneborder rounded p-2.5 text-sm focus:outline-none focus:border-terracotta">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-bold uppercase tracking-wider text-stone-500 mb-1">Kode Pos</label>
+                                            <input type="text" x-model="checkoutForm.postalCode" placeholder="25132" class="w-full bg-sand border border-stoneborder rounded p-2.5 text-sm focus:outline-none focus:border-terracotta">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-bold uppercase tracking-wider text-stone-500 mb-1">Kurir</label>
+                                            <select x-model="checkoutForm.courier" class="w-full bg-sand border border-stoneborder rounded p-2.5 text-sm focus:outline-none focus:border-terracotta">
+                                                <option value="JNE REG">JNE REG (Rp 18.000)</option>
+                                                <option value="SiCepat BEST">SiCepat BEST (Rp 22.000)</option>
+                                                <option value="J&T Express">J&T Express (Rp 17.000)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold uppercase tracking-wider text-stone-500 mb-1">Alamat Lengkap & Patokan</label>
+                                        <textarea x-model="checkoutForm.address" rows="2" placeholder="Jalan Ahmad Dahlan No. 45, dekat masjid raya..." class="w-full bg-sand border border-stoneborder rounded p-2.5 text-sm focus:outline-none focus:border-terracotta"></textarea>
+                                    </div>
+                                </div>
+
+                                <!-- Step 3: Payment Method -->
+                                <div class="bg-white p-6 rounded-md border border-stoneborder space-y-4">
+                                    <h2 class="font-bold text-base flex items-center gap-2">
+                                        <span class="w-6 h-6 rounded-full bg-terracotta text-white text-xs flex items-center justify-center font-bold">3</span>
+                                        Metode Pembayaran (Simulasi Payment Gateway)
+                                    </h2>
+                                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                        <label :class="checkoutForm.payment === 'QRIS' ? 'border-charcoal bg-sand' : 'border-stoneborder'" class="border rounded-md p-4 flex flex-col justify-between cursor-pointer">
+                                            <div class="flex items-center justify-between mb-2">
+                                                <span class="font-bold text-sm">QRIS</span>
+                                                <input type="radio" value="QRIS" x-model="checkoutForm.payment" class="accent-terracotta">
+                                            </div>
+                                            <span class="text-xs text-stone-500">GoPay, OVO, Dana, BCA, Mandiri</span>
+                                        </label>
+                                        <label :class="checkoutForm.payment === 'VA' ? 'border-charcoal bg-sand' : 'border-stoneborder'" class="border rounded-md p-4 flex flex-col justify-between cursor-pointer">
+                                            <div class="flex items-center justify-between mb-2">
+                                                <span class="font-bold text-sm">Virtual Account</span>
+                                                <input type="radio" value="VA" x-model="checkoutForm.payment" class="accent-terracotta">
+                                            </div>
+                                            <span class="text-xs text-stone-500">BCA, BNI, BRI, Mandiri VA</span>
+                                        </label>
+                                        <label :class="checkoutForm.payment === 'EWALLET' ? 'border-charcoal bg-sand' : 'border-stoneborder'" class="border rounded-md p-4 flex flex-col justify-between cursor-pointer">
+                                            <div class="flex items-center justify-between mb-2">
+                                                <span class="font-bold text-sm">E-Wallet</span>
+                                                <input type="radio" value="EWALLET" x-model="checkoutForm.payment" class="accent-terracotta">
+                                            </div>
+                                            <span class="text-xs text-stone-500">ShopeePay & LinkAja</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Order Summary Sidebar -->
+                            <div class="lg:col-span-5 space-y-6">
+                                <div class="bg-white p-6 rounded-md border border-stoneborder space-y-6 sticky top-28">
+                                    <h3 class="font-bold text-base border-b border-stoneborder pb-4">Ringkasan Pesanan</h3>
+                                    
+                                    <!-- Items list -->
+                                    <div class="space-y-4 max-h-60 overflow-y-auto pr-1">
+                                        <template x-for="item in cart" :key="item.id + item.variant">
+                                            <div class="flex items-center justify-between gap-4 text-xs">
+                                                <div class="flex items-center gap-3">
+                                                    <img :src="item.image" class="w-12 h-12 object-cover rounded border border-stoneborder">
+                                                    <div>
+                                                        <div class="font-bold text-charcoal" x-text="item.name"></div>
+                                                        <div class="text-stone-500">Varian: <span x-text="item.variant"></span> × <span x-text="item.qty"></span></div>
+                                                    </div>
+                                                </div>
+                                                <div class="font-bold text-charcoal" x-text="formatIDR(item.price * item.qty)"></div>
+                                            </div>
+                                        </template>
+                                    </div>
+
+                                    <!-- Voucher Input -->
+                                    <div class="pt-4 border-t border-stoneborder flex gap-2">
+                                        <input type="text" x-model="voucherCode" placeholder="Kode Promo (cth. HECIJAYA)" class="bg-sand border border-stoneborder rounded px-3 py-2 text-xs uppercase flex-1 focus:outline-none focus:border-terracotta">
+                                        <button @click="applyPromo(voucherCode)" class="bg-charcoal text-white px-4 py-2 rounded text-xs font-semibold hover:bg-terracotta transition-colors">Pakai</button>
+                                    </div>
+                                    <div x-show="appliedDiscount > 0" class="text-xs text-emerald-600 font-semibold">
+                                        ✓ Voucher aktif: Diskon Rp <span x-text="appliedDiscount"></span> diterapkan!
+                                    </div>
+
+                                    <!-- Calculations -->
+                                    <div class="space-y-2 pt-4 border-t border-stoneborder text-xs text-stone-600">
+                                        <div class="flex justify-between">
+                                            <span>Subtotal Produk</span>
+                                            <span class="font-bold text-charcoal" x-text="formatIDR(cartSubtotal)"></span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span>Estimasi Ongkir (<span x-text="checkoutForm.courier"></span>)</span>
+                                            <span class="font-bold text-charcoal" x-text="formatIDR(shippingCost)"></span>
+                                        </div>
+                                        <div x-show="appliedDiscount > 0" class="flex justify-between text-emerald-600">
+                                            <span>Diskon Voucher</span>
+                                            <span class="font-bold">- <span x-text="formatIDR(appliedDiscount)"></span></span>
+                                        </div>
+                                        <div class="flex justify-between text-base font-bold text-charcoal pt-3 border-t border-stoneborder">
+                                            <span>Total Tagihan</span>
+                                            <span class="text-terracotta" x-text="formatIDR(cartTotal + shippingCost - appliedDiscount)"></span>
+                                        </div>
+                                    </div>
+
+                                    <button @click="submitOrder()" class="w-full bg-charcoal text-white hover:bg-terracotta font-semibold py-4 rounded-md transition-all shadow-sm">
+                                        Konfirmasi & Buat Pesanan
+                                    </button>
+                                    <span class="block text-[10px] text-center text-stone-400">Dengan menekan tombol di atas, pesanan Anda akan diproses secara aman.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- 5. PAYMENT INSTRUCTION VIEW -->
+                <template x-if="currentView === 'storefront' && currentSubView === 'success'">
+                    <div class="max-w-2xl mx-auto px-4 py-16 text-center space-y-6">
+                        <div class="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-3xl font-bold shadow-sm">✓</div>
+                        <div>
+                            <span class="text-xs font-semibold text-terracotta uppercase tracking-wider">Pesanan Berhasil Dibuat</span>
+                            <h1 class="text-3xl font-bold tracking-tight mt-1">Terima Kasih, <span x-text="checkoutForm.name"></span>!</h1>
+                            <p class="text-stone-500 text-sm mt-2">Nomor Pesanan Anda: <strong class="text-charcoal" x-text="lastOrderNumber"></strong></p>
+                        </div>
+
+                        <!-- Payment box -->
+                        <div class="bg-white p-8 rounded-lg border border-stoneborder text-left space-y-6 shadow-sm">
+                            <div class="flex justify-between items-center border-b border-stoneborder pb-4">
+                                <div>
+                                    <div class="text-xs text-stone-500">Metode Pembayaran</div>
+                                    <div class="font-bold text-base" x-text="checkoutForm.payment === 'QRIS' ? 'QRIS (Instant)' : (checkoutForm.payment === 'VA' ? 'Virtual Account BCA' : 'E-Wallet ShopeePay')"></div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-xs text-stone-500">Total Tagihan</div>
+                                    <div class="font-bold text-lg text-terracotta" x-text="formatIDR(cartTotal + shippingCost - appliedDiscount)"></div>
+                                </div>
+                            </div>
+
+                            <!-- QR Code or VA Number Simulation -->
+                            <div class="text-center space-y-4 py-2">
+                                <template x-if="checkoutForm.payment === 'QRIS'">
+                                    <div class="space-y-3">
+                                        <div class="w-48 h-48 bg-sand border-2 border-dashed border-stoneborder mx-auto rounded flex items-center justify-center font-mono text-xs text-stone-500">
+                                            [ SIMULASI QRIS CODE ]
+                                        </div>
+                                        <p class="text-xs text-stone-500">Scan QR Code di atas menggunakan aplikasi m-banking atau e-wallet Anda.</p>
+                                    </div>
+                                </template>
+                                <template x-if="checkoutForm.payment !== 'QRIS'">
+                                    <div class="space-y-2 bg-sand p-4 rounded border border-stoneborder">
+                                        <div class="text-xs text-stone-500">Nomor Virtual Account / Tujuan</div>
+                                        <div class="font-mono text-xl font-bold text-charcoal">8803129841029481</div>
+                                        <div class="text-[11px] text-stone-500">Silakan transfer sesuai total tagihan sebelum batas waktu.</div>
+                                    </div>
+                                </template>
+                            </div>
+
+                            <div class="bg-amber-50 border border-amber-200 p-4 rounded text-xs text-amber-800 flex items-start gap-3">
+                                <span class="text-base">⏳</span>
+                                <div>
+                                    <strong>Status: Menunggu Pembayaran (Pending Payment)</strong>
+                                    <p class="mt-0.5">Sistem Heci.Tech akan memverifikasi pembayaran secara otomatis melalui webhook setelah Anda melakukan pembayaran simulasi.</p>
+                                </div>
+                            </div>
+
+                            <div class="flex gap-4 pt-2">
+                                <button @click="simulatePaymentSuccess()" class="flex-1 bg-emerald-600 text-white font-semibold py-3 rounded text-xs hover:bg-emerald-700 transition-colors">
+                                    Simulasikan Bayar Sukses (Webhook)
+                                </button>
+                                <button @click="currentSubView = 'home'; cart = [];" class="px-6 border border-stoneborder font-semibold py-3 rounded text-xs hover:border-charcoal transition-colors">
+                                    Kembali ke Beranda
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+
+            </div><!-- END STOREFRONT MODE -->
+
+            <!-- ======================================================== -->
+            <!-- ADMIN DASHBOARD MODE                                     -->
+            <!-- ======================================================== -->
+            <div x-show="currentMode === 'admin'" class="bg-sand/30 min-h-screen">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+                    
+                    <!-- Admin Header -->
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 pb-6 border-b border-stoneborder">
+                        <div>
+                            <span class="text-xs font-bold text-terracotta uppercase tracking-wider">Heci.Tech Admin Panel</span>
+                            <h1 class="text-3xl font-bold tracking-tight mt-1">Dashboard Pengelolaan UMKM</h1>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="bg-emerald-100 text-emerald-800 text-xs font-semibold px-3 py-1.5 rounded-full flex items-center gap-1.5">
+                                <span class="w-2 h-2 rounded-full bg-emerald-600"></span> Toko Aktif & Terhubung
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Admin Navigation Tabs -->
+                    <div class="flex items-center gap-2 overflow-x-auto pb-4 mb-6 border-b border-stoneborder">
+                        <button @click="adminTab = 'overview'" :class="adminTab === 'overview' ? 'bg-charcoal text-white' : 'bg-white text-stone-600 hover:bg-stone-100'" class="px-4 py-2 rounded text-xs font-semibold whitespace-nowrap border border-stoneborder transition-all">
+                            📊 Ringkasan Bisnis
+                        </button>
+                        <button @click="adminTab = 'products'" :class="adminTab === 'products' ? 'bg-charcoal text-white' : 'bg-white text-stone-600 hover:bg-stone-100'" class="px-4 py-2 rounded text-xs font-semibold whitespace-nowrap border border-stoneborder transition-all">
+                            📦 Manajemen Produk & Stok
+                        </button>
+                        <button @click="adminTab = 'orders'" :class="adminTab === 'orders' ? 'bg-charcoal text-white' : 'bg-white text-stone-600 hover:bg-stone-100'" class="px-4 py-2 rounded text-xs font-semibold whitespace-nowrap border border-stoneborder transition-all">
+                            🛍️ Kelola Pesanan & Resi
+                        </button>
+                        <button @click="adminTab = 'reports'" :class="adminTab === 'reports' ? 'bg-charcoal text-white' : 'bg-white text-stone-600 hover:bg-stone-100'" class="px-4 py-2 rounded text-xs font-semibold whitespace-nowrap border border-stoneborder transition-all">
+                            📈 Laporan & Analitik
+                        </button>
+                    </div>
+
+                    <!-- 1. ADMIN OVERVIEW -->
+                    <div x-show="adminTab === 'overview'" class="space-y-6">
+                        <!-- Stats Grid -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                            <div class="bg-white p-6 rounded-md border border-stoneborder space-y-2">
+                                <span class="text-xs font-semibold text-stone-500 uppercase tracking-wider">Total Penjualan (Bulan Ini)</span>
+                                <div class="text-2xl font-bold text-charcoal" x-text="formatIDR(14850000)"></div>
+                                <span class="text-xs text-emerald-600 font-semibold">↑ 18.2% dari bulan lalu</span>
+                            </div>
+                            <div class="bg-white p-6 rounded-md border border-stoneborder space-y-2">
+                                <span class="text-xs font-semibold text-stone-500 uppercase tracking-wider">Pesanan Masuk</span>
+                                <div class="text-2xl font-bold text-charcoal">42 Pesanan</div>
+                                <span class="text-xs text-stone-500">3 Perlu Diproses</span>
+                            </div>
+                            <div class="bg-white p-6 rounded-md border border-stoneborder space-y-2">
+                                <span class="text-xs font-semibold text-stone-500 uppercase tracking-wider">Produk Stok Rendah</span>
+                                <div class="text-2xl font-bold text-amber-600">2 Produk</div>
+                                <span class="text-xs text-stone-500">Segera restock varian</span>
+                            </div>
+                            <div class="bg-white p-6 rounded-md border border-stoneborder space-y-2">
+                                <span class="text-xs font-semibold text-stone-500 uppercase tracking-wider">Rating Pelanggan</span>
+                                <div class="text-2xl font-bold text-charcoal">4.9 / 5.0</div>
+                                <span class="text-xs text-emerald-600 font-semibold">128 Ulasan Positif</span>
+                            </div>
+                        </div>
+
+                        <!-- Recent Orders Table -->
+                        <div class="bg-white rounded-md border border-stoneborder p-6 space-y-4">
+                            <h3 class="font-bold text-base">Pesanan Terbaru yang Masuk</h3>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-xs">
+                                    <thead class="bg-sand text-stone-500 uppercase tracking-wider">
+                                        <tr>
+                                            <th class="p-3 rounded-l">No. Pesanan</th>
+                                            <th class="p-3">Pelanggan</th>
+                                            <th class="p-3">Total</th>
+                                            <th class="p-3">Status Pembayaran</th>
+                                            <th class="p-3">Status Pemenuhan</th>
+                                            <th class="p-3 rounded-r text-right">Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-stoneborder">
+                                        <tr>
+                                            <td class="p-3 font-mono font-bold">#HECI-98421</td>
+                                            <td class="p-3 font-medium">Siti Rahma (Padang)</td>
+                                            <td class="p-3 font-bold">Rp 345.000</td>
+                                            <td class="p-3"><span class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-semibold">Paid (Lunas)</span></td>
+                                            <td class="p-3"><span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded font-semibold">Processing</span></td>
+                                            <td class="p-3 text-right"><button @click="adminTab = 'orders'" class="text-terracotta font-semibold hover:underline">Kelola →</button></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="p-3 font-mono font-bold">#HECI-98420</td>
+                                            <td class="p-3 font-medium">Ahmad Fauzi (Jakarta)</td>
+                                            <td class="p-3 font-bold">Rp 780.000</td>
+                                            <td class="p-3"><span class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-semibold">Paid (Lunas)</span></td>
+                                            <td class="p-3"><span class="bg-blue-100 text-blue-800 px-2 py-0.5 rounded font-semibold">Shipped (Dikirim)</span></td>
+                                            <td class="p-3 text-right"><button @click="adminTab = 'orders'" class="text-terracotta font-semibold hover:underline">Kelola →</button></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. ADMIN PRODUCTS -->
+                    <div x-show="adminTab === 'products'" class="space-y-6">
+                        <div class="flex justify-between items-center bg-white p-6 rounded-md border border-stoneborder">
+                            <div>
+                                <h3 class="font-bold text-base">Manajemen Katalog & Inventori</h3>
+                                <p class="text-xs text-stone-500 mt-0.5">Tambah produk baru, ubah harga, atau pantau stok varian secara real-time.</p>
+                            </div>
+                            <button @click="showAddProductModal = true" class="bg-charcoal text-white hover:bg-terracotta text-xs font-semibold px-4 py-2.5 rounded transition-colors shadow-sm">
+                                + Tambah Produk Baru
+                            </button>
+                        </div>
+
+                        <!-- Product Table -->
+                        <div class="bg-white rounded-md border border-stoneborder overflow-hidden">
+                            <table class="w-full text-left text-xs">
+                                <thead class="bg-sand text-stone-500 uppercase tracking-wider">
+                                    <tr>
+                                        <th class="p-4">Produk</th>
+                                        <th class="p-4">Kategori</th>
+                                        <th class="p-4">Harga</th>
+                                        <th class="p-4">Stok Total</th>
+                                        <th class="p-4">Status</th>
+                                        <th class="p-4 text-right">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-stoneborder">
+                                    <template x-for="p in products" :key="p.id">
+                                        <tr>
+                                            <td class="p-4 flex items-center gap-3">
+                                                <img :src="p.image" class="w-10 h-10 object-cover rounded border border-stoneborder">
+                                                <div>
+                                                    <div class="font-bold text-charcoal" x-text="p.name"></div>
+                                                    <div class="text-stone-400 text-[10px]">SKU: HECI-PRD-0<span x-text="p.id"></span></div>
+                                                </div>
+                                            </td>
+                                            <td class="p-4 text-stone-600 font-medium" x-text="p.category"></td>
+                                            <td class="p-4 font-bold text-charcoal" x-text="formatIDR(p.price)"></td>
+                                            <td class="p-4">
+                                                <span :class="p.stock > 5 ? 'text-emerald-600' : 'text-red-600 font-bold'" x-text="p.stock + ' unit'"></span>
+                                            </td>
+                                            <td class="p-4"><span class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-semibold">Aktif</span></td>
+                                            <td class="p-4 text-right">
+                                                <button @click="editProduct(p)" class="text-charcoal font-semibold hover:text-terracotta mr-3">Edit</button>
+                                                <button @click="deleteProduct(p.id)" class="text-red-600 font-semibold hover:underline">Hapus</button>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- 3. ADMIN ORDERS -->
+                    <div x-show="adminTab === 'orders'" class="space-y-6">
+                        <div class="bg-white p-6 rounded-md border border-stoneborder">
+                            <h3 class="font-bold text-base">Kelola Pesanan & Masukkan Resi Pengiriman</h3>
+                            <p class="text-xs text-stone-500 mt-0.5">Perbarui status pemenuhan pesanan dan masukkan nomor resi kurir setelah barang dikirim.</p>
+                        </div>
+
+                        <!-- Orders List -->
+                        <div class="bg-white rounded-md border border-stoneborder p-6 space-y-4">
+                            <div class="flex items-center justify-between pb-4 border-b border-stoneborder">
+                                <span class="font-bold text-sm">Daftar Pesanan Masuk (Live State)</span>
+                                <span class="text-xs text-emerald-600 font-semibold">● Terhubung ke sistem checkout</span>
+                            </div>
+
+                            <div class="space-y-4">
+                                <div class="border border-stoneborder rounded-md p-4 space-y-3 bg-sand/30">
+                                    <div class="flex flex-wrap justify-between items-center gap-2">
+                                        <div>
+                                            <span class="font-mono font-bold text-sm">#HECI-98421</span>
+                                            <span class="text-xs text-stone-500 ml-2">• 10 Okt 2026, 14:20</span>
+                                        </div>
+                                        <span class="bg-emerald-100 text-emerald-800 text-xs px-2.5 py-1 rounded font-semibold">Paid (Lunas)</span>
+                                    </div>
+                                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs text-stone-600 py-2 border-y border-stoneborder">
+                                        <div>
+                                            <strong class="text-charcoal block mb-0.5">Penerima:</strong>
+                                            Siti Rahma (08129831928)<br>
+                                            Jl. Khatib Sulaiman No. 12, Padang
+                                        </div>
+                                        <div>
+                                            <strong class="text-charcoal block mb-0.5">Kurir & Layanan:</strong>
+                                            JNE REG (Rp 18.000)<br>
+                                            Resi: <span class="font-mono font-bold text-terracotta">JN8829102948</span>
+                                        </div>
+                                        <div>
+                                            <strong class="text-charcoal block mb-0.5">Total Pembayaran:</strong>
+                                            <span class="font-bold text-base text-charcoal">Rp 345.000</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex justify-end gap-2 pt-1">
+                                        <button class="bg-white border border-stoneborder px-3 py-1.5 rounded text-xs font-semibold hover:border-charcoal">Cetak Invoice</button>
+                                        <button class="bg-charcoal text-white px-3 py-1.5 rounded text-xs font-semibold hover:bg-terracotta">Perbarui Status & Resi</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4. ADMIN REPORTS -->
+                    <div x-show="adminTab === 'reports'" class="space-y-6">
+                        <div class="bg-white p-6 rounded-md border border-stoneborder space-y-4">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <h3 class="font-bold text-base">Laporan Penjualan & Analitik Bulanan</h3>
+                                    <p class="text-xs text-stone-500 mt-0.5">Rekapitulasi penjualan bersih, kategori terlaris, dan penggunaan voucher.</p>
+                                </div>
+                                <button class="bg-charcoal text-white text-xs font-semibold px-4 py-2 rounded hover:bg-terracotta transition-colors">
+                                    📥 Ekspor Laporan (CSV)
+                                </button>
+                            </div>
+                            <div class="p-6 bg-sand rounded border border-stoneborder text-center space-y-2">
+                                <div class="text-3xl font-bold text-charcoal">Rp 14.850.000</div>
+                                <div class="text-xs text-stone-500 font-medium">Total Omzet Bersih Periode Oktober 2026</div>
+                                <div class="text-[11px] text-emerald-600 font-semibold pt-2">✓ Seluruh transaksi tervalidasi server & payment gateway.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div><!-- END ADMIN MODE -->
+
+        </main>
+
+        <!-- ==================== CART SLIDE-OVER DRAWER ==================== -->
+        <div x-show="cartOpen" class="fixed inset-0 z-50 overflow-hidden" x-cloak>
+            <div @click="cartOpen = false" class="absolute inset-0 bg-charcoal/50 backdrop-blur-sm transition-opacity"></div>
+            <div class="absolute inset-y-0 right-0 max-w-full flex pl-10">
+                <div class="w-screen max-w-md bg-warmbg border-l border-stoneborder flex flex-col justify-between shadow-xl">
+                    <!-- Drawer Header -->
+                    <div class="p-6 border-b border-stoneborder flex items-center justify-between">
+                        <h2 class="font-bold text-lg">Keranjang Belanja (<span x-text="cartCount"></span>)</h2>
+                        <button @click="cartOpen = false" class="text-stone-400 hover:text-charcoal font-bold text-xl">✕</button>
+                    </div>
+
+                    <!-- Drawer Items -->
+                    <div class="p-6 flex-1 overflow-y-auto space-y-4">
+                        <template x-for="item in cart" :key="item.id + item.variant">
+                            <div class="flex gap-4 p-4 bg-white rounded-md border border-stoneborder items-center">
+                                <img :src="item.image" class="w-16 h-16 object-cover rounded border border-stoneborder">
+                                <div class="flex-1">
+                                    <h4 class="font-bold text-sm text-charcoal" x-text="item.name"></h4>
+                                    <div class="text-xs text-stone-500">Varian: <span x-text="item.variant"></span></div>
+                                    <div class="font-bold text-sm text-terracotta mt-1" x-text="formatIDR(item.price)"></div>
+                                    <div class="flex items-center gap-2 mt-2">
+                                        <button @click="updateQty(item, -1)" class="w-6 h-6 bg-sand rounded border border-stoneborder text-xs font-bold hover:bg-charcoal hover:text-white">-</button>
+                                        <span class="text-xs font-semibold" x-text="item.qty"></span>
+                                        <button @click="updateQty(item, 1)" class="w-6 h-6 bg-sand rounded border border-stoneborder text-xs font-bold hover:bg-charcoal hover:text-white">+</button>
+                                        <button @click="removeFromCart(item)" class="text-xs text-red-600 hover:underline ml-auto font-semibold">Hapus</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+
+                        <!-- Empty Cart State -->
+                        <div x-show="cart.length === 0" class="text-center py-16 space-y-3">
+                            <div class="w-16 h-16 bg-sand rounded-full flex items-center justify-center mx-auto text-2xl">🛒</div>
+                            <h3 class="font-bold text-base">Keranjang Anda Masih Kosong</h3>
+                            <p class="text-xs text-stone-500 max-w-xs mx-auto">Yuk, jelajahi katalog Nusantara Crafted dan temukan produk kriya pilihan Anda.</p>
+                            <button @click="cartOpen = false; currentSubView = 'catalog'" class="bg-charcoal text-white text-xs font-semibold px-6 py-3 rounded mt-2">Mulai Belanja</button>
+                        </div>
+                    </div>
+
+                    <!-- Drawer Footer -->
+                    <template x-if="cart.length > 0">
+                        <div class="p-6 border-t border-stoneborder bg-white space-y-4">
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-stone-500">Subtotal Belanja</span>
+                                <span class="font-bold text-base text-charcoal" x-text="formatIDR(cartSubtotal)"></span>
+                            </div>
+                            <button @click="cartOpen = false; currentSubView = 'checkout'" class="w-full bg-charcoal text-white hover:bg-terracotta font-semibold py-4 rounded-md transition-all shadow-sm">
+                                Lanjut ke Checkout →
+                            </button>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== FOOTER ==================== -->
+        <footer class="bg-stone-900 text-stone-400 py-12 border-t border-stone-800">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="space-y-4">
+                    <div class="flex items-center gap-2 text-white font-bold text-lg">
+                        <div class="w-8 h-8 bg-terracotta text-white flex items-center justify-center rounded">NC</div>
+                        Nusantara Crafted
+                    </div>
+                    <p class="text-xs leading-relaxed">
+                        Platform e-commerce UMKM profesional yang dikembangkan oleh <strong class="text-white">Heci.Tech</strong> untuk menghadirkan pengalaman belanja digital terbaik.
+                    </p>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold text-xs uppercase tracking-wider mb-3">Kategori Produk</h4>
+                    <ul class="space-y-2 text-xs">
+                        <li><a href="#" @click.prevent="selectedCategory='Tas & Aksesori'; currentSubView='catalog'" class="hover:text-white">Tas & Aksesori Kulit</a></li>
+                        <li><a href="#" @click.prevent="selectedCategory='Dekorasi Rumah'; currentSubView='catalog'" class="hover:text-white">Dekorasi Rumah Rotan</a></li>
+                        <li><a href="#" @click.prevent="selectedCategory='Kopi & Rempah'; currentSubView='catalog'" class="hover:text-white">Kopi Nusantara & Rempah</a></li>
+                        <li><a href="#" @click.prevent="selectedCategory='Tekstil & Tenun'; currentSubView='catalog'" class="hover:text-white">Tekstil & Tenun Tradisional</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold text-xs uppercase tracking-wider mb-3">Layanan Heci.Tech</h4>
+                    <ul class="space-y-2 text-xs">
+                        <li><a href="#" class="hover:text-white">Pembuatan Website UMKM</a></li>
+                        <li><a href="#" class="hover:text-white">Integrasi Payment Gateway</a></li>
+                        <li><a href="#" class="hover:text-white">Dashboard WMS & Inventory</a></li>
+                        <li><a href="#" class="hover:text-white">Konsultasi Bisnis Digital</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold text-xs uppercase tracking-wider mb-3">Kontak & Lokasi</h4>
+                    <p class="text-xs leading-relaxed">
+                        Padang, Sumatera Barat & Yogyakarta<br>
+                        Email: halo@heci.tech<br>
+                        WhatsApp: +62 811-2345-6789
+                    </p>
+                </div>
+            </div>
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 pt-8 border-t border-stone-800 text-center text-xs text-stone-500">
+                © 2026 Nusantara Crafted & Heci.Tech. Seluruh hak cipta dilindungi undang-undang.
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- ==================== ALPINE.JS APP LOGIC ==================== -->
+    <script>
+        function appState() {
+            return {
+                currentMode: 'storefront', // 'storefront' | 'admin'
+                currentView: 'storefront', // 'storefront' | 'admin'
+                currentSubView: 'home',    // 'home' | 'catalog' | 'detail' | 'checkout' | 'success'
+                adminTab: 'overview',      // 'overview' | 'products' | 'orders' | 'reports'
+                
+                cartOpen: false,
+                searchQuery: '',
+                selectedCategory: 'Semua',
+                priceFilter: 1000000,
+                sortBy: 'newest',
+                
+                categories: ['Tas & Aksesori', 'Dekorasi Rumah', 'Kopi & Rempah', 'Tekstil & Tenun'],
+                
+                products: [
+                    {
+                        id: 1,
+                        name: 'Tas Rotan Anyaman Premium "Kencana"',
+                        category: 'Tas & Aksesori',
+                        price: 325000,
+                        originalPrice: 400000,
+                        stock: 12,
+                        badge: 'Terlaris',
+                        image: 'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&q=80&w=800',
+                        description: 'Tas anyaman rotan asli buatan pengrajin desa Sukarara dengan tali kulit nabati pilihan. Sangat elegan untuk acara kasual maupun formal.',
+                        variants: ['Natural', 'Dark Brown', 'Vintage Honey']
+                    },
+                    {
+                        id: 2,
+                        name: 'Kopi Arabika Kerinci Specialty (250g)',
+                        category: 'Kopi & Rempah',
+                        price: 85000,
+                        originalPrice: null,
+                        stock: 25,
+                        badge: 'Baru',
+                        image: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&q=80&w=800',
+                        description: 'Biji kopi pilihan dari lereng Gunung Kerinci dengan catatan rasa buah tropis dan cokelat hitam yang kaya.',
+                        variants: ['Biji Utuh (Whole Bean)', 'Giling Halus (Fine Grind)', 'Giling Kasar (Coarse)']
+                    },
+                    {
+                        id: 3,
+                        name: 'Taplak Meja Tenun Ikat Tradisional',
+                        category: 'Tekstil & Tenun',
+                        price: 195000,
+                        originalPrice: 250000,
+                        stock: 4,
+                        badge: 'Stok Terbatas',
+                        image: 'https://images.unsplash.com/photo-1606760227091-3dd870d97f1d?auto=format&fit=crop&q=80&w=800',
+                        description: 'Ditenun secara manual menggunakan alat tenun bukan mesin (ATBM) dengan pewarna alami dari ekstrak kayu lokal.',
+                        variants: ['Merah Terakota', 'Biru Samudera']
+                    },
+                    {
+                        id: 4,
+                        name: 'Keranjang Buah Serbaguna Bambu Minimalis',
+                        category: 'Dekorasi Rumah',
+                        price: 145000,
+                        originalPrice: null,
+                        stock: 0,
+                        badge: null,
+                        image: 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&q=80&w=800',
+                        description: 'Wadah buah dan dekorasi meja makan berbahan dasar bambu pilihan yang dianyam rapat dan dilapisi pelindung anti-jamur.',
+                        variants: ['Standar']
+                    },
+                    {
+                        id: 5,
+                        name: 'Dompet Kulit Sapi Nabati Asli "Merapi"',
+                        category: 'Tas & Aksesori',
+                        price: 275000,
+                        originalPrice: 320000,
+                        stock: 8,
+                        badge: 'Favorit',
+                        image: 'https://images.unsplash.com/photo-1627123424574-724758594e93?auto=format&fit=crop&q=80&w=800',
+                        description: 'Dompet lipat kulit sapi pull-up asli yang dirancang tahan lama dan semakin estetik seiring pemakaian.',
+                        variants: ['Tan', 'Black', 'Dark Choco']
+                    }
+                ],
+
+                activeProduct: null,
+                selectedVariant: '',
+                quantity: 1,
+
+                cart: [
+                    { id: 1, name: 'Tas Rotan Anyaman Premium "Kencana"', price: 325000, variant: 'Natural', qty: 1, image: 'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&q=80&w=800' }
+                ],
+
+                voucherCode: '',
+                appliedDiscount: 0,
+
+                checkoutForm: {
+                    name: 'Budi Santoso',
+                    phone: '081234567890',
+                    email: 'budi@heci.tech',
+                    province: 'Sumatera Barat',
+                    city: 'Padang',
+                    district: 'Padang Utara',
+                    postalCode: '25132',
+                    courier: 'JNE REG',
+                    address: 'Jl. Ahmad Dahlan No. 45',
+                    payment: 'QRIS'
+                },
+                lastOrderNumber: '#HECI-98425',
+
+                get filteredProducts() {
+                    let result = this.products;
+                    if (this.selectedCategory !== 'Semua') {
+                        result = result.filter(p => p.category === this.selectedCategory);
+                    }
+                    if (this.searchQuery.trim() !== '') {
+                        const q = this.searchQuery.toLowerCase();
+                        result = result.filter(p => p.name.toLowerCase().includes(q) || p.category.toLowerCase().includes(q));
+                    }
+                    result = result.filter(p => p.price <= this.priceFilter);
+
+                    if (this.sortBy === 'price-low') {
+                        result.sort((a, b) => a.price - b.price);
+                    } else if (this.sortBy === 'price-high') {
+                        result.sort((a, b) => b.price - a.price);
+                    } else {
+                        result.sort((a, b) => b.id - a.id);
+                    }
+                    return result;
+                },
+
+                get cartCount() {
+                    return this.cart.reduce((sum, item) => sum + item.qty, 0);
+                },
+
+                get cartSubtotal() {
+                    return this.cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+                },
+
+                get shippingCost() {
+                    if (this.checkoutForm.courier === 'SiCepat BEST') return 22000;
+                    if (this.checkoutForm.courier === 'J&T Express') return 17000;
+                    return 18000; // JNE REG
+                },
+
+                formatIDR(num) {
+                    return 'Rp ' + num.toLocaleString('id-ID');
+                },
+
+                getCategoryIcon(cat) {
+                    if (cat.includes('Tas')) return '👜';
+                    if (cat.includes('Dekorasi')) return '🪴';
+                    if (cat.includes('Kopi')) return '☕';
+                    return '🧵';
+                },
+
+                viewProduct(product) {
+                    this.activeProduct = product;
+                    this.selectedVariant = product.variants[0] || 'Default';
+                    this.quantity = 1;
+                    this.currentSubView = 'detail';
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                },
+
+                addToCart(product) {
+                    if (product.stock === 0) return;
+                    const existing = this.cart.find(i => i.id === product.id && i.variant === this.selectedVariant);
+                    if (existing) {
+                        existing.qty += this.quantity;
+                    } else {
+                        this.cart.push({
+                            id: product.id,
+                            name: product.name,
+                            price: product.price,
+                            variant: this.selectedVariant,
+                            qty: this.quantity,
+                            image: product.image
+                        });
+                    }
+                    this.cartOpen = true;
+                },
+
+                updateQty(item, delta) {
+                    item.qty += delta;
+                    if (item.qty <= 0) {
+                        this.removeFromCart(item);
+                    }
+                },
+
+                removeFromCart(item) {
+                    this.cart = this.cart.filter(i => !(i.id === item.id && i.variant === item.variant));
+                },
+
+                applyPromo(code) {
+                    if (code.toUpperCase() === 'HECIJAYA' || code.toUpperCase() === 'HECI') {
+                        this.appliedDiscount = 50000;
+                        alert('Voucher berhasil digunakan! Diskon Rp 50.000 diterapkan.');
+                    } else {
+                        alert('Kode voucher tidak valid atau sudah kedaluwarsa.');
+                    }
+                },
+
+                submitOrder() {
+                    if (!this.checkoutForm.name || !this.checkoutForm.phone || !this.checkoutForm.address) {
+                        alert('Mohon lengkapi nama, nomor telepon, dan alamat pengiriman Anda.');
+                        return;
+                    }
+                    this.lastOrderNumber = '#HECI-' + Math.floor(10000 + Math.random() * 90000);
+                    this.currentSubView = 'success';
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                },
+
+                simulatePaymentSuccess() {
+                    alert('Webhook diterima! Pembayaran terverifikasi lunas. Stok produk telah diperbarui secara otomatis di database.');
+                    this.cart = [];
+                    this.currentSubView = 'home';
+                },
+
+                editProduct(p) {
+                    alert('Fitur edit produk untuk SKU: ' + p.name);
+                },
+
+                deleteProduct(id) {
+                    if (confirm('Apakah Anda yakin ingin menonaktifkan produk ini?')) {
+                        this.products = this.products.filter(p => p.id !== id);
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,1594 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sajian Nusantara — Gourmet Culinary & Ordering Platform</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Tailwind Custom Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        warmIvory: '#FFF9F2',
+                        deepCharcoal: '#25231F',
+                        chiliOrange: '#F05A28',
+                        chiliOrangeHover: '#D94819',
+                        sageGreen: '#687C5A',
+                        softSand: '#EEE5DA',
+                        cardBg: '#FFFFFF',
+                        mutedText: '#78716C'
+                    },
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #FFF9F2;
+            color: #25231F;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #EEE5DA;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #A8A29E;
+            border-radius: 3px;
+        }
+        .fade-in {
+            animation: fadeIn 0.25s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="h-full flex flex-col antialiased selection:bg-chiliOrange selection:text-white">
+
+    <div id="app" class="flex flex-col min-h-full">
+        <!-- Dynamically rendered via JavaScript SPA Router -->
+    </div>
+
+    <script>
+        /* ==========================================================================
+           1. INITIAL STATE & MOCK DATA
+           ========================================================================== */
+        const DEFAULT_OUTLETS = [
+            { id: 'out-1', name: 'Sajian Nusantara Senopati', address: 'Jl. Senopati Raya No. 42, Kebayoran Baru, Jakarta Selatan', city: 'Jakarta Selatan', phone: '+62 21 5551234', isOpen: true, openTime: '10:00', closeTime: '22:00', deliveryRadiusKm: 8, lat: -6.2293, lng: 106.8123 },
+            { id: 'out-2', name: 'Sajian Nusantara Menteng', address: 'Jl. HOS Cokroaminoto No. 88, Menteng, Jakarta Pusat', city: 'Jakarta Pusat', phone: '+62 21 5555678', isOpen: true, openTime: '09:00', closeTime: '23:00', deliveryRadiusKm: 10, lat: -6.1944, lng: 106.8329 },
+            { id: 'out-3', name: 'Sajian Nusantara PIK', address: 'Ruko Golf Island Blok L No. 12, Pantai Indah Kapuk, Jakarta Utara', city: 'Jakarta Utara', phone: '+62 21 5559012', isOpen: false, openTime: '10:00', closeTime: '22:00', deliveryRadiusKm: 7, lat: -6.1112, lng: 106.7412 }
+        ];
+
+        const DEFAULT_CATEGORIES = [
+            { id: 'cat-1', name: 'Semua Menu', slug: 'all' },
+            { id: 'cat-2', name: 'Signature Nusantara', slug: 'signature' },
+            { id: 'cat-3', name: 'Daging & Bakaran', slug: 'grill' },
+            { id: 'cat-4', name: 'Sup & Kuah', slug: 'soup' },
+            { id: 'cat-5', name: 'Minuman Segar', slug: 'beverages' }
+        ];
+
+        const DEFAULT_PRODUCTS = [
+            {
+                id: 'prod-1',
+                categoryId: 'cat-2',
+                name: 'Nasi Rendang Sapi Wagyu',
+                description: 'Daging wagyu empuk dimasak perlahan dalam rempah minang asli dengan santan kelapa murni selama 8 jam.',
+                price: 95000,
+                image: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80',
+                isBestSeller: true,
+                isNew: false,
+                isSpicy: true,
+                isVegetarian: false,
+                isAvailable: true,
+                variants: [
+                    { name: 'Nasi Putih Premium', priceOffset: 0 },
+                    { name: 'Nasi Merah Organik', priceOffset: 5000 },
+                    { name: 'Tanpa Nasi (Extra Daging)', priceOffset: 25000 }
+                ],
+                addons: [
+                    { name: 'Extra Sambal Hijau Padang', price: 6000 },
+                    { name: 'Kerupuk Udang Special', price: 8000 },
+                    { name: 'Telur Balado', price: 9000 }
+                ]
+            },
+            {
+                id: 'prod-2',
+                categoryId: 'cat-3',
+                name: 'Sate Ayam Madura Bakar Arang',
+                description: '10 tusuk sate ayam pilihan dengan bumbu kacang mede kental legit serta taburan bawang goreng harum.',
+                price: 65000,
+                image: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=800&q=80',
+                isBestSeller: true,
+                isNew: false,
+                isSpicy: false,
+                isVegetarian: false,
+                isAvailable: true,
+                variants: [
+                    { name: 'Bumbu Kacang Madura', priceOffset: 0 },
+                    { name: 'Bumbu Kecap Pedas Manis', priceOffset: 0 }
+                ],
+                addons: [
+                    { name: 'Lontong Daun Pisang', price: 7000 },
+                    { name: 'Es Teh Manis', price: 10000 }
+                ]
+            },
+            {
+                id: 'prod-3',
+                categoryId: 'cat-4',
+                name: 'Soto Betawi Daging Sapi & Paru',
+                description: 'Kuah santan susu gurih kaya rempah khas Betawi disajikan dengan daging empuk, paru goreng, emping, dan tomat segar.',
+                price: 78000,
+                image: 'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=800&q=80',
+                isBestSeller: false,
+                isNew: true,
+                isSpicy: false,
+                isVegetarian: false,
+                isAvailable: true,
+                variants: [
+                    { name: 'Susu Sapi Murni', priceOffset: 0 },
+                    { name: 'Santan Kelapa Tradisional', priceOffset: 0 }
+                ],
+                addons: [
+                    { name: 'Extra Emping Melinjo', price: 6000 },
+                    { name: 'Nasi Putih Hangat', price: 8000 }
+                ]
+            },
+            {
+                id: 'prod-4',
+                categoryId: 'cat-2',
+                name: 'Ayam Goreng Lengkuas Kremes',
+                description: 'Ayam kampung muda ungkep rempah gurih dengan taburan serundeng lengkuas renyah dan lalapan segar.',
+                price: 62000,
+                image: 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?auto=format&fit=crop&w=800&q=80',
+                isBestSeller: true,
+                isNew: false,
+                isSpicy: false,
+                isVegetarian: false,
+                isAvailable: true,
+                variants: [
+                    { name: 'Bagian Dada', priceOffset: 0 },
+                    { name: 'Bagian Paha', priceOffset: 0 }
+                ],
+                addons: [
+                    { name: 'Sambal Terasi Mentah', price: 5000 },
+                    { name: 'Tahu Tempe Goreng', price: 12000 }
+                ]
+            },
+            {
+                id: 'prod-5',
+                categoryId: 'cat-5',
+                name: 'Es Dawet Ireng Purworejo',
+                description: 'Minuman tradisional segar dengan cendol hitam dari abu jerami, santan kelapa segar, dan gula aren asli.',
+                price: 28000,
+                image: 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?auto=format&fit=crop&w=800&q=80',
+                isBestSeller: false,
+                isNew: true,
+                isSpicy: false,
+                isVegetarian: true,
+                isAvailable: true,
+                variants: [
+                    { name: 'Normal Manis Gula Aren', priceOffset: 0 },
+                    { name: 'Less Sugar', priceOffset: 0 }
+                ],
+                addons: [
+                    { name: 'Extra Nangka Madu', price: 5000 }
+                ]
+            }
+        ];
+
+        const DEFAULT_VOUCHERS = [
+            { code: 'NUSANTARA15', discountType: 'percent', discountValue: 15, minSpend: 50000, maxDiscount: 30000, expiry: '2026-12-31' },
+            { code: 'HEMATHEMAT', discountType: 'fixed', discountValue: 20000, minSpend: 100000, maxDiscount: 20000, expiry: '2026-12-31' }
+        ];
+
+        const INITIAL_ORDERS = [
+            {
+                id: 'ORD-8821',
+                createdAt: new Date(Date.now() - 1000 * 60 * 15).toISOString(),
+                outletId: 'out-1',
+                customerName: 'Budi Santoso',
+                customerPhone: '+62 812 3456 7890',
+                fulfillmentType: 'delivery',
+                address: 'Jl. Jend. Sudirman Kav. 52-53, Jakarta Selatan',
+                deliveryNotes: 'Lantai 18, titip ke resepsionis',
+                items: [
+                    { name: 'Nasi Rendang Sapi Wagyu', variant: 'Nasi Putih Premium', addons: ['Extra Sambal Hijau Padang'], quantity: 2, price: 101000 }
+                ],
+                subtotal: 202000,
+                deliveryFee: 15000,
+                discount: 30000,
+                total: 187000,
+                paymentMethod: 'qris',
+                paymentStatus: 'paid',
+                status: 'cooking', // received, cooking, ready, delivering, completed, cancelled
+                targetMinutes: 25,
+                courier: 'Joki Send (Ahmad)',
+                auditTrail: [{ time: '15 mins ago', note: 'Pesanan Diterima' }, { time: '10 mins ago', note: 'Mulai Dimasak di Dapur' }]
+            },
+            {
+                id: 'ORD-8822',
+                createdAt: new Date(Date.now() - 1000 * 60 * 5).toISOString(),
+                outletId: 'out-1',
+                customerName: 'Siti Rahma',
+                customerPhone: '+62 856 7890 1234',
+                fulfillmentType: 'pickup',
+                address: 'Ambil di Outlet Senopati',
+                deliveryNotes: 'Tiba dalam 10 menit',
+                items: [
+                    { name: 'Sate Ayam Madura Bakar Arang', variant: 'Bumbu Kacang Madura', addons: ['Lontong Daun Pisang'], quantity: 1, price: 72000 }
+                ],
+                subtotal: 72000,
+                deliveryFee: 0,
+                discount: 0,
+                total: 72000,
+                paymentMethod: 'transfer',
+                paymentStatus: 'paid',
+                status: 'received',
+                targetMinutes: 15,
+                courier: '-',
+                auditTrail: [{ time: '5 mins ago', note: 'Pesanan Diterima oleh Kasir' }]
+            }
+        ];
+
+        /* ==========================================================================
+           2. APP STATE MANAGEMENT
+           ========================================================================== */
+        let state = {
+            currentView: 'customer-home', // customer-home, customer-catalog, customer-checkout, customer-tracking, ops-login, ops-cashier, ops-kitchen, ops-admin
+            selectedOutlet: DEFAULT_OUTLETS[0],
+            selectedCategory: 'all',
+            searchQuery: '',
+            cart: [],
+            activeModalProduct: null,
+            checkoutForm: {
+                fulfillmentType: 'delivery', // delivery or pickup
+                customerName: '',
+                customerPhone: '',
+                address: '',
+                deliveryNotes: '',
+                paymentMethod: 'qris', // qris, ewallet, va, cod
+                voucherCode: '',
+                appliedVoucher: null
+            },
+            orders: [...INITIAL_ORDERS],
+            activeTrackingOrderId: null,
+            // Admin / Ops State
+            adminTab: 'orders', // orders, menu, outlets, vouchers, reports
+            staffRole: 'cashier', // cashier, kitchen, admin
+            inventoryStock: {}, // productId -> boolean
+            notificationsEnabled: true
+        };
+
+        // Initialize Inventory Stock Status
+        DEFAULT_PRODUCTS.forEach(p => {
+            state.inventoryStock[p.id] = p.isAvailable;
+        });
+
+        /* ==========================================================================
+           3. ROUTER & RENDER ENGINE
+           ========================================================================== */
+        function navigateTo(view, orderId = null) {
+            state.currentView = view;
+            if (orderId) state.activeTrackingOrderId = orderId;
+            render();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function render() {
+            const appEl = document.getElementById('app');
+            appEl.innerHTML = '';
+
+            if (state.currentView.startsWith('customer-')) {
+                appEl.innerHTML += renderCustomerHeader();
+            } else if (state.currentView.startsWith('ops-') && state.currentView !== 'ops-login') {
+                appEl.innerHTML += renderOpsNavbar();
+            }
+
+            // Route views
+            switch (state.currentView) {
+                case 'customer-home':
+                    appEl.innerHTML += renderCustomerHome();
+                    break;
+                case 'customer-catalog':
+                    appEl.innerHTML += renderCustomerCatalog();
+                    break;
+                case 'customer-checkout':
+                    appEl.innerHTML += renderCustomerCheckout();
+                    break;
+                case 'customer-tracking':
+                    appEl.innerHTML += renderCustomerTracking();
+                    break;
+                case 'ops-login':
+                    appEl.innerHTML += renderOpsLogin();
+                    break;
+                case 'ops-cashier':
+                    appEl.innerHTML += renderOpsCashier();
+                    break;
+                case 'ops-kitchen':
+                    appEl.innerHTML += renderOpsKitchen();
+                    break;
+                case 'ops-admin':
+                    appEl.innerHTML += renderOpsAdmin();
+                    break;
+                default:
+                    appEl.innerHTML += renderCustomerHome();
+            }
+
+            appEl.innerHTML += renderFooter();
+            
+            // Render modal if active
+            if (state.activeModalProduct) {
+                appEl.innerHTML += renderProductModal();
+            }
+        }
+
+        /* ==========================================================================
+           4. SHARED COMPONENTS (HEADER & FOOTER)
+           ========================================================================== */
+        function renderCustomerHeader() {
+            const cartCount = state.cart.reduce((sum, item) => sum + item.quantity, 0);
+            return `
+                <header class="sticky top-0 z-40 bg-warmIvory/90 backdrop-blur-md border-b border-softSand px-4 lg:px-12 py-4 flex items-center justify-between">
+                    <div class="flex items-center gap-6">
+                        <button onclick="navigateTo('customer-home')" class="flex items-center gap-2 text-left group">
+                            <div class="w-10 h-10 rounded-xl bg-chiliOrange flex items-center justify-center text-white font-extrabold text-xl shadow-md group-hover:bg-chiliOrangeHover transition">
+                                SN
+                            </div>
+                            <div>
+                                <h1 class="font-extrabold text-deepCharcoal text-lg leading-tight tracking-tight">Sajian Nusantara</h1>
+                                <p class="text-xs text-mutedText font-medium">Gourmet Culinary Group</p>
+                            </div>
+                        </button>
+
+                        <!-- Outlet Switcher Dropdown Trigger -->
+                        <div class="hidden md:flex items-center gap-2 bg-white border border-softSand rounded-xl px-3 py-1.5 shadow-sm text-sm">
+                            <svg class="w-4 h-4 text-chiliOrange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                            <span class="font-semibold text-deepCharcoal truncate max-w-[200px]">${state.selectedOutlet.name}</span>
+                            <button onclick="openOutletModal()" class="text-xs text-chiliOrange font-bold hover:underline ml-1">Ubah</button>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-4">
+                        <button onclick="navigateTo('customer-catalog')" class="hidden sm:inline-flex text-sm font-semibold text-deepCharcoal hover:text-chiliOrange transition px-3 py-2">
+                            Menu Kami
+                        </button>
+                        
+                        <!-- Cart Button -->
+                        <button onclick="toggleCartDrawer()" class="relative flex items-center gap-2 bg-deepCharcoal text-warmIvory px-4 py-2.5 rounded-xl font-semibold text-sm shadow-md hover:bg-black transition">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+                            <span class="hidden sm:inline">Keranjang</span>
+                            ${cartCount > 0 ? `<span class="absolute -top-1.5 -right-1.5 bg-chiliOrange text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold shadow">${cartCount}</span>` : ''}
+                        </button>
+
+                        <!-- Ops Portal Login Link -->
+                        <button onclick="navigateTo('ops-login')" title="Login Kasir & Dapur" class="p-2.5 text-mutedText hover:text-chiliOrange bg-white border border-softSand rounded-xl shadow-sm transition">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M12 5l7 7-7 7"/></svg>
+                        </button>
+                    </div>
+                </header>
+            `;
+        }
+
+        function renderOpsNavbar() {
+            return `
+                <nav class="bg-deepCharcoal text-warmIvory px-6 py-4 flex items-center justify-between border-b border-stone-800">
+                    <div class="flex items-center gap-4">
+                        <div class="w-9 h-9 rounded-lg bg-chiliOrange flex items-center justify-center text-white font-bold">
+                            OPS
+                        </div>
+                        <div>
+                            <span class="font-bold text-base tracking-wide">${state.selectedOutlet.name}</span>
+                            <div class="flex items-center gap-2 text-xs text-stone-400">
+                                <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                Sistem Kasir & Dapur Aktif
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <button onclick="navigateTo('ops-cashier')" class="px-3 py-1.5 rounded-lg text-xs font-semibold ${state.currentView === 'ops-cashier' ? 'bg-chiliOrange text-white' : 'bg-stone-800 text-stone-300 hover:bg-stone-700'}">
+                            Kasir
+                        </button>
+                        <button onclick="navigateTo('ops-kitchen')" class="px-3 py-1.5 rounded-lg text-xs font-semibold ${state.currentView === 'ops-kitchen' ? 'bg-chiliOrange text-white' : 'bg-stone-800 text-stone-300 hover:bg-stone-700'}">
+                            Dapur (KDS)
+                        </button>
+                        <button onclick="navigateTo('ops-admin')" class="px-3 py-1.5 rounded-lg text-xs font-semibold ${state.currentView === 'ops-admin' ? 'bg-chiliOrange text-white' : 'bg-stone-800 text-stone-300 hover:bg-stone-700'}">
+                            Manajemen & Laporan
+                        </button>
+                        <button onclick="navigateTo('customer-home')" class="ml-4 px-3 py-1.5 rounded-lg text-xs font-semibold bg-stone-700 text-white hover:bg-stone-600">
+                            Keluar ke Web Pelanggan
+                        </button>
+                    </div>
+                </nav>
+            `;
+        }
+
+        function renderFooter() {
+            return `
+                <footer class="bg-deepCharcoal text-warmIvory/80 pt-16 pb-12 px-6 lg:px-16 mt-auto border-t border-stone-800">
+                    <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
+                        <div>
+                            <div class="flex items-center gap-2 mb-4">
+                                <div class="w-8 h-8 rounded-lg bg-chiliOrange flex items-center justify-center text-white font-bold">SN</div>
+                                <span class="font-bold text-white text-lg">Sajian Nusantara</span>
+                            </div>
+                            <p class="text-sm text-stone-400 leading-relaxed">
+                                Platform pemesanan kuliner autentik Indonesia berstandar gourmet dengan kualitas bahan baku pilihan dan pengiriman cepat.
+                            </p>
+                        </div>
+                        <div>
+                            <h3 class="text-white font-bold text-sm mb-4 tracking-wide uppercase">Outlet Utama</h3>
+                            <ul class="space-y-2 text-sm text-stone-400">
+                                <li>Senopati, Jakarta Selatan</li>
+                                * <li>Menteng, Jakarta Pusat</li>
+                                <li>Pantai Indah Kapuk, Jakarta Utara</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h3 class="text-white font-bold text-sm mb-4 tracking-wide uppercase">Bantuan & Layanan</h3>
+                            <ul class="space-y-2 text-sm text-stone-400">
+                                <li><a href="#" class="hover:text-chiliOrange transition">Cara Pemesanan</a></li>
+                                <li><a href="#" class="hover:text-chiliOrange transition">Kebijakan Privasi</a></li>
+                                <li><a href="#" class="hover:text-chiliOrange transition">Syarat & Ketentuan</a></li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h3 class="text-white font-bold text-sm mb-4 tracking-wide uppercase">Jam Operasional</h3>
+                            <p class="text-sm text-stone-400 leading-relaxed mb-3">
+                                Setiap Hari: 10.00 - 22.00 WIB<br>
+                                Layanan Delivery & Pickup tersedia.
+                            </p>
+                            <div class="flex items-center gap-2 text-xs text-emerald-400 font-semibold">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Semua Outlet Beroperasi Normal
+                            </div>
+                        </div>
+                    </div>
+                    <div class="max-w-7xl mx-auto pt-8 border-t border-stone-800 text-center text-xs text-stone-500 flex flex-col sm:flex-row justify-between items-center gap-4">
+                        <p>&copy; 2026 PT Sajian Kuliner Nusantara. Hak cipta dilindungi undang-undang.</p>
+                        <p>Designed with Passion for Gourmet Excellence.</p>
+                    </div>
+                </footer>
+            `;
+        }
+
+        /* ==========================================================================
+           5. CUSTOMER HOMEPAGE
+           ========================================================================== */
+        function renderCustomerHome() {
+            const popularProducts = DEFAULT_PRODUCTS.filter(p => p.isBestSeller);
+            return `
+                <main class="flex-grow">
+                    <!-- Hero Section -->
+                    <section class="px-4 lg:px-16 py-8 lg:py-16 max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                        <div class="lg:col-span-7 space-y-6 fade-in">
+                            <div class="inline-flex items-center gap-2 bg-chiliOrange/10 text-chiliOrange px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider">
+                                <span class="w-2 h-2 rounded-full bg-chiliOrange animate-ping"></span>
+                                Autentik & Gourmet Nusantara
+                            </div>
+                            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-deepCharcoal tracking-tight leading-[1.1]">
+                                Kelezatan Warisan Kuliner, <span class="text-chiliOrange">Kini Di Meja Anda.</span>
+                            </h1>
+                            <p class="text-stone-600 text-base sm:text-lg max-w-xl leading-relaxed">
+                                Nikmati hidangan tradisional berstandar tinggi dari resep legendaris nusantara. Dipesan secara online tanpa repot, siap diantar atau diambil segar dari outlet terdekat.
+                            </p>
+                            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-2">
+                                <button onclick="navigateTo('customer-catalog')" class="bg-chiliOrange hover:bg-chiliOrangeHover text-white font-bold px-8 py-4 rounded-xl shadow-lg shadow-chiliOrange/20 transition transform active:scale-95 text-center">
+                                    Pesan Sekarang
+                                </button>
+                                <button onclick="openOutletModal()" class="bg-white border border-softSand hover:bg-stone-50 text-deepCharcoal font-semibold px-6 py-4 rounded-xl transition text-center flex items-center justify-center gap-2">
+                                    <svg class="w-5 h-5 text-chiliOrange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                    Pilih Outlet Terdekat
+                                </button>
+                            </div>
+                            <div class="flex items-center gap-6 pt-4 text-xs font-semibold text-stone-500 border-t border-softSand">
+                                <div>✓ Jaminan Bahan Segar</div>
+                                <div>✓ Higienis & Standar Dapur Ketat</div>
+                                <div>✓ Real-time Tracking</div>
+                            </div>
+                        </div>
+
+                        <div class="lg:col-span-5 relative fade-in">
+                            <div class="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-white aspect-[4/5]">
+                                <img src="https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=1000&q=80" alt="Hero Food" class="w-full h-full object-cover">
+                                <div class="absolute inset-0 bg-gradient-to-t from-deepCharcoal/70 via-transparent to-transparent flex flex-col justify-end p-6 text-white">
+                                    <span class="bg-chiliOrange text-white text-xs font-bold px-3 py-1 rounded-full w-max mb-2">Signature Dish</span>
+                                    <h3 class="font-extrabold text-2xl">Nasi Rendang Sapi Wagyu</h3>
+                                    <p class="text-xs text-stone-200 mt-1">Dimasak 8 jam dengan rempah pilihan terbaik</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Categories Quick Grid -->
+                    <section class="bg-softSand/50 py-12 px-4 lg:px-16 border-y border-softSand">
+                        <div class="max-w-7xl mx-auto">
+                            <div class="flex justify-between items-end mb-8">
+                                <div>
+                                    <h2 class="text-2xl font-extrabold text-deepCharcoal">Kategori Pilihan</h2>
+                                    <p class="text-sm text-stone-500 mt-1">Eksplorasi ragam menu spesial kami</p>
+                                </div>
+                                <button onclick="navigateTo('customer-catalog')" class="text-sm font-bold text-chiliOrange hover:underline">Lihat Semua Menu →</button>
+                            </div>
+                            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+                                ${DEFAULT_CATEGORIES.filter(c => c.slug !== 'all').map(cat => `
+                                    <div onclick="state.selectedCategory='${cat.id}'; navigateTo('customer-catalog');" class="bg-white p-6 rounded-2xl border border-softSand hover:border-chiliOrange cursor-pointer transition text-center group shadow-sm">
+                                        <div class="w-12 h-12 bg-chiliOrange/10 text-chiliOrange rounded-xl flex items-center justify-center mx-auto mb-3 font-bold text-lg group-hover:bg-chiliOrange group-hover:text-white transition">
+                                            ${cat.name.charAt(0)}
+                                        </div>
+                                        <h3 class="font-bold text-sm text-deepCharcoal group-hover:text-chiliOrange transition">${cat.name}</h3>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Popular Best Sellers -->
+                    <section class="py-16 px-4 lg:px-16 max-w-7xl mx-auto">
+                        <div class="flex justify-between items-end mb-8">
+                            <div>
+                                <h2 class="text-2xl font-extrabold text-deepCharcoal">Menu Terfavorit</h2>
+                                <p class="text-sm text-stone-500 mt-1">Pilihan paling sering dipesan oleh pelanggan setia kami</p>
+                            </div>
+                            <button onclick="navigateTo('customer-catalog')" class="text-sm font-bold text-chiliOrange hover:underline">Lihat Menu Lainnya →</button>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                            ${popularProducts.map(product => renderProductCard(product)).join('')}
+                        </div>
+                    </section>
+                </main>
+            `;
+        }
+
+        /* ==========================================================================
+           6. MENU CATALOG & PRODUCT CARD
+           ========================================================================== */
+        function renderCustomerCatalog() {
+            const filteredProducts = DEFAULT_PRODUCTS.filter(p => {
+                const matchCat = state.selectedCategory === 'all' || p.categoryId === state.selectedCategory;
+                const matchQuery = p.name.toLowerCase().includes(state.searchQuery.toLowerCase()) || p.description.toLowerCase().includes(state.searchQuery.toLowerCase());
+                return matchCat && matchQuery;
+            });
+
+            return `
+                <main class="flex-grow max-w-7xl mx-auto px-4 lg:px-16 py-8 w-full">
+                    <!-- Search & Title Bar -->
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+                        <div>
+                            <h1 class="text-3xl font-extrabold text-deepCharcoal">Katalog Menu</h1>
+                            <p class="text-sm text-stone-500 mt-1">Ketersediaan disesuaikan dengan outlet: <span class="font-semibold text-deepCharcoal">${state.selectedOutlet.name}</span></p>
+                        </div>
+                        <div class="w-full md:w-80">
+                            <div class="relative">
+                                <input type="text" id="searchInput" oninput="handleSearchInput(this.value)" value="${state.searchQuery}" placeholder="Cari makanan atau minuman..." class="w-full bg-white border border-softSand rounded-xl px-4 py-3 pl-10 text-sm focus:outline-none focus:border-chiliOrange transition">
+                                <svg class="w-5 h-5 text-stone-400 absolute left-3 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Category Pills -->
+                    <div class="flex items-center gap-2 overflow-x-auto pb-4 mb-8 scrollbar-none">
+                        ${DEFAULT_CATEGORIES.map(cat => `
+                            <button onclick="state.selectedCategory='${cat.id}'; render();" class="px-5 py-2.5 rounded-xl text-sm font-semibold whitespace-nowrap transition ${state.selectedCategory === cat.id ? 'bg-chiliOrange text-white shadow-md shadow-chiliOrange/20' : 'bg-white text-stone-600 border border-softSand hover:border-chiliOrange'}">
+                                ${cat.name}
+                            </button>
+                        `).join('')}
+                    </div>
+
+                    <!-- Product Grid -->
+                    ${filteredProducts.length === 0 ? `
+                        <div class="py-20 text-center bg-white rounded-3xl border border-softSand my-6">
+                            <div class="w-16 h-16 bg-stone-100 rounded-full flex items-center justify-center mx-auto mb-4 text-stone-400 text-2xl">🍽️</div>
+                            <h3 class="font-bold text-lg text-deepCharcoal">Menu Tidak Ditemukan</h3>
+                            <p class="text-sm text-stone-500 mt-1">Coba gunakan kata kunci lain atau pilih kategori berbeda.</p>
+                        </div>
+                    ` : `
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                            ${filteredProducts.map(p => renderProductCard(p)).join('')}
+                        </div>
+                    `}
+                </main>
+            `;
+        }
+
+        function renderProductCard(product) {
+            const isAvailable = state.inventoryStock[product.id] !== false;
+            return `
+                <div class="bg-white rounded-2xl border border-softSand overflow-hidden shadow-sm hover:shadow-md transition flex flex-col group">
+                    <div class="relative aspect-[4/3] overflow-hidden bg-stone-100">
+                        <img src="${product.image}" alt="${product.name}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" onerror="this.src='https://placehold.co/600x400/EEE5DA/25231F?text=Sajian+Nusantara'">
+                        <div class="absolute top-3 left-3 flex flex-wrap gap-1.5">
+                            ${product.isBestSeller ? `<span class="bg-chiliOrange text-white text-xs font-bold px-2.5 py-1 rounded-lg shadow">Best Seller</span>` : ''}
+                            ${product.isNew ? `<span class="bg-sageGreen text-white text-xs font-bold px-2.5 py-1 rounded-lg shadow">Baru</span>` : ''}
+                        </div>
+                        ${!isAvailable ? `<div class="absolute inset-0 bg-deepCharcoal/60 backdrop-blur-[2px] flex items-center justify-center text-white font-bold text-sm tracking-wider">HABIS TERJUAL</div>` : ''}
+                    </div>
+                    <div class="p-5 flex flex-col flex-grow">
+                        <h3 class="font-extrabold text-base text-deepCharcoal group-hover:text-chiliOrange transition">${product.name}</h3>
+                        <p class="text-xs text-stone-500 mt-1.5 line-clamp-2 leading-relaxed flex-grow">${product.description}</p>
+                        
+                        <div class="flex items-center justify-between mt-5 pt-4 border-t border-softSand">
+                            <div>
+                                <span class="text-xs text-stone-400 block font-medium">Harga</span>
+                                <span class="font-extrabold text-deepCharcoal text-base">Rp ${product.price.toLocaleString('id-ID')}</span>
+                            </div>
+                            <button ${!isAvailable ? 'disabled' : `onclick="openProductModal('${product.id}')"`} class="px-4 py-2.5 rounded-xl text-sm font-bold transition ${isAvailable ? 'bg-deepCharcoal text-warmIvory hover:bg-chiliOrange' : 'bg-stone-200 text-stone-400 cursor-not-allowed'}">
+                                ${isAvailable ? 'Pilih Menu' : 'Habis'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        /* ==========================================================================
+           7. PRODUCT CUSTOMIZATION MODAL
+           ========================================================================== */
+        function openProductModal(productId) {
+            const product = DEFAULT_PRODUCTS.find(p => p.id === productId);
+            if (!product) return;
+            state.activeModalProduct = {
+                ...product,
+                selectedVariant: product.variants[0] || null,
+                selectedAddons: [],
+                quantity: 1,
+                notes: ''
+            };
+            render();
+        }
+
+        function closeModal() {
+            state.activeModalProduct = null;
+            render();
+        }
+
+        function renderProductModal() {
+            const p = state.activeModalProduct;
+            if (!p) return '';
+            
+            let calculatedPrice = p.price;
+            if (p.selectedVariant) calculatedPrice += p.selectedVariant.priceOffset;
+            p.selectedAddons.forEach(addon => calculatedPrice += addon.price);
+            calculatedPrice *= p.quantity;
+
+            return `
+                <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-deepCharcoal/60 backdrop-blur-sm fade-in">
+                    <div class="bg-white rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl border border-softSand max-h-[90vh] flex flex-col">
+                        <div class="relative h-56 bg-stone-100 flex-shrink-0">
+                            <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover">
+                            <button onclick="closeModal()" class="absolute top-4 right-4 bg-white/80 hover:bg-white text-deepCharcoal w-9 h-9 rounded-full flex items-center justify-center font-bold shadow transition">✕</button>
+                        </div>
+                        <div class="p-6 overflow-y-auto space-y-6 flex-grow">
+                            <div>
+                                <h2 class="text-2xl font-extrabold text-deepCharcoal">${p.name}</h2>
+                                <p class="text-sm text-stone-500 mt-1">${p.description}</p>
+                                <p class="font-extrabold text-chiliOrange text-lg mt-3">Rp ${p.price.toLocaleString('id-ID')}</p>
+                            </div>
+
+                            ${p.variants && p.variants.length > 0 ? `
+                                <div>
+                                    <h3 class="font-bold text-sm text-deepCharcoal mb-3 flex items-center justify-between">
+                                        <span>Pilihan Varian <span class="text-chiliOrange">*</span></span>
+                                        <span class="text-xs text-stone-400 font-normal">Pilih salah satu</span>
+                                    </h3>
+                                    <div class="space-y-2">
+                                        ${p.variants.map((v, i) => `
+                                            <label class="flex items-center justify-between p-3.5 rounded-xl border border-softSand hover:border-chiliOrange cursor-pointer transition ${p.selectedVariant?.name === v.name ? 'bg-chiliOrange/5 border-chiliOrange' : 'bg-white'}">
+                                                <div class="flex items-center gap-3">
+                                                    <input type="radio" name="variantRadio" ${p.selectedVariant?.name === v.name ? 'checked' : ''} onchange="setProductVariant(${i})" class="text-chiliOrange focus:ring-chiliOrange">
+                                                    <span class="text-sm font-semibold text-deepCharcoal">${v.name}</span>
+                                                </div>
+                                                <span class="text-xs font-bold text-stone-500">${v.priceOffset > 0 ? `+Rp ${v.priceOffset.toLocaleString('id-ID')}` : 'Termasuk'}</span>
+                                            </label>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            ` : ''}
+
+                            ${p.addons && p.addons.length > 0 ? `
+                                <div>
+                                    <h3 class="font-bold text-sm text-deepCharcoal mb-3">Add-ons Tambahan (Opsional)</h3>
+                                    <div class="space-y-2">
+                                        ${p.addons.map((addon, i) => {
+                                            const isChecked = p.selectedAddons.some(a => a.name === addon.name);
+                                            return `
+                                                <label class="flex items-center justify-between p-3.5 rounded-xl border border-softSand hover:border-chiliOrange cursor-pointer transition ${isChecked ? 'bg-chiliOrange/5 border-chiliOrange' : 'bg-white'}">
+                                                    <div class="flex items-center gap-3">
+                                                        <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleProductAddon(${i})" class="rounded text-chiliOrange focus:ring-chiliOrange">
+                                                        <span class="text-sm font-semibold text-deepCharcoal">${addon.name}</span>
+                                                    </div>
+                                                    <span class="text-xs font-bold text-stone-500">+Rp ${addon.price.toLocaleString('id-ID')}</span>
+                                                </label>
+                                            `;
+                                        }).join('')}
+                                    </div>
+                                </div>
+                            ` : ''}
+
+                            <div>
+                                <h3 class="font-bold text-sm text-deepCharcoal mb-2">Catatan Khusus untuk Dapur</h3>
+                                <textarea id="productNotes" oninput="state.activeModalProduct.notes = this.value" placeholder="Contoh: Jangan pakai pedas, kuah dipisah..." class="w-full bg-softSand/40 border border-softSand rounded-xl p-3 text-sm focus:outline-none focus:border-chiliOrange">${p.notes}</textarea>
+                            </div>
+                        </div>
+
+                        <!-- Modal Footer / CTA -->
+                        <div class="p-6 bg-white border-t border-softSand flex items-center justify-between gap-4 flex-shrink-0">
+                            <div class="flex items-center gap-3 bg-softSand/50 p-1.5 rounded-xl border border-softSand">
+                                <button onclick="adjustModalQty(-1)" class="w-8 h-8 rounded-lg bg-white font-bold text-deepCharcoal shadow-sm hover:bg-stone-100 transition">-</button>
+                                <span class="font-bold text-deepCharcoal w-6 text-center">${p.quantity}</span>
+                                <button onclick="adjustModalQty(1)" class="w-8 h-8 rounded-lg bg-white font-bold text-deepCharcoal shadow-sm hover:bg-stone-100 transition">+</button>
+                            </div>
+                            <button onclick="addProductToCart()" class="flex-grow bg-chiliOrange hover:bg-chiliOrangeHover text-white font-bold py-3.5 px-6 rounded-xl shadow-lg shadow-chiliOrange/20 transition flex items-center justify-between">
+                                <span>Masukkan Keranjang</span>
+                                <span>Rp ${calculatedPrice.toLocaleString('id-ID')}</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function setProductVariant(index) {
+            state.activeModalProduct.selectedVariant = state.activeModalProduct.variants[index];
+            render();
+        }
+
+        function toggleProductAddon(index) {
+            const addon = state.activeModalProduct.addons[index];
+            const exists = state.activeModalProduct.selectedAddons.some(a => a.name === addon.name);
+            if (exists) {
+                state.activeModalProduct.selectedAddons = state.activeModalProduct.selectedAddons.filter(a => a.name !== addon.name);
+            } else {
+                state.activeModalProduct.selectedAddons.push(addon);
+            }
+            render();
+        }
+
+        function adjustModalQty(amount) {
+            state.activeModalProduct.quantity = Math.max(1, state.activeModalProduct.quantity + amount);
+            render();
+        }
+
+        function addProductToCart() {
+            const p = state.activeModalProduct;
+            let unitPrice = p.price;
+            if (p.selectedVariant) unitPrice += p.selectedVariant.priceOffset;
+            p.selectedAddons.forEach(addon => unitPrice += addon.price);
+
+            const cartItem = {
+                cartId: 'item-' + Date.now() + Math.random().toString(36).substr(2, 4),
+                productId: p.id,
+                name: p.name,
+                image: p.image,
+                variant: p.selectedVariant ? p.selectedVariant.name : null,
+                addons: p.selectedAddons.map(a => a.name),
+                notes: p.notes,
+                unitPrice: unitPrice,
+                quantity: p.quantity,
+                totalPrice: unitPrice * p.quantity
+            };
+
+            state.cart.push(cartItem);
+            closeModal();
+            toggleCartDrawer(true);
+        }
+
+        /* ==========================================================================
+           8. SHOPPING CART DRAWER
+           ========================================================================== */
+        let isCartOpen = false;
+
+        function toggleCartDrawer(open = null) {
+            isCartOpen = open !== null ? open : !isCartOpen;
+            const existingDrawer = document.getElementById('cartDrawer');
+            if (existingDrawer) existingDrawer.remove();
+
+            if (isCartOpen) {
+                document.body.insertAdjacentHTML('beforeend', renderCartDrawerHtml());
+            }
+        }
+
+        function renderCartDrawerHtml() {
+            const subtotal = state.cart.reduce((sum, item) => sum + item.totalPrice, 0);
+            return `
+                <div id="cartDrawer" class="fixed inset-0 z-50 flex justify-end bg-deepCharcoal/50 backdrop-blur-sm fade-in">
+                    <div class="bg-white w-full max-w-md h-full flex flex-col shadow-2xl border-l border-softSand">
+                        <div class="p-6 border-b border-softSand flex items-center justify-between">
+                            <h2 class="font-extrabold text-xl text-deepCharcoal flex items-center gap-2">
+                                🛍️ Keranjang Pesanan
+                            </h2>
+                            <button onclick="toggleCartDrawer(false)" class="w-8 h-8 rounded-full bg-stone-100 text-deepCharcoal font-bold hover:bg-stone-200 transition">✕</button>
+                        </div>
+
+                        <div class="p-4 bg-warmIvory border-b border-softSand flex items-center justify-between text-xs">
+                            <span class="font-semibold text-stone-600">Outlet Dipilih:</span>
+                            <span class="font-extrabold text-chiliOrange">${state.selectedOutlet.name}</span>
+                        </div>
+
+                        <div class="flex-grow overflow-y-auto p-6 space-y-4">
+                            ${state.cart.length === 0 ? `
+                                <div class="py-20 text-center">
+                                    <div class="text-4xl mb-3">🛒</div>
+                                    <h3 class="font-bold text-deepCharcoal">Keranjang Masih Kosong</h3>
+                                    <p class="text-xs text-stone-500 mt-1">Belum ada hidangan lezat yang dipilih.</p>
+                                </div>
+                            ` : state.cart.map(item => `
+                                <div class="bg-white p-4 rounded-2xl border border-softSand flex gap-4 items-start relative group">
+                                    <img src="${item.image}" alt="${item.name}" class="w-16 h-16 rounded-xl object-cover bg-stone-100 flex-shrink-0">
+                                    <div class="flex-grow">
+                                        <h4 class="font-extrabold text-sm text-deepCharcoal">${item.name}</h4>
+                                        ${item.variant ? `<p class="text-xs text-stone-500 font-medium">Varian: ${item.variant}</p>` : ''}
+                                        ${item.addons && item.addons.length > 0 ? `<p class="text-xs text-stone-400">Add-ons: ${item.addons.join(', ')}</p>` : ''}
+                                        ${item.notes ? `<p class="text-xs text-chiliOrange italic mt-1">Catatan: "${item.notes}"</p>` : ''}
+                                        <div class="flex items-center justify-between mt-3">
+                                            <span class="font-extrabold text-sm text-deepCharcoal">Rp ${item.totalPrice.toLocaleString('id-ID')}</span>
+                                            <div class="flex items-center gap-2 bg-softSand/50 p-1 rounded-lg">
+                                                <button onclick="updateCartQty('${item.cartId}', -1)" class="w-6 h-6 bg-white rounded font-bold text-xs shadow-sm">-</button>
+                                                <span class="text-xs font-bold w-5 text-center">${item.quantity}</span>
+                                                <button onclick="updateCartQty('${item.cartId}', 1)" class="w-6 h-6 bg-white rounded font-bold text-xs shadow-sm">+</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button onclick="removeFromCart('${item.cartId}')" class="absolute top-3 right-3 text-stone-400 hover:text-red-500 text-xs font-bold">✕</button>
+                                </div>
+                            `).join('')}
+                        </div>
+
+                        ${state.cart.length > 0 ? `
+                            <div class="p-6 bg-white border-t border-softSand space-y-4 flex-shrink-0">
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-stone-500 font-medium">Subtotal</span>
+                                    <span class="font-extrabold text-deepCharcoal">Rp ${subtotal.toLocaleString('id-ID')}</span>
+                                </div>
+                                <button onclick="toggleCartDrawer(false); navigateTo('customer-checkout');" class="w-full bg-chiliOrange hover:bg-chiliOrangeHover text-white font-bold py-4 rounded-xl shadow-lg shadow-chiliOrange/20 transition text-center">
+                                    Lanjut ke Checkout
+                                </button>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        function updateCartQty(cartId, delta) {
+            const item = state.cart.find(i => i.cartId === cartId);
+            if (!item) return;
+            item.quantity += delta;
+            if (item.quantity <= 0) {
+                state.cart = state.cart.filter(i => i.cartId !== cartId);
+            } else {
+                item.totalPrice = item.unitPrice * item.quantity;
+            }
+            render();
+            if (isCartOpen) toggleCartDrawer(true);
+        }
+
+        function removeFromCart(cartId) {
+            state.cart = state.cart.filter(i => i.cartId !== cartId);
+            render();
+            if (isCartOpen) toggleCartDrawer(true);
+        }
+
+        /* ==========================================================================
+           9. CHECKOUT PAGE
+           ========================================================================== */
+        function renderCustomerCheckout() {
+            if (state.cart.length === 0) {
+                return `
+                    <main class="flex-grow max-w-4xl mx-auto px-4 py-20 text-center">
+                        <h2 class="text-2xl font-extrabold text-deepCharcoal mb-2">Keranjang Kosong</h2>
+                        <p class="text-stone-500 mb-6">Silakan pilih menu sebelum melanjutkan ke checkout.</p>
+                        <button onclick="navigateTo('customer-catalog')" class="bg-chiliOrange text-white font-bold px-6 py-3 rounded-xl">Lihat Katalog Menu</button>
+                    </main>
+                `;
+            }
+
+            const subtotal = state.cart.reduce((sum, item) => sum + item.totalPrice, 0);
+            const deliveryFee = state.checkoutForm.fulfillmentType === 'delivery' ? 15000 : 0;
+            
+            let discount = 0;
+            const v = state.checkoutForm.appliedVoucher;
+            if (v) {
+                if (subtotal >= v.minSpend) {
+                    if (v.discountType === 'percent') {
+                        discount = (subtotal * v.discountValue) / 100;
+                        if (v.maxDiscount && discount > v.maxDiscount) discount = v.maxDiscount;
+                    } else {
+                        discount = v.discountValue;
+                    }
+                }
+            }
+            const grandTotal = Math.max(0, subtotal + deliveryFee - discount);
+
+            return `
+                <main class="flex-grow max-w-7xl mx-auto px-4 lg:px-16 py-8 w-full">
+                    <h1 class="text-3xl font-extrabold text-deepCharcoal mb-8">Checkout Pesanan</h1>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                        <!-- Left Form -->
+                        <div class="lg:col-span-7 space-y-6">
+                            <!-- Fulfillment Type Selection -->
+                            <div class="bg-white p-6 rounded-2xl border border-softSand shadow-sm space-y-4">
+                                <h2 class="font-extrabold text-base text-deepCharcoal">Metode Pemenuhan Pesanan</h2>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <button onclick="state.checkoutForm.fulfillmentType='delivery'; render();" class="p-4 rounded-xl border text-left font-bold transition flex items-center gap-3 ${state.checkoutForm.fulfillmentType === 'delivery' ? 'bg-chiliOrange/5 border-chiliOrange text-chiliOrange' : 'border-softSand text-deepCharcoal hover:border-stone-400'}">
+                                        <span class="text-xl">🛵</span>
+                                        <div>
+                                            <div>Delivery</div>
+                                            <div class="text-xs font-normal text-stone-500">Diantar ke alamat Anda</div>
+                                        </div>
+                                    </button>
+                                    <button onclick="state.checkoutForm.fulfillmentType='pickup'; render();" class="p-4 rounded-xl border text-left font-bold transition flex items-center gap-3 ${state.checkoutForm.fulfillmentType === 'pickup' ? 'bg-chiliOrange/5 border-chiliOrange text-chiliOrange' : 'border-softSand text-deepCharcoal hover:border-stone-400'}">
+                                        <span class="text-xl">🛍️</span>
+                                        <div>
+                                            <div>Pickup Mandiri</div>
+                                            <div class="text-xs font-normal text-stone-500">Ambil langsung di outlet</div>
+                                        </div>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Customer Information -->
+                            <div class="bg-white p-6 rounded-2xl border border-softSand shadow-sm space-y-4">
+                                <h2 class="font-extrabold text-base text-deepCharcoal">Informasi Kontak & Pengiriman</h2>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-xs font-bold text-stone-600 mb-1">Nama Lengkap <span class="text-chiliOrange">*</span></label>
+                                        <input type="text" id="custName" oninput="state.checkoutForm.customerName=this.value" value="${state.checkoutForm.customerName}" placeholder="Budi Santoso" class="w-full bg-softSand/30 border border-softSand rounded-xl p-3 text-sm focus:outline-none focus:border-chiliOrange">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-stone-600 mb-1">Nomor WhatsApp <span class="text-chiliOrange">*</span></label>
+                                        <input type="text" id="custPhone" oninput="state.checkoutForm.customerPhone=this.value" value="${state.checkoutForm.customerPhone}" placeholder="081234567890" class="w-full bg-softSand/30 border border-softSand rounded-xl p-3 text-sm focus:outline-none focus:border-chiliOrange">
+                                    </div>
+                                </div>
+                                ${state.checkoutForm.fulfillmentType === 'delivery' ? `
+                                    <div>
+                                        <label class="block text-xs font-bold text-stone-600 mb-1">Alamat Lengkap Pengiriman <span class="text-chiliOrange">*</span></label>
+                                        <textarea id="custAddress" oninput="state.checkoutForm.address=this.value" placeholder="Jl. Sudirman No. 10, RT 01/02, Patokan..." class="w-full bg-softSand/30 border border-softSand rounded-xl p-3 text-sm focus:outline-none focus:border-chiliOrange">${state.checkoutForm.address}</textarea>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-stone-600 mb-1">Catatan Kurir (Opsional)</label>
+                                        <input type="text" id="custNotes" oninput="state.checkoutForm.deliveryNotes=this.value" value="${state.checkoutForm.deliveryNotes}" placeholder="Titip di pos satpam..." class="w-full bg-softSand/30 border border-softSand rounded-xl p-3 text-sm focus:outline-none focus:border-chiliOrange">
+                                    </div>
+                                ` : `
+                                    <div class="p-4 bg-warmIvory rounded-xl border border-softSand text-xs text-stone-600">
+                                        <strong class="text-deepCharcoal block mb-1">Lokasi Outlet Pengambilan:</strong>
+                                        ${state.selectedOutlet.name}<br>${state.selectedOutlet.address}
+                                    </div>
+                                `}
+                            </div>
+
+                            <!-- Payment Methods -->
+                            <div class="bg-white p-6 rounded-2xl border border-softSand shadow-sm space-y-4">
+                                <h2 class="font-extrabold text-base text-deepCharcoal">Metode Pembayaran</h2>
+                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                    ${[
+                                        { id: 'qris', name: 'QRIS', icon: '⚡' },
+                                        { id: 'ewallet', name: 'E-Wallet', icon: '📱' },
+                                        { id: 'va', name: 'Virtual Account', icon: '🏦' },
+                                        { id: 'cod', name: 'Bayar di Tempat (COD)', icon: '💵' }
+                                    ].map(pm => `
+                                        <button onclick="state.checkoutForm.paymentMethod='${pm.id}'; render();" class="p-3.5 rounded-xl border text-center font-bold text-xs transition ${state.checkoutForm.paymentMethod === pm.id ? 'bg-chiliOrange/5 border-chiliOrange text-chiliOrange' : 'border-softSand text-deepCharcoal hover:border-stone-400'}">
+                                            <div class="text-xl mb-1">${pm.icon}</div>
+                                            ${pm.name}
+                                        </button>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Summary -->
+                        <div class="lg:col-span-5 space-y-6">
+                            <div class="bg-white p-6 rounded-2xl border border-softSand shadow-sm space-y-6 sticky top-24">
+                                <h2 class="font-extrabold text-base text-deepCharcoal border-b border-softSand pb-4">Ringkasan Pesanan</h2>
+                                
+                                <div class="space-y-3 max-h-60 overflow-y-auto pr-2">
+                                    ${state.cart.map(i => `
+                                        <div class="flex justify-between items-center text-sm">
+                                            <div>
+                                                <span class="font-bold text-deepCharcoal">${i.quantity}x ${i.name}</span>
+                                                ${i.variant ? `<div class="text-xs text-stone-400">${i.variant}</div>` : ''}
+                                            </div>
+                                            <span class="font-semibold text-deepCharcoal">Rp ${i.totalPrice.toLocaleString('id-ID')}</span>
+                                        </div>
+                                    `).join('')}
+                                </div>
+
+                                <!-- Voucher Input -->
+                                <div class="pt-4 border-t border-softSand">
+                                    <div class="flex gap-2">
+                                        <input type="text" id="voucherInput" placeholder="Kode Promo (e.g. NUSANTARA15)" class="flex-grow bg-softSand/30 border border-softSand rounded-xl px-3 py-2 text-xs uppercase focus:outline-none focus:border-chiliOrange">
+                                        <button onclick="applyVoucher()" class="bg-deepCharcoal text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-chiliOrange transition">Gunakan</button>
+                                    </div>
+                                    ${state.checkoutForm.appliedVoucher ? `
+                                        <div class="mt-2 text-xs text-emerald-600 font-bold flex items-center justify-between bg-emerald-50 p-2 rounded-lg">
+                                            <span>✓ Voucher ${state.checkoutForm.appliedVoucher.code} Aktif</span>
+                                            <button onclick="removeVoucher()" class="text-stone-400 hover:text-red-500">Hapus</button>
+                                        </div>
+                                    ` : ''}
+                                </div>
+
+                                <div class="space-y-2 pt-4 border-t border-softSand text-sm">
+                                    <div class="flex justify-between text-stone-600">
+                                        <span>Subtotal</span>
+                                        <span>Rp ${subtotal.toLocaleString('id-ID')}</span>
+                                    </div>
+                                    ${state.checkoutForm.fulfillmentType === 'delivery' ? `
+                                        <div class="flex justify-between text-stone-600">
+                                            <span>Biaya Pengiriman</span>
+                                            <span>Rp ${deliveryFee.toLocaleString('id-ID')}</span>
+                                        </div>
+                                    ` : ''}
+                                    ${discount > 0 ? `
+                                        <div class="flex justify-between text-emerald-600 font-semibold">
+                                            <span>Diskon Voucher</span>
+                                            <span>-Rp ${discount.toLocaleString('id-ID')}</span>
+                                        </div>
+                                    ` : ''}
+                                    <div class="flex justify-between text-lg font-extrabold text-deepCharcoal pt-3 border-t border-softSand">
+                                        <span>Total Pembayaran</span>
+                                        <span class="text-chiliOrange">Rp ${grandTotal.toLocaleString('id-ID')}</span>
+                                    </div>
+                                </div>
+
+                                <button onclick="submitOrder()" class="w-full bg-chiliOrange hover:bg-chiliOrangeHover text-white font-bold py-4 rounded-xl shadow-lg shadow-chiliOrange/20 transition text-center text-base">
+                                    Buat Pesanan Sekarang
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+            `;
+        }
+
+        function applyVoucher() {
+            const code = document.getElementById('voucherInput').value.trim().toUpperCase();
+            const found = DEFAULT_VOUCHERS.find(v => v.code === code);
+            if (!found) {
+                alertCustom('Kode promo tidak valid atau sudah kedaluwarsa.');
+                return;
+            }
+            const subtotal = state.cart.reduce((sum, item) => sum + item.totalPrice, 0);
+            if (subtotal < found.minSpend) {
+                alertCustom(`Minimum transaksi untuk voucher ini adalah Rp ${found.minSpend.toLocaleString('id-ID')}`);
+                return;
+            }
+            state.checkoutForm.appliedVoucher = found;
+            render();
+        }
+
+        function removeVoucher() {
+            state.checkoutForm.appliedVoucher = null;
+            render();
+        }
+
+        function submitOrder() {
+            const f = state.checkoutForm;
+            if (!f.customerName || !f.customerPhone) {
+                alertCustom('Mohon lengkapi Nama dan Nomor WhatsApp.');
+                return;
+            }
+            if (f.fulfillmentType === 'delivery' && !f.address) {
+                alertCustom('Mohon lengkapi alamat pengiriman.');
+                return;
+            }
+
+            const subtotal = state.cart.reduce((sum, item) => sum + item.totalPrice, 0);
+            const deliveryFee = f.fulfillmentType === 'delivery' ? 15000 : 0;
+            let discount = 0;
+            if (f.appliedVoucher && subtotal >= f.appliedVoucher.minSpend) {
+                if (f.appliedVoucher.discountType === 'percent') {
+                    discount = (subtotal * f.appliedVoucher.discountValue) / 100;
+                } else {
+                    discount = f.appliedVoucher.discountValue;
+                }
+            }
+            const total = Math.max(0, subtotal + deliveryFee - discount);
+
+            const newOrder = {
+                id: 'ORD-' + Math.floor(1000 + Math.random() * 9000),
+                createdAt: new Date().toISOString(),
+                outletId: state.selectedOutlet.id,
+                customerName: f.customerName,
+                customerPhone: f.customerPhone,
+                fulfillmentType: f.fulfillmentType,
+                address: f.fulfillmentType === 'delivery' ? f.address : `Ambil di Outlet ${state.selectedOutlet.name}`,
+                deliveryNotes: f.deliveryNotes || '-',
+                items: [...state.cart],
+                subtotal: subtotal,
+                deliveryFee: deliveryFee,
+                discount: discount,
+                total: total,
+                paymentMethod: f.paymentMethod,
+                paymentStatus: f.paymentMethod === 'cod' ? 'pending' : 'paid',
+                status: 'received',
+                targetMinutes: 20,
+                courier: f.fulfillmentType === 'delivery' ? 'Kurir Internal Outlet' : '-',
+                auditTrail: [{ time: 'Baru saja', note: 'Pesanan Dibuat oleh Pelanggan' }]
+            };
+
+            state.orders.unshift(newOrder);
+            state.cart = []; // Clear cart
+            navigateTo('customer-tracking', newOrder.id);
+        }
+
+        /* ==========================================================================
+           10. LIVE TRACKING & CONFIRMATION
+           ========================================================================== */
+        function renderCustomerTracking() {
+            const order = state.orders.find(o => o.id === state.activeTrackingOrderId) || state.orders[0];
+            if (!order) {
+                return `<div class="p-20 text-center">Pesanan tidak ditemukan.</div>`;
+            }
+
+            const steps = [
+                { key: 'received', label: 'Pesanan Diterima', desc: 'Diterima oleh sistem & kasir' },
+                { key: 'cooking', label: 'Sedang Dimasak', desc: 'Koki menyiapkan hidangan' },
+                { key: order.fulfillmentType === 'delivery' ? 'delivering' : 'ready', label: order.fulfillmentType === 'delivery' ? 'Dalam Pengantaran' : 'Siap Diambil', desc: order.fulfillmentType === 'delivery' ? 'Kurir menuju lokasi' : 'Silakan ambil di outlet' },
+                { key: 'completed', label: 'Selesai', desc: 'Pesanan telah diterima' }
+            ];
+
+            const currentIndex = steps.findIndex(s => s.key === order.status);
+
+            return `
+                <main class="flex-grow max-w-4xl mx-auto px-4 py-12 w-full">
+                    <div class="bg-white rounded-3xl border border-softSand shadow-lg p-6 sm:p-10 space-y-8">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-softSand pb-6">
+                            <div>
+                                <span class="bg-chiliOrange/10 text-chiliOrange text-xs font-extrabold px-3 py-1 rounded-full uppercase tracking-wider">Status Live Tracking</span>
+                                <h1 class="text-3xl font-extrabold text-deepCharcoal mt-2">${order.id}</h1>
+                                <p class="text-xs text-stone-500 mt-1">Dibuat pada ${new Date(order.createdAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} WIB</p>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-xs text-stone-400 block font-medium">Estimasi Waktu Tiba</span>
+                                <span class="font-extrabold text-chiliOrange text-xl">${order.targetMinutes} Menit</span>
+                            </div>
+                        </div>
+
+                        <!-- Timeline Progress -->
+                        <div class="py-4">
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                ${steps.map((step, idx) => {
+                                    const isDone = idx <= currentIndex;
+                                    const isCurrent = idx === currentIndex;
+                                    return `
+                                        <div class="p-4 rounded-2xl border transition ${isCurrent ? 'bg-chiliOrange/5 border-chiliOrange' : isDone ? 'bg-emerald-50/50 border-emerald-200' : 'bg-stone-50 border-stone-200 opacity-60'}">
+                                            <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs mb-3 ${isCurrent ? 'bg-chiliOrange text-white' : isDone ? 'bg-emerald-600 text-white' : 'bg-stone-200 text-stone-600'}">
+                                                ${idx + 1}
+                                            </div>
+                                            <h4 class="font-bold text-sm text-deepCharcoal">${step.label}</h4>
+                                            <p class="text-xs text-stone-500 mt-0.5">${step.desc}</p>
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        </div>
+
+                        <!-- Order Details Box -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-warmIvory/50 p-6 rounded-2xl border border-softSand">
+                            <div>
+                                <h3 class="font-bold text-sm text-deepCharcoal mb-3">Detail Penerima</h3>
+                                <p class="text-sm font-semibold text-deepCharcoal">${order.customerName} (${order.customerPhone})</p>
+                                <p class="text-xs text-stone-600 mt-1">${order.address}</p>
+                                <p class="text-xs text-chiliOrange font-medium mt-2">Catatan: ${order.deliveryNotes}</p>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-sm text-deepCharcoal mb-3">Ringkasan Pembayaran</h3>
+                                <div class="space-y-1.5 text-xs text-stone-600">
+                                    <div class="flex justify-between"><span>Metode:</span> <span class="font-bold uppercase">${order.paymentMethod}</span></div>
+                                    <div class="flex justify-between"><span>Status Pembayaran:</span> <span class="font-bold text-emerald-600 uppercase">${order.paymentStatus}</span></div>
+                                    <div class="flex justify-between text-sm font-extrabold text-deepCharcoal pt-2 border-t border-softSand">
+                                        <span>Total:</span>
+                                        <span class="text-chiliOrange">Rp ${order.total.toLocaleString('id-ID')}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between items-center pt-4">
+                            <button onclick="navigateTo('customer-home')" class="text-sm font-bold text-stone-600 hover:text-chiliOrange">← Kembali ke Beranda</button>
+                            <button onclick="alertCustom('Simulasi WhatsApp terkirim ke ' + order.customerPhone)" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-6 py-3 rounded-xl text-sm shadow transition flex items-center gap-2">
+                                💬 Cek Notifikasi WhatsApp
+                            </button>
+                        </div>
+                    </div>
+                </main>
+            `;
+        }
+
+        /* ==========================================================================
+           11. CASHIER DASHBOARD (OPERATIONS)
+           ========================================================================== */
+        function renderOpsLogin() {
+            return `
+                <main class="flex-grow flex items-center justify-center px-4 py-16 bg-warmIvory">
+                    <div class="bg-white rounded-3xl max-w-md w-full p-8 border border-softSand shadow-2xl space-y-6 text-center">
+                        <div class="w-16 h-16 rounded-2xl bg-chiliOrange text-white font-extrabold text-2xl flex items-center justify-center mx-auto shadow-lg">
+                            SN
+                        </div>
+                        <div>
+                            <h1 class="text-2xl font-extrabold text-deepCharcoal">Portal Kasir & Dapur</h1>
+                            <p class="text-xs text-stone-500 mt-1">Masuk untuk mengelola operasional outlet Sajian Nusantara</p>
+                        </div>
+                        <div class="space-y-4 text-left">
+                            <div>
+                                <label class="block text-xs font-bold text-stone-600 mb-1">Pilih Peran Staf</label>
+                                <select id="staffRoleSelect" onchange="state.staffRole=this.value" class="w-full bg-softSand/30 border border-softSand rounded-xl p-3 text-sm font-semibold focus:outline-none focus:border-chiliOrange">
+                                    <option value="cashier" ${state.staffRole === 'cashier' ? 'selected' : ''}>Kasir & Operator</option>
+                                    <option value="kitchen" ${state.staffRole === 'kitchen' ? 'selected' : ''}>Chef / Tim Dapur (KDS)</option>
+                                    <option value="admin" ${state.staffRole === 'admin' ? 'selected' : ''}>Manajer Outlet & Admin</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button onclick="handleStaffLogin()" class="w-full bg-chiliOrange hover:bg-chiliOrangeHover text-white font-bold py-4 rounded-xl shadow-lg shadow-chiliOrange/20 transition text-sm">
+                            Masuk ke Dashboard Ops
+                        </button>
+                        <button onclick="navigateTo('customer-home')" class="text-xs font-bold text-stone-500 hover:text-chiliOrange block mx-auto">
+                            ← Kembali ke Web Pelanggan
+                        </button>
+                    </div>
+                </main>
+            `;
+        }
+
+        function handleStaffLogin() {
+            if (state.staffRole === 'kitchen') navigateTo('ops-kitchen');
+            else if (state.staffRole === 'admin') navigateTo('ops-admin');
+            else navigateTo('ops-cashier');
+        }
+
+        function renderOpsCashier() {
+            return `
+                <main class="flex-grow max-w-7xl mx-auto px-4 lg:px-12 py-8 w-full space-y-8">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <div>
+                            <h1 class="text-2xl font-extrabold text-deepCharcoal">Dashboard Kasir & Antrean Pesanan</h1>
+                            <p class="text-xs text-stone-500 mt-1">Kelola pesanan masuk secara real-time dari pelanggan online</p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="text-xs font-bold bg-emerald-100 text-emerald-800 px-3 py-1.5 rounded-xl">● Live Audio Notification: Aktif</span>
+                        </div>
+                    </div>
+
+                    <!-- Orders Table / Cards -->
+                    <div class="bg-white rounded-3xl border border-softSand shadow-sm overflow-hidden">
+                        <div class="p-6 border-b border-softSand flex items-center justify-between">
+                            <h2 class="font-extrabold text-base text-deepCharcoal">Daftar Antrean Pesanan Aktif</h2>
+                            <span class="text-xs font-bold bg-chiliOrange/10 text-chiliOrange px-3 py-1 rounded-full">${state.orders.length} Pesanan</span>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm">
+                                <thead class="bg-warmIvory text-stone-600 font-bold text-xs uppercase tracking-wider border-b border-softSand">
+                                    <tr>
+                                        <th class="p-4">ID Pesanan</th>
+                                        <th class="p-4">Pelanggan</th>
+                                        <th class="p-4">Tipe</th>
+                                        <th class="p-4">Item Pesanan</th>
+                                        <th class="p-4">Total</th>
+                                        <th class="p-4">Status</th>
+                                        <th class="p-4 text-right">Aksi Kasir</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-softSand">
+                                    ${state.orders.map(o => `
+                                        <tr class="hover:bg-warmIvory/30 transition">
+                                            <td class="p-4 font-extrabold text-deepCharcoal">${o.id}</td>
+                                            <td class="p-4">
+                                                <div class="font-bold text-deepCharcoal">${o.customerName}</div>
+                                                <div class="text-xs text-stone-400">${o.customerPhone}</div>
+                                            </td>
+                                            <td class="p-4">
+                                                <span class="px-2.5 py-1 rounded-lg text-xs font-bold ${o.fulfillmentType === 'delivery' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'} uppercase">${o.fulfillmentType}</span>
+                                            </td>
+                                            <td class="p-4">
+                                                <div class="text-xs font-medium text-stone-600">
+                                                    ${o.items.map(i => `${i.quantity}x ${i.name}`).join(', ')}
+                                                </div>
+                                                ${o.deliveryNotes !== '-' ? `<div class="text-xs text-chiliOrange italic mt-0.5">Catatan: ${o.deliveryNotes}</div>` : ''}
+                                            </td>
+                                            <td class="p-4 font-extrabold text-deepCharcoal">Rp ${o.total.toLocaleString('id-ID')}</td>
+                                            <td class="p-4">
+                                                <span class="px-3 py-1 rounded-full text-xs font-bold uppercase ${o.status === 'received' ? 'bg-amber-100 text-amber-800' : o.status === 'cooking' ? 'bg-orange-100 text-orange-800' : 'bg-emerald-100 text-emerald-800'}">
+                                                    ${o.status}
+                                                </span>
+                                            </td>
+                                            <td class="p-4 text-right space-x-2">
+                                                ${o.status === 'received' ? `
+                                                    <button onclick="updateOrderStatus('${o.id}', 'cooking')" class="bg-chiliOrange text-white px-3 py-1.5 rounded-xl text-xs font-bold hover:bg-chiliOrangeHover">Terima & Masak</button>
+                                                ` : o.status === 'cooking' ? `
+                                                    <button onclick="updateOrderStatus('${o.id}', '${o.fulfillmentType === 'delivery' ? 'delivering' : 'ready'}')" class="bg-emerald-600 text-white px-3 py-1.5 rounded-xl text-xs font-bold hover:bg-emerald-700">Tandai Siap</button>
+                                                ` : `
+                                                    <button onclick="updateOrderStatus('${o.id}', 'completed')" class="bg-deepCharcoal text-white px-3 py-1.5 rounded-xl text-xs font-bold">Selesai</button>
+                                                `}
+                                            </td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </main>
+            `;
+        }
+
+        function updateOrderStatus(orderId, newStatus) {
+            const o = state.orders.find(item => item.id === orderId);
+            if (o) {
+                o.status = newStatus;
+                o.auditTrail.push({ time: 'Baru saja', note: `Status diperbarui ke: ${newStatus}` });
+                render();
+            }
+        }
+
+        /* ==========================================================================
+           12. KITCHEN DISPLAY SYSTEM (KDS)
+           ========================================================================== */
+        function renderOpsKitchen() {
+            const activeKitchenOrders = state.orders.filter(o => o.status === 'received' || o.status === 'cooking');
+            return `
+                <main class="flex-grow max-w-7xl mx-auto px-4 lg:px-12 py-8 w-full space-y-8">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h1 class="text-2xl font-extrabold text-deepCharcoal">Kitchen Display System (KDS)</h1>
+                            <p class="text-xs text-stone-500 mt-1">Antrean pesanan aktif yang perlu segera disiapkan oleh koki</p>
+                        </div>
+                        <span class="bg-chiliOrange text-white text-xs font-bold px-3 py-1.5 rounded-xl">${activeKitchenOrders.length} Tiket Aktif</span>
+                    </div>
+
+                    ${activeKitchenOrders.length === 0 ? `
+                        <div class="py-24 text-center bg-white rounded-3xl border border-softSand">
+                            <div class="text-4xl mb-2">🍳</div>
+                            <h3 class="font-bold text-lg text-deepCharcoal">Dapur Bersih & Siap</h3>
+                            <p class="text-xs text-stone-500 mt-1">Belum ada pesanan baru dalam antrean dapur saat ini.</p>
+                        </div>
+                    ` : `
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            ${activeKitchenOrders.map(o => `
+                                <div class="bg-white rounded-3xl border-2 ${o.status === 'received' ? 'border-amber-400' : 'border-chiliOrange'} shadow-md p-6 space-y-4 flex flex-col justify-between">
+                                    <div>
+                                        <div class="flex justify-between items-start mb-3">
+                                            <div>
+                                                <span class="text-xs font-extrabold bg-stone-100 text-stone-700 px-2.5 py-1 rounded-lg">${o.id}</span>
+                                                <h3 class="font-bold text-sm text-deepCharcoal mt-2">${o.customerName}</h3>
+                                            </div>
+                                            <span class="text-xs font-bold uppercase px-2.5 py-1 rounded-lg ${o.status === 'received' ? 'bg-amber-100 text-amber-800' : 'bg-orange-100 text-orange-800'}">${o.status}</span>
+                                        </div>
+                                        <div class="space-y-2 py-3 border-y border-softSand my-3">
+                                            ${o.items.map(i => `
+                                                <div class="flex justify-between text-sm">
+                                                    <span class="font-bold text-deepCharcoal">${i.quantity}x ${i.name}</span>
+                                                </div>
+                                                ${i.variant ? `<div class="text-xs text-stone-500">Varian: ${i.variant}</div>` : ''}
+                                                ${i.addons && i.addons.length > 0 ? `<div class="text-xs text-stone-400">+ ${i.addons.join(', ')}</div>` : ''}
+                                                ${i.notes ? `<div class="text-xs text-chiliOrange font-bold mt-1">Catatan: ${i.notes}</div>` : ''}
+                                            `).join('')}
+                                        </div>
+                                    </div>
+                                    <div class="pt-2">
+                                        ${o.status === 'received' ? `
+                                            <button onclick="updateOrderStatus('${o.id}', 'cooking')" class="w-full bg-chiliOrange hover:bg-chiliOrangeHover text-white font-bold py-3 rounded-xl text-xs transition">
+                                                Mulai Memasak ⏱️
+                                            </button>
+                                        ` : `
+                                            <button onclick="updateOrderStatus('${o.id}', '${o.fulfillmentType === 'delivery' ? 'delivering' : 'ready'}')" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl text-xs transition">
+                                                Tandai Masakan Selesai ✓
+                                            </button>
+                                        `}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `}
+                </main>
+            `;
+        }
+
+        /* ==========================================================================
+           13. ADMIN MANAGEMENT & SALES ANALYTICS
+           ========================================================================== */
+        function renderOpsAdmin() {
+            return `
+                <main class="flex-grow max-w-7xl mx-auto px-4 lg:px-12 py-8 w-full space-y-8">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <div>
+                            <h1 class="text-2xl font-extrabold text-deepCharcoal">Manajemen & Laporan Penjualan</h1>
+                            <p class="text-xs text-stone-500 mt-1">Kontrol stok, menu, outlet, voucher promo, dan laporan keuangan</p>
+                        </div>
+                        <div class="flex items-center gap-2 bg-white border border-softSand p-1.5 rounded-xl">
+                            <button onclick="state.adminTab='orders'; render();" class="px-4 py-2 rounded-lg text-xs font-bold transition ${state.adminTab === 'orders' ? 'bg-chiliOrange text-white' : 'text-stone-600 hover:bg-stone-50'}">Transaksi</button>
+                            <button onclick="state.adminTab='menu'; render();" class="px-4 py-2 rounded-lg text-xs font-bold transition ${state.adminTab === 'menu' ? 'bg-chiliOrange text-white' : 'text-stone-600 hover:bg-stone-50'}">Stok Menu</button>
+                            <button onclick="state.adminTab='outlets'; render();" class="px-4 py-2 rounded-lg text-xs font-bold transition ${state.adminTab === 'outlets' ? 'bg-chiliOrange text-white' : 'text-stone-600 hover:bg-stone-50'}">Outlet</button>
+                            <button onclick="state.adminTab='reports'; render();" class="px-4 py-2 rounded-lg text-xs font-bold transition ${state.adminTab === 'reports' ? 'bg-chiliOrange text-white' : 'text-stone-600 hover:bg-stone-50'}">Laporan</button>
+                        </div>
+                    </div>
+
+                    ${state.adminTab === 'orders' ? renderAdminOrdersTab() : ''}
+                    ${state.adminTab === 'menu' ? renderAdminMenuTab() : ''}
+                    ${state.adminTab === 'outlets' ? renderAdminOutletsTab() : ''}
+                    ${state.adminTab === 'reports' ? renderAdminReportsTab() : ''}
+                </main>
+            `;
+        }
+
+        function renderAdminOrdersTab() {
+            return `
+                <div class="bg-white rounded-3xl border border-softSand shadow-sm overflow-hidden p-6 space-y-4">
+                    <h2 class="font-extrabold text-base text-deepCharcoal">Audit Trail & Riwayat Transaksi Seluruh Outlet</h2>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-warmIvory text-stone-600 font-bold text-xs uppercase border-b border-softSand">
+                                <tr>
+                                    <th class="p-3">ID</th>
+                                    <th class="p-3">Pelanggan</th>
+                                    <th class="p-3">Waktu</th>
+                                    <th class="p-3">Total</th>
+                                    <th class="p-3">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-softSand">
+                                ${state.orders.map(o => `
+                                    <tr>
+                                        <td class="p-3 font-extrabold">${o.id}</td>
+                                        <td class="p-3">${o.customerName}</td>
+                                        <td class="p-3 text-xs text-stone-500">${new Date(o.createdAt).toLocaleTimeString()}</td>
+                                        <td class="p-3 font-bold">Rp ${o.total.toLocaleString('id-ID')}</td>
+                                        <td class="p-3"><span class="px-2.5 py-1 bg-stone-100 rounded text-xs font-bold uppercase">${o.status}</span></td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderAdminMenuTab() {
+            return `
+                <div class="bg-white rounded-3xl border border-softSand shadow-sm p-6 space-y-6">
+                    <div class="flex justify-between items-center">
+                        <h2 class="font-extrabold text-base text-deepCharcoal">Kontrol Ketersediaan Stok Menu</h2>
+                        <span class="text-xs text-stone-500">Perubahan langsung berlaku di katalog pelanggan</span>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                        ${DEFAULT_PRODUCTS.map(p => {
+                            const isAvailable = state.inventoryStock[p.id] !== false;
+                            return `
+                                <div class="p-4 rounded-2xl border border-softSand flex items-center justify-between bg-warmIvory/30">
+                                    <div class="flex items-center gap-3">
+                                        <img src="${p.image}" class="w-12 h-12 rounded-xl object-cover">
+                                        <div>
+                                            <h4 class="font-bold text-sm text-deepCharcoal">${p.name}</h4>
+                                            <span class="text-xs font-bold ${isAvailable ? 'text-emerald-600' : 'text-red-500'}">${isAvailable ? 'Tersedia' : 'Habis'}</span>
+                                        </div>
+                                    </div>
+                                    <button onclick="toggleProductStock('${p.id}')" class="px-3 py-1.5 rounded-xl text-xs font-bold transition ${isAvailable ? 'bg-red-50 text-red-600 hover:bg-red-100' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'}">
+                                        ${isAvailable ? 'Set Habis' : 'Set Ready'}
+                                    </button>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function toggleProductStock(productId) {
+            state.inventoryStock[productId] = !state.inventoryStock[productId];
+            render();
+        }
+
+        function renderAdminOutletsTab() {
+            return `
+                <div class="bg-white rounded-3xl border border-softSand shadow-sm p-6 space-y-6">
+                    <h2 class="font-extrabold text-base text-deepCharcoal">Manajemen Outlet & Jam Operasional</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        ${DEFAULT_OUTLETS.map(o => `
+                            <div class="p-6 rounded-2xl border border-softSand space-y-3 bg-warmIvory/20">
+                                <div class="flex justify-between items-start">
+                                    <h3 class="font-extrabold text-base text-deepCharcoal">${o.name}</h3>
+                                    <span class="px-2.5 py-1 rounded-full text-xs font-bold ${o.isOpen ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'}">${o.isOpen ? 'Buka' : 'Tutup'}</span>
+                                </div>
+                                <p class="text-xs text-stone-500">${o.address}</p>
+                                <p class="text-xs font-semibold text-stone-600">Jam Operasional: ${o.openTime} - ${o.closeTime}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderAdminReportsTab() {
+            const totalRevenue = state.orders.reduce((sum, o) => sum + o.total, 0);
+            const totalOrdersCount = state.orders.length;
+            const avgOrderValue = totalOrdersCount > 0 ? Math.round(totalRevenue / totalOrdersCount) : 0;
+
+            return `
+                <div class="space-y-6">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                        <div class="bg-white p-6 rounded-3xl border border-softSand shadow-sm">
+                            <span class="text-xs font-bold text-stone-400 uppercase">Total Pendapatan</span>
+                            <h3 class="text-3xl font-extrabold text-deepCharcoal mt-2">Rp ${totalRevenue.toLocaleString('id-ID')}</h3>
+                        </div>
+                        <div class="bg-white p-6 rounded-3xl border border-softSand shadow-sm">
+                            <span class="text-xs font-bold text-stone-400 uppercase">Jumlah Transaksi</span>
+                            <h3 class="text-3xl font-extrabold text-deepCharcoal mt-2">${totalOrdersCount} Pesanan</h3>
+                        </div>
+                        <div class="bg-white p-6 rounded-3xl border border-softSand shadow-sm">
+                            <span class="text-xs font-bold text-stone-400 uppercase">Rata-rata Transaksi (AOV)</span>
+                            <h3 class="text-3xl font-extrabold text-deepCharcoal mt-2">Rp ${avgOrderValue.toLocaleString('id-ID')}</h3>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        /* ==========================================================================
+           14. OUTLET SELECTION MODAL & UTILITIES
+           ========================================================================== */
+        function openOutletModal() {
+            const modalHtml = `
+                <div id="outletModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-deepCharcoal/60 backdrop-blur-sm fade-in">
+                    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-softSand space-y-6">
+                        <div class="flex justify-between items-center">
+                            <h2 class="font-extrabold text-xl text-deepCharcoal">Pilih Outlet Terdekat</h2>
+                            <button onclick="document.getElementById('outletModal').remove()" class="w-8 h-8 rounded-full bg-stone-100 font-bold text-deepCharcoal">✕</button>
+                        </div>
+                        <div class="space-y-3">
+                            ${DEFAULT_OUTLETS.map(o => `
+                                <div onclick="selectOutlet('${o.id}')" class="p-4 rounded-2xl border border-softSand hover:border-chiliOrange cursor-pointer transition flex items-center justify-between ${state.selectedOutlet.id === o.id ? 'bg-chiliOrange/5 border-chiliOrange' : 'bg-white'}">
+                                    <div>
+                                        <h3 class="font-bold text-sm text-deepCharcoal">${o.name}</h3>
+                                        <p class="text-xs text-stone-500 mt-1">${o.address}</p>
+                                    </div>
+                                    <span class="text-xs font-extrabold ${o.isOpen ? 'text-emerald-600' : 'text-red-500'}">${o.isOpen ? 'Buka' : 'Tutup'}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+        }
+
+        function selectOutlet(outletId) {
+            const outlet = DEFAULT_OUTLETS.find(o => o.id === outletId);
+            if (outlet) {
+                state.selectedOutlet = outlet;
+                const modal = document.getElementById('outletModal');
+                if (modal) modal.remove();
+                render();
+            }
+        }
+
+        function handleSearchInput(val) {
+            state.searchQuery = val;
+        }
+
+        function alertCustom(msg) {
+            const box = document.createElement('div');
+            box.className = 'fixed bottom-6 right-6 z-50 bg-deepCharcoal text-warmIvory px-6 py-3.5 rounded-2xl shadow-xl text-sm font-semibold fade-in border border-stone-700';
+            box.innerHTML = msg;
+            document.body.appendChild(box);
+            setTimeout(() => box.remove(), 3000);
+        }
+
+        // Initial render on window load
+        window.onload = function() {
+            render();
+        };
+    </script>
+</body>
+</html>
