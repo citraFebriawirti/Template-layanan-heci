@@ -1,0 +1,10 @@
+{
+  "cleanUrls": true,
+  "trailingSlash": true,
+  "rewrites": [
+    { "source": "/website/:path*", "destination": "/Website/:path*" },
+    { "source": "/web-app/:path*", "destination": "/Web-App/:path*" },
+    { "source": "/ecommerce/:path*", "destination": "/Ecommerce/:path*" },
+    { "source": "/sistem-manajemen/:path*", "destination": "/Sistem-Manajemen/:path*" }
+  ]
+}
